@@ -1,0 +1,9 @@
+.git
+node_modules
+*.log
+.backup*
+supabase/.temp
+supabase/.branches
+.env
+.env.*
+!.env.example
