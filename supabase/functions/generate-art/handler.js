@@ -11,8 +11,10 @@ const RESULT_LIMIT = 15_000_000;
 const RESULT_TTL = 15 * 60 * 1000;
 const TASK_TOKEN_TTL = 30 * 60 * 1000;
 const TASK_ID_PATTERN = /^[A-Za-z0-9_-]{1,128}$/;
-const DEFAULT_MODEL = "black-forest-labs/flux.1-schnell";
-const DEFAULT_BASE_URL = "https://integrate.api.nvidia.com";
+const DEFAULT_MODEL = "black-forest-labs/flux.1-dev";
+const DEFAULT_BASE_URL = "https://ai.api.nvidia.com";
+const DEFAULT_STEPS = 30;
+const DEFAULT_CFG_SCALE = 3.5;
 
 const json = (body, status = 200) => new Response(JSON.stringify(body), {
   status,
@@ -182,12 +184,13 @@ export function createGenerateArtHandler({ env = () => undefined, fetchImpl = fe
     const response = await fetchImpl(`${baseUrl}/v1/genai/${model}`, {
       method: "POST",
       signal: AbortSignal.timeout(120_000),
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt, width: 1024, height: 1024 })
+      headers: { Authorization: `Bearer ${apiKey}`, Accept: "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt, mode: "base", cfg_scale: DEFAULT_CFG_SCALE, width: 1024, height: 1024, seed: 0, steps: DEFAULT_STEPS })
     });
     if (!response.ok) throw Object.assign(new Error("provider_rejected"), { status: response.status });
     const result = await readJsonResponse(response);
-    const encoded = result?.artifacts?.[0]?.base64_image
+    const encoded = result?.artifacts?.[0]?.base64
+      || result?.artifacts?.[0]?.base64_image
       || result?.images?.[0]?.base64_image
       || result?.artifacts?.[0]?.image;
     const bytes = fromBase64(encoded);

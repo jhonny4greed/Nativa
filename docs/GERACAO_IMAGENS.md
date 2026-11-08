@@ -1,7 +1,7 @@
 # Ateliê de imagens do NATIVA
 
 O ateliê cria imagens para Nativas, biomas, técnicas/golpes e ideias futuras por
-meio da API de geração de imagens da NVIDIA (integrate.api.nvidia.com). A
+meio da API de geração de imagens da NVIDIA (ai.api.nvidia.com, FLUX.1-dev). A
 aplicação chama somente a Edge Function `generate-art` do Supabase; a chave do
 provedor permanece no servidor. O botão de gerar pode consumir créditos da
 conta NVIDIA.
@@ -30,7 +30,7 @@ no handler para compatibilidade com tokens assimétricos. A função não usa
 
 - A geração usa o endpoint síncrono `POST /v1/genai/{modelo}` da NVIDIA com
   tamanho fixo 1024×1024; o modelo padrão é
-  `black-forest-labs/flux.1-schnell` e pode ser trocado com
+  `black-forest-labs/flux.1-dev` e pode ser trocado com
   `NVIDIA_IMAGE_MODEL`.
 - O resultado fica em memória no isolate da função por até 15 minutos e o
   token temporário da tarefa expira em 30 minutos; ambos ficam vinculados à
