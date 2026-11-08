@@ -3,72 +3,100 @@
   "assets": [
     {
       "id": "logo-emblem",
-      "width": 1024, "height": 1024, "seed": 11,
+      "width": 1024,
+      "height": 1024,
+      "seed": 11,
       "prompt": "Circular emblem logo for a Brazilian wildlife fantasy RPG called NATIVA. A majestic jaguar head seen in three-quarter view, formed from interlocking stylized tropical leaves, palm fronds and glowing fireflies, eyes glowing warm gold. Surrounded by a thin ring of woven vines with tiny bromeliad flowers. Flat vector-style illustration with clean edges, limited palette of emerald green, deep forest teal, lime highlights and antique gold, centered composition on a plain very dark green background, symmetrical, high contrast, suitable as an app icon, no text, no letters, no watermark."
     },
     {
       "id": "hero-landing",
-      "width": 1344, "height": 768, "seed": 21,
+      "width": 1344,
+      "height": 768,
+      "seed": 21,
       "prompt": "Epic wide cinematic landscape of the Brazilian Atlantic Forest at blue hour. Towering jequitibá trees draped in moss and bromeliads, a misty waterfall in the distance, rays of golden light piercing the canopy. In the foreground a graceful jaguar made of living leaves and glowing lime fireflies stands on a mossy rock looking toward a glowing river. Fireflies and floating pollen drift through the air. Painterly fantasy concept art, extremely detailed, soft volumetric fog, emerald and teal palette with warm gold accents, strong depth, wide shot, cinematic composition with empty space on the left for a title, no text, no watermark."
     },
     {
       "id": "auth-backdrop",
-      "width": 768, "height": 1344, "seed": 31,
+      "width": 768,
+      "height": 1344,
+      "seed": 31,
       "prompt": "Vertical portrait composition of a dark Brazilian rainforest clearing at night. A still pool of water reflects a crescent moon and thousands of fireflies. Giant philodendron leaves and ferns frame the edges, dew drops glowing lime. Soft bioluminescent mushrooms on a fallen log. Calm, mysterious, atmospheric fantasy concept art, deep emerald and teal palette with warm gold reflections, soft focus background, plenty of dark negative space in the center, no creatures, no text, no watermark."
     },
     {
       "id": "biome-floresta-mata",
-      "width": 1344, "height": 768, "seed": 41,
+      "width": 1344,
+      "height": 768,
+      "seed": 41,
       "prompt": "Wide panoramic scene of a dense Brazilian rainforest interior, Mata Atlântica. Enormous buttress-root trees, hanging lianas, bromeliads and orchids, thick emerald undergrowth, ferns, dappled golden light filtering through a dense canopy, light mist near the ground, a mossy fallen trunk forming a natural arena clearing in the middle ground. Fantasy concept art background for a creature battle arena, extremely detailed foliage, emerald and teal palette, lime light shafts, no creatures, no text, no watermark."
     },
     {
       "id": "biome-rios-pantanal",
-      "width": 1344, "height": 768, "seed": 51,
+      "width": 1344,
+      "height": 768,
+      "seed": 51,
       "prompt": "Wide panoramic scene of the Brazilian Pantanal wetlands at golden sunrise. Shallow flooded plains with water lilies and giant Victoria amazonica pads, winding river reflecting a pink and gold sky, scattered palm trees and flooded grasses, mist rising from the water, a sandy riverbank forming a natural arena in the foreground. Fantasy concept art background for a creature battle arena, extremely detailed, teal water, emerald vegetation, warm gold sky, no creatures, no birds, no text, no watermark."
     },
     {
       "id": "biome-caatinga-cerrado",
-      "width": 1344, "height": 768, "seed": 61,
+      "width": 1344,
+      "height": 768,
+      "seed": 61,
       "prompt": "Wide panoramic scene of the Brazilian Cerrado and Caatinga at late afternoon. Twisted gnarled trees with thick corky bark, tall golden dry grass, red earth, towering termite mounds, mandacaru cacti, a few flowering yellow ipê trees, dramatic warm sky with scattered clouds, heat shimmer, a flat red-earth clearing forming a natural arena in the foreground. Fantasy concept art background for a creature battle arena, extremely detailed, warm ochre, terracotta, gold and olive palette with teal sky accents, no creatures, no text, no watermark."
     },
     {
       "id": "biome-costa-mangue",
-      "width": 1344, "height": 768, "seed": 71,
+      "width": 1344,
+      "height": 768,
+      "seed": 71,
       "prompt": "Wide panoramic scene of a Brazilian coastal mangrove and restinga at dusk. Tangled mangrove roots rising from dark reflective tidal water, sandy dunes with low restinga shrubs and coconut palms in the background, gentle waves on a beach, wet sand reflecting a violet and gold sky, tide pools, a firm wet-sand flat forming a natural arena in the foreground. Fantasy concept art background for a creature battle arena, extremely detailed, teal, sand, violet and gold palette, no creatures, no text, no watermark."
     },
     {
       "id": "biome-pampa",
-      "width": 1344, "height": 768, "seed": 81,
+      "width": 1344,
+      "height": 768,
+      "seed": 81,
       "prompt": "Wide panoramic scene of the southern Brazilian Pampa grasslands at dawn. Endless rolling hills of silver-green grass swaying in the wind, scattered granite outcrops, a lone araucaria tree on a ridge, a small marsh with reeds catching mist, cool blue and soft gold sky with long dramatic clouds, dew sparkling, a flat grassy knoll forming a natural arena in the foreground. Fantasy concept art background for a creature battle arena, extremely detailed, sage green, silver, teal and gold palette, no creatures, no text, no watermark."
     },
     {
       "id": "affinity-fogo",
-      "width": 1024, "height": 1024, "seed": 101,
+      "width": 1024,
+      "height": 1024,
+      "seed": 101,
       "prompt": "Round game icon emblem representing the element of Fire. A stylized swirling flame shaped like a curling fern leaf, ember sparks rising, glowing orange, crimson and gold against a dark forest-green circular background with a thin gold ring border. Flat vector-style illustration with clean edges and subtle inner glow, centered, symmetrical, high contrast, suitable as a small UI icon, no text, no letters, no watermark."
     },
     {
       "id": "affinity-agua",
-      "width": 1024, "height": 1024, "seed": 102,
+      "width": 1024,
+      "height": 1024,
+      "seed": 102,
       "prompt": "Round game icon emblem representing the element of Water. A stylized cresting wave curling around a single glowing water droplet, foam detailed like leaf veins, deep teal, aqua and silver against a dark forest-green circular background with a thin gold ring border. Flat vector-style illustration with clean edges and subtle inner glow, centered, symmetrical, high contrast, suitable as a small UI icon, no text, no letters, no watermark."
     },
     {
       "id": "affinity-terra",
-      "width": 1024, "height": 1024, "seed": 103,
+      "width": 1024,
+      "height": 1024,
+      "seed": 103,
       "prompt": "Round game icon emblem representing the element of Earth. A stylized cracked stone mountain with a glowing root system wrapping around it and a small sprout on top, ochre, moss green and antique gold against a dark forest-green circular background with a thin gold ring border. Flat vector-style illustration with clean edges and subtle inner glow, centered, symmetrical, high contrast, suitable as a small UI icon, no text, no letters, no watermark."
     },
     {
       "id": "affinity-vento",
-      "width": 1024, "height": 1024, "seed": 104,
+      "width": 1024,
+      "height": 1024,
+      "seed": 104,
       "prompt": "Round game icon emblem representing the element of Wind. Three stylized spiraling gusts of wind carrying floating feathers and small leaves, pale lime, mint and silver against a dark forest-green circular background with a thin gold ring border. Flat vector-style illustration with clean edges and subtle inner glow, centered, symmetrical, high contrast, suitable as a small UI icon, no text, no letters, no watermark."
     },
     {
       "id": "affinity-energia",
-      "width": 1024, "height": 1024, "seed": 105,
-      "prompt": "Round game icon emblem representing the element of Energy. A stylized glowing orb emitting concentric vibration rings and small arcs of lightning, electric lime, violet and gold against a dark forest-green circular background with a thin gold ring border. Flat vector-style illustration with clean edges and subtle inner glow, centered, symmetrical, high contrast, suitable as a small UI icon, no text, no letters, no watermark."
+      "width": 1024,
+      "height": 1024,
+      "seed": 106,
+      "prompt": "Round game icon emblem representing the element of Energy. A stylized glowing orb of pure light surrounded by concentric vibration rings and soft radiating waves, electric lime, violet and gold against a dark forest-green circular background with a thin gold ring border. Flat vector-style illustration with clean edges and subtle inner glow, centered, symmetrical, high contrast, suitable as a small UI icon, no text, no letters, no watermark."
     },
     {
       "id": "pattern-foliage",
-      "width": 1024, "height": 1024, "seed": 201,
+      "width": 1024,
+      "height": 1024,
+      "seed": 201,
       "prompt": "Seamless repeating pattern of tropical Brazilian foliage silhouettes: monstera, philodendron, palm fronds, ferns and tiny bromeliad flowers, very subtle tone-on-tone design in dark forest green and slightly lighter emerald, low contrast, flat vector style, evenly distributed, suitable as a subtle UI background texture, no text, no watermark."
     }
   ]

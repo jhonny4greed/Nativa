@@ -16,6 +16,7 @@ const { style, assets } = JSON.parse(await readFile(path.join(ROOT, "scripts/ass
 const only = new Set(process.argv.slice(2));
 const force = process.env.FORCE === "1";
 await mkdir(OUT, { recursive: true });
+const failed = [];
 
 for (const asset of assets) {
   if (only.size && !only.has(asset.id)) continue;
@@ -23,17 +24,37 @@ for (const asset of assets) {
   if (!force && existsSync(target)) { console.log(`skip ${asset.id}`); continue; }
   const body = { prompt: `${asset.prompt} ${style}`, mode: "base", cfg_scale: 3.5, width: asset.width, height: asset.height, seed: asset.seed ?? 0, steps: 50 };
   const started = Date.now();
-  const res = await fetch(`${ENDPOINT}/v1/genai/${MODEL}`, {
-    method: "POST", signal: AbortSignal.timeout(180_000),
-    headers: { Authorization: `Bearer ${apiKey}`, Accept: "application/json", "Content-Type": "application/json" },
-    body: JSON.stringify(body)
-  });
-  if (!res.ok) { console.error(`FAIL ${asset.id} HTTP ${res.status}: ${(await res.text()).slice(0, 300)}`); continue; }
-  const data = await res.json();
-  const b64 = data?.artifacts?.[0]?.base64;
-  if (!b64) { console.error(`FAIL ${asset.id}: resposta sem artifacts[0].base64`); continue; }
-  const bytes = Buffer.from(b64, "base64");
-  const isPng = bytes[0] === 0x89 && bytes[1] === 0x50;
-  await writeFile(isPng ? target.replace(/\.jpg$/, ".png") : target, bytes);
+  let bytes = null;
+  for (let attempt = 1; attempt <= 4 && !bytes; attempt++) {
+    const res = await fetch(`${ENDPOINT}/v1/genai/${MODEL}`, {
+      method: "POST", signal: AbortSignal.timeout(180_000),
+      headers: { Authorization: `Bearer ${apiKey}`, Accept: "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) {
+      console.error(`retry ${asset.id} (${attempt}) HTTP ${res.status}: ${(await res.text()).slice(0, 120)}`);
+      await new Promise(r => setTimeout(r, 3000 * attempt));
+      continue;
+    }
+    const data = await res.json();
+    const artifact = data?.artifacts?.[0];
+    if (!artifact?.base64 || (artifact.finishReason && artifact.finishReason !== "SUCCESS")) {
+      console.error(`retry ${asset.id} (${attempt}): finishReason=${artifact?.finishReason || "sem imagem"}`);
+      body.seed += 1000;
+      continue;
+    }
+    bytes = Buffer.from(artifact.base64, "base64");
+    if (bytes.length < 20_000) { console.error(`retry ${asset.id} (${attempt}): imagem suspeita (${bytes.length} bytes)`); bytes = null; body.seed += 1000; }
+  }
+  if (!bytes) { console.error(`FAIL ${asset.id}`); failed.push(asset.id); continue; }
+  // O arquivo referenciado pelo app é sempre <id>.jpg; o provedor devolve JPEG (verificado), mas se vier PNG
+  // o conteúdo ainda é gravado no mesmo caminho para que o app aponte para a imagem nova.
+  if (bytes[0] === 0x89 && bytes[1] === 0x50) console.warn(`aviso ${asset.id}: provedor devolveu PNG; gravado em ${path.basename(target)}`);
+  await writeFile(target, bytes);
   console.log(`ok ${asset.id} ${asset.width}x${asset.height} ${(bytes.length / 1024).toFixed(0)}KB ${((Date.now() - started) / 1000).toFixed(0)}s`);
+}
+
+if (failed.length) {
+  console.error(`Assets não gerados: ${failed.join(", ")}`);
+  process.exitCode = 1;
 }

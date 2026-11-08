@@ -13,6 +13,6 @@ export default defineConfig({
     emptyOutDir: true,
     target: "es2022",
     sourcemap: false,
-    rollupOptions: { input: { index: `${root}index.html` } }
+    rollupOptions: { input: { index: `${root}index.html`, syncDiagnostic: `${root}tests/sync-diagnostic.html` } }
   }
 });

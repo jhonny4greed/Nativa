@@ -2,12 +2,13 @@
 
 ## Como executar
 
-1. Extraia a pasta `NATIVA_Prototipo_Atualizado`.
-2. Abra um terminal dentro dessa pasta.
-3. Execute `python -m http.server 8000`.
-4. Abra `http://localhost:8000` no navegador.
+1. Instale o Node.js 20 ou superior.
+2. Na pasta do projeto, execute `npm install`.
+3. Execute `npm run dev` e abra o endereço indicado (normalmente `http://localhost:5173`).
 
-É necessário usar um servidor local porque o projeto utiliza módulos JavaScript (`import`/`export`). Não abra o `index.html` diretamente com duplo clique.
+O projeto usa o Vite para resolver pacotes (fontes, ícones, detecção de dispositivo), portanto um servidor estático simples como `python -m http.server` não é suficiente. Para o backend local, veja `docs/AMBIENTE_SUPABASE_LOCAL.md`.
+
+Outros comandos: `npm test` (testes), `npm run lint`, `npm run build` (gera `dist/`, usado pelo `Dockerfile`), `npm run preview` (serve o build) e `NVIDIA_API_KEY=... npm run assets` (gera as imagens de `scripts/asset-prompts.json`).
 
 ## Arquivos
 
