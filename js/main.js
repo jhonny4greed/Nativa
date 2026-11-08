@@ -1,6 +1,7 @@
 import "@fontsource-variable/inter";
 import "@fontsource-variable/fraunces";
 import "../css/tokens.css";
+import "../css/arena-biomes.css";
 import { detectDevice, applyDevice } from "./device.js";
 import { observeIcons } from "./icons.js";
 

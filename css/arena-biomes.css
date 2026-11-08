@@ -1,0 +1,30 @@
+/* Cenários da arena pintados com FLUX.1-dev; substituem as camadas vetoriais quando há imagem do bioma. */
+.battlefield[data-biome="Floresta e Mata"] .scene-backdrop,
+.battlefield[data-biome="Rios, Lagos e Pantanal"] .scene-backdrop,
+.battlefield[data-biome="Caatinga e Cerrado"] .scene-backdrop,
+.battlefield[data-biome="Costa, Restinga e Manguezal"] .scene-backdrop,
+.battlefield[data-biome="Campos Sulinos e Pampa"] .scene-backdrop {
+  background-size: cover;
+  background-position: center 40%;
+  background-repeat: no-repeat;
+}
+.battlefield[data-biome="Floresta e Mata"] .scene-backdrop { background-image: linear-gradient(180deg, #0b1f1522, #0b1f1599 85%), url("../assets/generated/biome-floresta-mata.jpg"); }
+.battlefield[data-biome="Rios, Lagos e Pantanal"] .scene-backdrop { background-image: linear-gradient(180deg, #0b1f1522, #0b1f1599 85%), url("../assets/generated/biome-rios-pantanal.jpg"); }
+.battlefield[data-biome="Caatinga e Cerrado"] .scene-backdrop { background-image: linear-gradient(180deg, #2a160a22, #1a0f0899 85%), url("../assets/generated/biome-caatinga-cerrado.jpg"); }
+.battlefield[data-biome="Costa, Restinga e Manguezal"] .scene-backdrop { background-image: linear-gradient(180deg, #0b1f1522, #0b1f1599 85%), url("../assets/generated/biome-costa-mangue.jpg"); }
+.battlefield[data-biome="Campos Sulinos e Pampa"] .scene-backdrop { background-image: linear-gradient(180deg, #0b1f1522, #0b1f1599 85%), url("../assets/generated/biome-pampa.jpg"); }
+
+.battlefield[data-biome="Floresta e Mata"] .scene-backdrop > *,
+.battlefield[data-biome="Rios, Lagos e Pantanal"] .scene-backdrop > *,
+.battlefield[data-biome="Caatinga e Cerrado"] .scene-backdrop > *,
+.battlefield[data-biome="Costa, Restinga e Manguezal"] .scene-backdrop > *,
+.battlefield[data-biome="Campos Sulinos e Pampa"] .scene-backdrop > *,
+.battlefield[data-biome="Floresta e Mata"] .scene-backdrop::before,
+.battlefield[data-biome="Rios, Lagos e Pantanal"] .scene-backdrop::before,
+.battlefield[data-biome="Caatinga e Cerrado"] .scene-backdrop::before,
+.battlefield[data-biome="Costa, Restinga e Manguezal"] .scene-backdrop::before,
+.battlefield[data-biome="Floresta e Mata"] .scene-backdrop::after,
+.battlefield[data-biome="Rios, Lagos e Pantanal"] .scene-backdrop::after,
+.battlefield[data-biome="Caatinga e Cerrado"] .scene-backdrop::after,
+.battlefield[data-biome="Costa, Restinga e Manguezal"] .scene-backdrop::after,
+.battlefield[data-biome="Campos Sulinos e Pampa"] .scene-backdrop::after { display: none; }
