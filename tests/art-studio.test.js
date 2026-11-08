@@ -8,9 +8,11 @@ import { criarEstudioImagens } from "../js/art-studio.js";
 const USER_A = "user-account-a";
 const USER_B = "user-account-b";
 const SIGNING_KEY = "test-only-signing-key-with-at-least-32-bytes";
-const API_KEY = "server-test-novita-key";
-const PNG = () => new Blob([new Uint8Array([137, 80, 78, 71])], { type: "image/png" });
-const goodImageUrl = taskId => `https://faas-output-image.s3.ap-southeast-1.amazonaws.com/prod/${taskId}/image.png?signature=mock`;
+const API_KEY = "server-test-nvidia-key";
+const NVIDIA_URL = "https://integrate.api.nvidia.com/v1/genai/black-forest-labs/flux.1-schnell";
+const PNG_BYTES = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
+const PNG_BASE64 = Buffer.from(PNG_BYTES).toString("base64");
+const PNG = () => new Blob([PNG_BYTES], { type: "image/png" });
 
 function jsonResponse(value, status = 200) {
   return new Response(JSON.stringify(value), { status, headers: { "content-type": "application/json" } });
@@ -18,8 +20,7 @@ function jsonResponse(value, status = 200) {
 
 function createServer({
   allowedUsers = [USER_A], userByBearer = { "token-a": USER_A, "token-b": USER_B }, nowValue = 1_000_000,
-  startResponse = { task_id: "task-123" }, startStatus = 200, statusResponse,
-  imageResponse = new Response(new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]), { headers: { "content-type": "image/png", "content-length": "8" } }),
+  nvidiaStatus = 200, nvidiaResponse = { artifacts: [{ base64_image: PNG_BASE64 }] },
   fetchOverride
 } = {}) {
   let currentNow = nowValue;
@@ -27,7 +28,7 @@ function createServer({
   const envValues = {
     SUPABASE_URL: "http://127.0.0.1:54321",
     SUPABASE_ANON_KEY: "public-anon-test-key",
-    NOVITA_API_KEY: API_KEY,
+    NVIDIA_API_KEY: API_KEY,
     IMAGE_TASK_SIGNING_KEY: SIGNING_KEY,
     IMAGE_GENERATION_ALLOWED_USER_IDS: allowedUsers.join(",")
   };
@@ -40,12 +41,7 @@ function createServer({
       const id = userByBearer[bearer];
       return id ? jsonResponse({ id }) : jsonResponse({ message: "unauthorized" }, 401);
     }
-    if (url === "https://api.novita.ai/v3/async/z-image-turbo") return jsonResponse(startResponse, startStatus);
-    if (url.startsWith("https://api.novita.ai/v3/async/task-result?")) {
-      const taskId = new URL(url).searchParams.get("task_id");
-      return jsonResponse(statusResponse || { task: { task_id: taskId, status: "TASK_STATUS_SUCCEED", progress_percent: 100 }, images: [{ image_url: goodImageUrl(taskId), image_type: "png" }] });
-    }
-    if (url.startsWith("https://faas-output-image.s3.")) return imageResponse;
+    if (url === NVIDIA_URL) return jsonResponse(nvidiaResponse, nvidiaStatus);
     throw new Error(`Unexpected request: ${url}`);
   };
   const handler = createGenerateArtHandler({ env: name => envValues[name], fetchImpl, now: () => currentNow });
@@ -72,28 +68,29 @@ function mockClient({ userId = USER_A, sessionIds, invoke = async () => ({ data:
   });
 }
 
-test("conta autorizada inicia Z Image Turbo com contrato documentado e recebe token opaco", async () => {
+test("conta autorizada chama o modelo NVIDIA configurado e recebe token opaco", async () => {
   const server = createServer();
   const response = await server.request({ action: "start", kind: "nativa", title: "Guardião", prompt: "Folhas verdes" });
   assert.equal(response.status, 200);
   const body = await response.json();
   assert.match(body.taskToken, /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/);
-  assert.equal(JSON.stringify(body).includes("task-123"), false);
-  const request = server.calls.find(call => call.url === "https://api.novita.ai/v3/async/z-image-turbo");
+  const request = server.calls.find(call => call.url === NVIDIA_URL);
   assert.equal(request.init.method, "POST");
   assert.equal(new Headers(request.init.headers).get("authorization"), `Bearer ${API_KEY}`);
-  assert.deepEqual(JSON.parse(request.init.body) && { size: JSON.parse(request.init.body).size, seed: JSON.parse(request.init.body).seed }, { size: "1024*1024", seed: -1 });
-  assert.match(JSON.parse(request.init.body).prompt, /Subject: Guardião/);
-  assert.equal(server.calls.filter(call => call.url.includes("/auth/v1/user")).length, 1);
+  const payload = JSON.parse(request.init.body);
+  assert.equal(payload.width, 1024);
+  assert.equal(payload.height, 1024);
+  assert.match(payload.prompt, /Subject: Guardião/);
+  assert.equal(server.calls.filter(call => call.url.endsWith("/auth/v1/user")).length, 1);
 });
 
 test("conta fora da allowlist e ausência de sessão não iniciam geração", async () => {
   const denied = createServer();
   assert.equal((await denied.request({ action: "start", kind: "nativa", title: "x", prompt: "y" }, "token-b")).status, 403);
-  assert.equal(denied.calls.some(call => call.url.includes("api.novita.ai")), false);
+  assert.equal(denied.calls.some(call => call.url === NVIDIA_URL), false);
   const anonymous = createServer();
   assert.equal((await anonymous.request({ action: "start", kind: "nativa", title: "x", prompt: "y" }, null)).status, 401);
-  assert.equal(anonymous.calls.some(call => call.url.includes("api.novita.ai")), false);
+  assert.equal(anonymous.calls.some(call => call.url === NVIDIA_URL), false);
 });
 
 test("allowlist também protege status e download", async () => {
@@ -102,7 +99,7 @@ test("allowlist também protege status e download", async () => {
   const download = await server.request({ action: "download", taskToken: "not-needed" }, "token-b");
   assert.equal(status.status, 403);
   assert.equal(download.status, 403);
-  assert.equal(server.calls.some(call => call.url.includes("api.novita.ai")), false);
+  assert.equal(server.calls.some(call => call.url === NVIDIA_URL), false);
 });
 
 test("autentica e aplica allowlist antes de ler corpo grande", async () => {
@@ -117,7 +114,7 @@ test("autentica e aplica allowlist antes de ler corpo grande", async () => {
   });
   assert.equal((await server.handler(request)).status, 403);
   assert.equal(streamCancelled, false);
-  assert.equal(server.calls.some(call => call.url.includes("api.novita.ai")), false);
+  assert.equal(server.calls.some(call => call.url === NVIDIA_URL), false);
 });
 
 test("JSON inválido, array e excesso de corpo são recusados após autenticação", async () => {
@@ -129,13 +126,13 @@ test("JSON inválido, array e excesso de corpo são recusados após autenticaç�
     body: JSON.stringify({ value: "x".repeat(12_100) })
   });
   assert.equal((await server.handler(oversized)).status, 413);
-  assert.equal(server.calls.some(call => call.url.includes("api.novita.ai")), false);
+  assert.equal(server.calls.some(call => call.url === NVIDIA_URL), false);
 });
 
-test("token arbitrário é recusado sem consultar tarefa", async () => {
+test("token arbitrário é recusado sem consultar o provedor", async () => {
   const server = createServer();
   assert.equal((await server.request({ action: "status", taskToken: "arbitrary" })).status, 403);
-  assert.equal(server.calls.some(call => call.url.includes("task-result")), false);
+  assert.equal(server.calls.some(call => call.url === NVIDIA_URL), false);
 });
 
 test("token expirado é recusado", async () => {
@@ -143,38 +140,30 @@ test("token expirado é recusado", async () => {
   const token = await createTask(server);
   server.setNow(1_000_000 + 31 * 60 * 1000);
   assert.equal((await server.request({ action: "status", taskToken: token })).status, 403);
-  assert.equal(server.calls.some(call => call.url.includes("task-result")), false);
+});
+
+test("resultado expira antes do token e status informa indisponibilidade", async () => {
+  const server = createServer();
+  const token = await createTask(server);
+  server.setNow(1_000_000 + 16 * 60 * 1000);
+  const response = await server.request({ action: "status", taskToken: token });
+  assert.equal(response.status, 410);
 });
 
 test("token de uma conta não pode ser usado por outra conta autorizada", async () => {
   const server = createServer({ allowedUsers: [USER_A, USER_B] });
   const token = await createTask(server);
   assert.equal((await server.request({ action: "status", taskToken: token }, "token-b")).status, 403);
-  assert.equal(server.calls.some(call => call.url.includes("task-result")), false);
 });
 
-test("status verifica que a resposta Novita corresponde à tarefa assinada", async () => {
-  const server = createServer({ statusResponse: { task: { task_id: "other-task", status: "TASK_STATUS_RUNNING" } } });
+test("status retorna sucesso enquanto o resultado está disponível", async () => {
+  const server = createServer();
   const token = await createTask(server);
-  const response = await server.request({ action: "status", taskToken: token });
-  assert.equal(response.status, 502);
-  assert.match((await response.json()).error, /estado de tarefa inválido/i);
-});
-
-test("estados processando, concluído e falha são reconhecidos", async () => {
-  const processing = createServer({ statusResponse: { task: { task_id: "task-123", status: "TASK_STATUS_QUEUED", progress_percent: 18 } } });
-  const tokenA = await createTask(processing);
-  assert.deepEqual(await (await processing.request({ action: "status", taskToken: tokenA })).json(), { status: "processing", progress: 18 });
-  const failed = createServer({ statusResponse: { task: { task_id: "task-123", status: "TASK_STATUS_FAILED", reason: "failed" } } });
-  const tokenB = await createTask(failed);
-  assert.deepEqual(await (await failed.request({ action: "status", taskToken: tokenB })).json(), { status: "failed", reason: "O provedor não conseguiu concluir a geração." });
-  const unknown = createServer({ statusResponse: { task: { task_id: "task-123", status: "UNKNOWN" } } });
-  const tokenC = await createTask(unknown);
-  assert.equal((await unknown.request({ action: "status", taskToken: tokenC })).status, 502);
+  assert.deepEqual(await (await server.request({ action: "status", taskToken: token })).json(), { status: "succeeded" });
 });
 
 test("falha HTTP do provedor e timeout retornam erros limitados", async () => {
-  const rejected = createServer({ startStatus: 429 });
+  const rejected = createServer({ nvidiaStatus: 429 });
   assert.equal((await rejected.request({ action: "start", kind: "nativa", title: "x", prompt: "y" })).status, 502);
   const timeout = createServer({ fetchOverride: async ({ url }) => {
     if (url.endsWith("/auth/v1/user")) return jsonResponse({ id: USER_A });
@@ -185,51 +174,19 @@ test("falha HTTP do provedor e timeout retornam erros limitados", async () => {
   assert.match((await response.json()).error, /demorou demais/i);
 });
 
-test("URL de imagem arbitrária, caminho de outra tarefa e redirecionamento são rejeitados", async () => {
-  for (const image_url of [
-    "https://127.0.0.1/admin",
-    "https://evil.example/prod/task-123/image.png",
-    "https://faas-output-image.s3.ap-southeast-1.amazonaws.com/prod/other-task/image.png"
-  ]) {
-    const server = createServer({ statusResponse: { task: { task_id: "task-123", status: "TASK_STATUS_SUCCEED" }, images: [{ image_url, image_type: "png" }] } });
-    const token = await createTask(server);
-    assert.equal((await server.request({ action: "download", taskToken: token })).status, 502);
-    assert.equal(server.calls.some(call => call.url === image_url), false);
-  }
-  const redirect = createServer({ imageResponse: new Response(null, { status: 302, headers: { location: "http://127.0.0.1/" } }) });
-  const token = await createTask(redirect);
-  assert.equal((await redirect.request({ action: "download", taskToken: token })).status, 502);
-  const imageCall = redirect.calls.find(call => call.url.startsWith("https://faas-output-image.s3."));
-  assert.equal(imageCall.init.redirect, "error");
-});
-
-test("SVG, MIME divergente, tipo não documentado e imagem vazia são recusados", async () => {
+test("resposta sem imagem, base64 inválido ou conteúdo não raster são recusados", async () => {
   const cases = [
-    { image_type: "svg", contentType: "image/svg+xml", status: 502 },
-    { image_type: "png", contentType: "image/svg+xml", status: 502 },
-    { image_type: "webp", contentType: "image/png", status: 502 },
-    { image_type: "png", contentType: "image/png", bytes: [], status: 502 }
+    { artifacts: [] },
+    { artifacts: [{ base64_image: Buffer.from("não é imagem").toString("base64") }] },
+    { artifacts: [{ base64_image: Buffer.from(new Uint8Array([60, 115, 118, 103])).toString("base64") }] }
   ];
-  for (const scenario of cases) {
-    const server = createServer({
-      statusResponse: { task: { task_id: "task-123", status: "TASK_STATUS_SUCCEED" }, images: [{ image_url: goodImageUrl("task-123"), image_type: scenario.image_type }] },
-      imageResponse: new Response(new Uint8Array(scenario.bytes || [1]), { headers: { "content-type": scenario.contentType } })
-    });
-    const token = await createTask(server);
-    assert.equal((await server.request({ action: "download", taskToken: token })).status, scenario.status);
+  for (const nvidiaResponse of cases) {
+    const server = createServer({ nvidiaResponse });
+    assert.equal((await server.request({ action: "start", kind: "nativa", title: "x", prompt: "y" })).status, 502);
   }
 });
 
-test("tamanho declarado ou real acima do limite é recusado", async () => {
-  const declared = createServer({ imageResponse: new Response(new Uint8Array([1]), { headers: { "content-type": "image/png", "content-length": "15000001" } }) });
-  const tokenA = await createTask(declared);
-  assert.equal((await declared.request({ action: "download", taskToken: tokenA })).status, 413);
-  const streamed = createServer({ imageResponse: new Response(new ReadableStream({ start(controller) { controller.enqueue(new Uint8Array(8_000_000)); controller.enqueue(new Uint8Array(8_000_000)); controller.close(); } }), { headers: { "content-type": "image/png" } }) });
-  const tokenB = await createTask(streamed);
-  assert.equal((await streamed.request({ action: "download", taskToken: tokenB })).status, 413);
-});
-
-test("download válido devolve apenas Blob raster sem cache", async () => {
+test("download válido devolve Blob raster sem cache e é de uso único", async () => {
   const server = createServer();
   const token = await createTask(server);
   const response = await server.request({ action: "download", taskToken: token });
@@ -238,7 +195,8 @@ test("download válido devolve apenas Blob raster sem cache", async () => {
   assert.equal(response.headers.get("x-image-content-type"), "image/png");
   assert.match(response.headers.get("access-control-expose-headers"), /x-image-content-type/i);
   assert.equal(response.headers.get("cache-control"), "no-store");
-  assert.equal((await response.arrayBuffer()).byteLength, 8);
+  assert.equal((await response.arrayBuffer()).byteLength, PNG_BYTES.byteLength);
+  assert.equal((await server.request({ action: "download", taskToken: token })).status, 410);
 });
 
 test("cliente não inicia geração sem clique explícito e limita tentativas", async () => {
@@ -261,7 +219,7 @@ test("fluxo completo do estúdio interpreta resposta octet-stream do supabase-js
     if (options.body.action === "status") return { data: { status: "succeeded" }, error: null };
     assert.equal(options.responseType, undefined);
     return {
-      data: new Blob([new Uint8Array([137, 80, 78, 71])], { type: "application/octet-stream" }),
+      data: new Blob([PNG_BYTES], { type: "application/octet-stream" }),
       response: new Response(null, { headers: { "x-image-content-type": "image/png" } }),
       error: null
     };
@@ -270,7 +228,7 @@ test("fluxo completo do estúdio interpreta resposta octet-stream do supabase-js
   const result = await studio.gerar({ kind: "nativa", title: "Guardião", prompt: "Escamas verdes" });
   assert.deepEqual(actions, ["start", "status", "download"]);
   assert.equal(result.blob.type, "image/png");
-  assert.equal(result.blob.size, 4);
+  assert.equal(result.blob.size, PNG_BYTES.byteLength);
 });
 
 test("estúdio rejeita resposta binária sem cabeçalho raster validado", async () => {

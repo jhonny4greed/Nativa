@@ -1,17 +1,18 @@
 # Ateliê de imagens do NATIVA
 
 O ateliê cria imagens para Nativas, biomas, técnicas/golpes e ideias futuras por
-meio do Novita AI. A aplicação chama somente a Edge Function `generate-art` do
-Supabase; a chave do provedor permanece no servidor. O botão de gerar pode
-consumir créditos da conta Novita.
+meio da API de geração de imagens da NVIDIA (integrate.api.nvidia.com). A
+aplicação chama somente a Edge Function `generate-art` do Supabase; a chave do
+provedor permanece no servidor. O botão de gerar pode consumir créditos da
+conta NVIDIA.
 
 ## Configuração local
 
-1. Revogue e substitua qualquer chave Novita que tenha sido compartilhada em
-   mensagens ou código.
+1. Revogue e substitua qualquer chave de provedor que tenha sido compartilhada
+   em mensagens ou código.
 2. Copie `supabase/functions/.env.example` para
    `supabase/functions/.env`.
-3. Preencha `NOVITA_API_KEY` com a chave substituta, gere pelo menos 32 bytes
+3. Preencha `NVIDIA_API_KEY` com a chave da NVIDIA, gere pelo menos 32 bytes
    criptograficamente aleatórios para `IMAGE_TASK_SIGNING_KEY` e informe em
    `IMAGE_GENERATION_ALLOWED_USER_IDS` somente os UUIDs das contas autorizadas
    a consumir créditos.
@@ -27,10 +28,13 @@ no handler para compatibilidade com tokens assimétricos. A função não usa
 
 ## Dados e limites
 
-- A geração usa o endpoint assíncrono Novita Z Image Turbo com tamanho fixo
-  1024×1024; a tarefa é consultada e baixada pelo servidor.
-- O token temporário da tarefa expira em 30 minutos e fica vinculado à conta;
-  downloads aceitam somente PNG, JPEG e WebP até 15 MB.
+- A geração usa o endpoint síncrono `POST /v1/genai/{modelo}` da NVIDIA com
+  tamanho fixo 1024×1024; o modelo padrão é
+  `black-forest-labs/flux.1-schnell` e pode ser trocado com
+  `NVIDIA_IMAGE_MODEL`.
+- O resultado fica em memória no isolate da função por até 15 minutos e o
+  token temporário da tarefa expira em 30 minutos; ambos ficam vinculados à
+  conta. O download é único e aceita somente PNG, JPEG e WebP até 15 MB.
 - O cliente salva o Blob no IndexedDB de fotos existente e metadados do acervo
   em `localStorage`, filtrados pela conta atual.
 - Nada é gravado no Supabase Storage, e nenhuma foto é enviada à nuvem.
@@ -42,7 +46,6 @@ no handler para compatibilidade com tokens assimétricos. A função não usa
 
 ## Implantação
 
-Esta alteração não publica a função nem configura secrets em projeto hospedado.
-Antes de uma implantação, cadastre `NOVITA_API_KEY`,
+Antes de uma implantação, cadastre `NVIDIA_API_KEY`,
 `IMAGE_TASK_SIGNING_KEY` e `IMAGE_GENERATION_ALLOWED_USER_IDS` no ambiente
 server-side do projeto de destino e revise os limites de uso.

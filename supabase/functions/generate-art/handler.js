@@ -6,16 +6,13 @@ const CORS_HEADERS = {
 };
 
 const BODY_LIMIT = 12_000;
-const IMAGE_LIMIT = 15_000_000;
 const JSON_RESPONSE_LIMIT = 1_000_000;
+const RESULT_LIMIT = 15_000_000;
+const RESULT_TTL = 15 * 60 * 1000;
 const TASK_TOKEN_TTL = 30 * 60 * 1000;
 const TASK_ID_PATTERN = /^[A-Za-z0-9_-]{1,128}$/;
-const IMAGE_TYPES = new Map([
-  ["png", "image/png"],
-  ["jpeg", "image/jpeg"],
-  ["webp", "image/webp"]
-]);
-const PENDING_STATUSES = new Set(["TASK_STATUS_QUEUED", "TASK_STATUS_RUNNING", "TASK_STATUS_PROCESSING"]);
+const DEFAULT_MODEL = "black-forest-labs/flux.1-schnell";
+const DEFAULT_BASE_URL = "https://integrate.api.nvidia.com";
 
 const json = (body, status = 200) => new Response(JSON.stringify(body), {
   status,
@@ -32,6 +29,12 @@ function fromB64url(value) {
   if (!/^[A-Za-z0-9_-]+$/.test(value)) throw new TypeError("Invalid token encoding");
   const base64 = value.replace(/-/g, "+").replace(/_/g, "/");
   const binary = atob(base64 + "=".repeat((4 - base64.length % 4) % 4));
+  return Uint8Array.from(binary, char => char.charCodeAt(0));
+}
+
+function fromBase64(value) {
+  if (typeof value !== "string" || !value) throw new Error("empty_image");
+  const binary = atob(value);
   return Uint8Array.from(binary, char => char.charCodeAt(0));
 }
 
@@ -124,31 +127,23 @@ function makePrompt(kind, title, prompt) {
   return `${contexts[kind]} Subject: ${title}. Details: ${prompt}`.slice(0, 1900);
 }
 
-function isNovitaImageUrl(value, taskId) {
-  try {
-    const url = new URL(value);
-    const path = `/prod/${taskId}/`;
-    return url.protocol === "https:" && !url.username && !url.password && !url.port && !url.hash
-      && /^faas-output-image\.s3\.[a-z0-9-]+\.amazonaws\.com$/i.test(url.hostname)
-      && url.pathname.startsWith(path);
-  } catch { return false; }
-}
-
-function matchesImageSignature(bytes, contentType) {
-  if (contentType === "image/png") return bytes.length >= 8
+function detectImageType(bytes) {
+  if (bytes.length >= 8
     && bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47
-    && bytes[4] === 0x0d && bytes[5] === 0x0a && bytes[6] === 0x1a && bytes[7] === 0x0a;
-  if (contentType === "image/jpeg") return bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
-  if (contentType === "image/webp") return bytes.length >= 12
+    && bytes[4] === 0x0d && bytes[5] === 0x0a && bytes[6] === 0x1a && bytes[7] === 0x0a) return "image/png";
+  if (bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return "image/jpeg";
+  if (bytes.length >= 12
     && bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46
-    && bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50;
-  return false;
+    && bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50) return "image/webp";
+  return null;
 }
 
-async function readBoundedResponse(response, limit) {
+async function readJsonResponse(response, limit = JSON_RESPONSE_LIMIT) {
+  const contentType = (response.headers.get("content-type") || "").split(";", 1)[0].trim().toLowerCase();
+  if (contentType !== "application/json" && !contentType.endsWith("+json")) throw new Error("invalid_json_type");
+  if (!response.body) throw new Error("empty_body");
   const length = response.headers.get("content-length");
   if (length && (!/^\d+$/.test(length) || Number(length) > limit)) throw Object.assign(new Error("too_large"), { status: 413 });
-  if (!response.body) throw new Error("empty_body");
   const reader = response.body.getReader();
   const chunks = [];
   let total = 0;
@@ -167,23 +162,39 @@ async function readBoundedResponse(response, limit) {
   const bytes = new Uint8Array(total);
   let offset = 0;
   for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
-  return bytes;
-}
-
-async function readJsonResponse(response, limit = JSON_RESPONSE_LIMIT) {
-  const contentType = (response.headers.get("content-type") || "").split(";", 1)[0].trim().toLowerCase();
-  if (contentType !== "application/json" && !contentType.endsWith("+json")) throw new Error("invalid_json_type");
-  const bytes = await readBoundedResponse(response, limit);
   return JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
 }
 
-export function createGenerateArtHandler({ env = () => undefined, fetchImpl = fetch, now = () => Date.now() } = {}) {
-  async function novita(path, init) {
-    return fetchImpl(`https://api.novita.ai${path}`, {
-      ...init,
-      signal: AbortSignal.timeout(30_000),
-      headers: { Authorization: `Bearer ${env("NOVITA_API_KEY")}`, ...(init.headers || {}) }
+export function createGenerateArtHandler({ env = () => undefined, fetchImpl = fetch, now = () => Date.now(), randomUUID = () => crypto.randomUUID() } = {}) {
+  // Resultados gerados ficam em memória no isolate por até RESULT_TTL.
+  // O provedor NVIDIA responde de forma síncrona; o download é único.
+  const results = new Map();
+
+  function sweepResults() {
+    const current = now();
+    for (const [id, entry] of results) if (entry.expiresAt <= current) results.delete(id);
+  }
+
+  async function generateImage(prompt) {
+    const baseUrl = (env("NVIDIA_API_BASE_URL") || DEFAULT_BASE_URL).replace(/\/$/, "");
+    const model = env("NVIDIA_IMAGE_MODEL") || DEFAULT_MODEL;
+    const apiKey = env("NVIDIA_API_KEY");
+    const response = await fetchImpl(`${baseUrl}/v1/genai/${model}`, {
+      method: "POST",
+      signal: AbortSignal.timeout(120_000),
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt, width: 1024, height: 1024 })
     });
+    if (!response.ok) throw Object.assign(new Error("provider_rejected"), { status: response.status });
+    const result = await readJsonResponse(response);
+    const encoded = result?.artifacts?.[0]?.base64_image
+      || result?.images?.[0]?.base64_image
+      || result?.artifacts?.[0]?.image;
+    const bytes = fromBase64(encoded);
+    if (bytes.byteLength === 0 || bytes.byteLength > RESULT_LIMIT) throw new Error("invalid_image_size");
+    const contentType = detectImageType(bytes);
+    if (!contentType) throw new Error("invalid_image_content");
+    return { bytes, contentType };
   }
 
   return async function handleGenerateArt(request) {
@@ -208,7 +219,7 @@ export function createGenerateArtHandler({ env = () => undefined, fetchImpl = fe
       return json({ error: error?.status === 413 ? "Pedido muito grande." : "Pedido JSON inválido." }, error?.status || 400);
     }
 
-    const apiKey = env("NOVITA_API_KEY");
+    const apiKey = env("NVIDIA_API_KEY");
     const signingKey = env("IMAGE_TASK_SIGNING_KEY");
     if (!apiKey || !signingKey || new TextEncoder().encode(signingKey).byteLength < 32) {
       return json({ error: "Geração de imagens não configurada corretamente no servidor." }, 503);
@@ -223,60 +234,41 @@ export function createGenerateArtHandler({ env = () => undefined, fetchImpl = fe
         return json({ error: "Informe uma categoria, um tema de até 80 caracteres e uma descrição de até 1.400 caracteres." }, 400);
       }
       try {
-        const response = await novita("/v3/async/z-image-turbo", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt: makePrompt(kind, title, prompt), size: "1024*1024", seed: -1 })
-        });
-        if (!response.ok) return json({ error: `O provedor recusou a geração (HTTP ${response.status}).` }, 502);
-        const result = await readJsonResponse(response);
-        if (typeof result?.task_id !== "string" || !TASK_ID_PATTERN.test(result.task_id)) return json({ error: "O provedor não retornou um identificador de tarefa válido." }, 502);
-        return json({ taskToken: await createTaskToken(result.task_id, user.id, signingKey, now()) });
+        sweepResults();
+        const image = await generateImage(makePrompt(kind, title, prompt));
+        const taskId = randomUUID();
+        results.set(taskId, { ...image, expiresAt: now() + RESULT_TTL });
+        return json({ taskToken: await createTaskToken(taskId, user.id, signingKey, now()) });
       } catch (error) {
-        return json({ error: error?.name === "TimeoutError" ? "O provedor demorou demais para aceitar o pedido." : "Falha ao iniciar a geração de imagem." }, 502);
+        const status = error?.status === 413 ? 413 : 502;
+        const message = error?.name === "TimeoutError" ? "O provedor demorou demais para gerar a imagem."
+          : error?.message === "invalid_image_size" ? "A imagem gerada excede o limite de 15 MB."
+          : error?.message === "invalid_image_content" ? "O provedor retornou um conteúdo que não é uma imagem válida."
+          : `O provedor recusou a geração (HTTP ${error?.status || "desconhecido"}).`;
+        return json({ error: status === 413 ? "A imagem excede o limite de 15 MB." : message }, status);
       }
     }
 
     if (body.action !== "status" && body.action !== "download") return json({ error: "Ação desconhecida." }, 400);
     const taskId = await readTaskToken(body.taskToken, user.id, signingKey, now());
     if (!taskId) return json({ error: "Tarefa inválida, expirada ou pertencente a outra conta." }, 403);
+    sweepResults();
+    const entry = results.get(taskId);
+    if (!entry) return json({ error: "O resultado desta geração expirou. Inicie uma nova geração." }, 410);
 
-    try {
-      const response = await novita(`/v3/async/task-result?task_id=${encodeURIComponent(taskId)}`, { method: "GET" });
-      if (!response.ok) return json({ error: `Não foi possível consultar a geração (HTTP ${response.status}).` }, 502);
-      const result = await readJsonResponse(response);
-      if (!result?.task || result.task.task_id !== taskId || typeof result.task.status !== "string") {
-        return json({ error: "O provedor retornou um estado de tarefa inválido." }, 502);
-      }
-      const status = result.task.status;
-      if (status === "TASK_STATUS_FAILED") {
-        if (body.action === "download") return json({ error: "A geração falhou e não há imagem para baixar." }, 409);
-        return json({ status: "failed", reason: "O provedor não conseguiu concluir a geração." });
-      }
-      if (PENDING_STATUSES.has(status)) {
-        if (body.action === "download") return json({ error: "A imagem ainda não está pronta." }, 409);
-        const progress = Number(result.task.progress_percent);
-        return json({ status: "processing", progress: Number.isFinite(progress) ? Math.max(0, Math.min(100, progress)) : 0 });
-      }
-      if (status !== "TASK_STATUS_SUCCEED") return json({ error: "O provedor retornou um estado de tarefa desconhecido." }, 502);
+    if (body.action === "status") return json({ status: "succeeded" });
 
-      const image = Array.isArray(result.images) ? result.images[0] : null;
-      if (!image || typeof image.image_url !== "string" || !IMAGE_TYPES.has(image.image_type)) {
-        return json({ error: "A tarefa terminou sem uma imagem válida disponível." }, 502);
+    const bytes = entry.bytes;
+    results.delete(taskId);
+    return new Response(bytes, {
+      headers: {
+        ...CORS_HEADERS,
+        "Content-Type": "application/octet-stream",
+        "X-Image-Content-Type": entry.contentType,
+        "Content-Length": String(bytes.byteLength),
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff"
       }
-      if (body.action === "status") return json({ status: "succeeded" });
-      if (!isNovitaImageUrl(image.image_url, taskId)) return json({ error: "O provedor retornou um endereço de imagem inválido." }, 502);
-
-      const imageResponse = await fetchImpl(image.image_url, { signal: AbortSignal.timeout(30_000), redirect: "error" });
-      const contentType = (imageResponse.headers.get("content-type") || "").split(";", 1)[0].trim().toLowerCase();
-      if (!imageResponse.ok || contentType !== IMAGE_TYPES.get(image.image_type)) return json({ error: "Não foi possível baixar uma imagem válida do provedor." }, 502);
-      const bytes = await readBoundedResponse(imageResponse, IMAGE_LIMIT);
-      if (bytes.byteLength === 0) return json({ error: "O provedor retornou uma imagem vazia." }, 502);
-      if (!matchesImageSignature(bytes, contentType)) return json({ error: "O conteúdo baixado não corresponde ao formato de imagem declarado." }, 502);
-      return new Response(bytes, { headers: { ...CORS_HEADERS, "Content-Type": "application/octet-stream", "X-Image-Content-Type": contentType, "Content-Length": String(bytes.byteLength), "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" } });
-    } catch (error) {
-      if (error?.status === 413) return json({ error: "A imagem excede o limite local de 15 MB." }, 413);
-      return json({ error: error?.name === "TimeoutError" ? "A consulta ao provedor excedeu o tempo limite." : "Falha ao consultar ou baixar a imagem." }, 502);
-    }
+    });
   };
 }
