@@ -18,26 +18,38 @@ test('Jato Defensivo permanece sem implementação conceitual até confirmação
   assert.match(jato.efeito, /espécie|substância|afastar/i);
 });
 
-test('parâmetros numéricos dos golpes especiais e suporte seguem pendentes', () => {
-  for (const t of TECNICAS_LINHAGEM_V2_1.filter(x => x.categoria !== 'Físico')) {
-    assert.equal(t.precisao, null, t.id);
-    assert.equal(t.mp, null, t.id);
-    assert.equal(t.recarga, null, t.id);
-    assert.equal(t.pg, null, t.id);
-    assert.equal(t.dano, null, t.id);
+test('28 especiais de combate têm parâmetros; utilitários e Jato ficam fora do balanceamento de dano', () => {
+  const prontos=TECNICAS_LINHAGEM_V2_1.filter(t=>t.parametrosTecnicosDisponiveis);
+  assert.equal(prontos.length,28);
+  for(const t of prontos) {
+    assert.equal(t.precisao,-1-t.P,t.id);
+    assert.equal(t.recarga,t.R,t.id);
+    assert.equal(t.mp,t.M,t.id);
+    assert.ok(Number.isFinite(t.pg),t.id);
+    assert.equal(t.dano,null,t.id);
+    assert.ok(Number.isInteger(t.parametrosBalanceamento.pgLiquido),t.id);
+    assert.equal(t.parametrosBalanceamento.pgLiquido,t.parametrosBalanceamento.pgBruto-t.parametrosBalanceamento.custoEfeitos,t.id);
+  }
+  for(const nome of ['Faro de Perseguição','Exploração Atenta','Ecolocalização','Chamado do Bando','Jato Defensivo']) {
+    const t=TECNICAS_LINHAGEM_V2_1.find(x=>x.nome===nome);
+    assert.ok(t);
+    assert.equal(t.parametrosTecnicosDisponiveis,undefined);
+    assert.equal(t.pg,null,t.id);
+    assert.equal(t.dano,null,t.id);
+    assert.equal(t.parametrosBalanceamento,undefined,t.id);
   }
 });
 
-test('regras comuns preservam durações e limites aprovados sem inventar intensidades', () => {
+test('regras comuns preservam durações e intensidades aprovadas', () => {
   assert.equal(REGRAS_EFEITOS_V2_1.desorientacao.acumula, false);
   assert.equal(REGRAS_EFEITOS_V2_1.reducao_atributo.acumula, false);
   assert.equal(REGRAS_EFEITOS_V2_1.reducao_atributo.renovaDuracao, true);
   assert.equal(REGRAS_EFEITOS_V2_1.reducao_dano.acumula, false);
   assert.equal(REGRAS_EFEITOS_V2_1.bonus_precisao.acumula, false);
   assert.equal(REGRAS_EFEITOS_V2_1.envenenamento.duracao, 2);
-  assert.equal(REGRAS_EFEITOS_V2_1.envenenamento.dano, null);
+  assert.equal(REGRAS_EFEITOS_V2_1.envenenamento.dano, 1);
   assert.equal(REGRAS_EFEITOS_V2_1.digestao.duracao, 1);
-  assert.equal(REGRAS_EFEITOS_V2_1.digestao.dano, null);
+  assert.equal(REGRAS_EFEITOS_V2_1.digestao.dano, 1);
   assert.equal(REGRAS_EFEITOS_V2_1.secrecao_defensiva.duracaoUsuario, 2);
   assert.equal(REGRAS_EFEITOS_V2_1.secrecao_defensiva.ativacoes, 1);
 });

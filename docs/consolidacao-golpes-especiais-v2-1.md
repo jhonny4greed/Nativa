@@ -1,5 +1,7 @@
 # Consolidação dos golpes especiais V2.1
 
+> **Atualização:** este arquivo registra a consolidação conceitual original. A parametrização e integração mecânica posteriores estão em [implementacao-parametros-especiais-v2-1.md](implementacao-parametros-especiais-v2-1.md), que substitui as pendências numéricas e de execução descritas abaixo. Jato Defensivo segue intocado e pendente.
+
 Este documento registra os efeitos conceituais aprovados para as 33 técnicas listadas na especificação. Foram ligados ao catálogo 32 registros por seus IDs estáveis. **Jato Defensivo** permanece intacto e sem metadados novos até a confirmação da espécie que fundamenta a técnica.
 
 ## Implementação

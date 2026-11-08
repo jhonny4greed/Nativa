@@ -91,7 +91,7 @@ test("modo real da batalha controla os menus sem expor o menu da CPU", () => {
   assert.match(app, /data-mode="\$\{escapar\(batalha\.modo\)\}"/);
   assert.match(app, /batalha\.modo===MODOS_BATALHA\.LOCAL\?renderizarPainelAcao\(f\[1\],1\):""/);
   assert.match(app, /batalha\.modo===MODOS_BATALHA\.CPU\?1:2/);
-  assert.match(app, /if\(batalha\.modo===MODOS_BATALHA\.CPU\)\{[\s\S]*?escolherAcaoCpu\(fighters\[1\]\)/);
+  assert.match(app, /if\(batalha\.modo===MODOS_BATALHA\.CPU\)\{[\s\S]*?escolherAcaoCpu\(fighters\[1\],Math\.random,fighters\[0\]\)/);
   assert.match(app, /resolverTurnoCombate\(\{fighters,choices:batalha\.escolhas/);
   assert.match(app, /renderizarHudCombatente\(f\[1\],1\)/);
   assert.match(css, /\.battlefield\[data-mode="cpu"\] \.battle-commands-grid/);

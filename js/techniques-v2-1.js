@@ -1,6 +1,6 @@
 // Catálogo conceitual V2.1 em revisão. Parâmetros numéricos requerem fonte V2.0 validada.
 import { CATALOGO_TRACOS } from './traits.js';
-import { auditarTecnicaV21, calcularPGBruto, calcularPGLiquido } from './technique-balance.js';
+import { auditarTecnicaV21, calcularPGBruto, calcularPGLiquido, calcularCustoEfeitos, obterParametrosEspeciaisV2_1 } from './technique-balance.js';
 import { obterEfeitosConceituaisV2_1 } from './technique-effects-v2-1.js';
 
 const registros = [
@@ -993,7 +993,14 @@ const PARAMETROS_NUMERICOS_FISICOS_V2_1 = Object.freeze({
 
 export const TECNICAS_LINHAGEM_V2_1 = registros.map(registro => {
   const id = `linhagem-v2-1-${slug(registro.group)}-${slug(registro.name)}`;
-  const parametros = PARAMETROS_NUMERICOS_FISICOS_V2_1[id.replace('linhagem-v2-1-', '')] || null;
+  const parametrosFisicos = PARAMETROS_NUMERICOS_FISICOS_V2_1[id.replace('linhagem-v2-1-', '')] || null;
+  const parametrosEspeciais = registro.category === 'Especial' ? obterParametrosEspeciaisV2_1(id) : null;
+  const custosEspeciais = parametrosEspeciais ? calcularCustoEfeitos(parametrosEspeciais.custosEfeitoIds) : null;
+  const parametros = parametrosFisicos || (parametrosEspeciais ? {
+    P:parametrosEspeciais.P,R:parametrosEspeciais.R,M:parametrosEspeciais.M,
+    precisao:-1-parametrosEspeciais.P,recarga:parametrosEspeciais.R,mp:parametrosEspeciais.M,
+    custoEfeitos:custosEspeciais.custoTotal,custosEfeitoIds:parametrosEspeciais.custosEfeitoIds
+  } : null);
   const parametrosBalanceamento = parametros ? {
     P:parametros.P, R:parametros.R, M:parametros.M,
     custoEfeitos:parametros.custoEfeitos,
@@ -1013,7 +1020,7 @@ export const TECNICAS_LINHAGEM_V2_1 = registros.map(registro => {
   pg: parametrosBalanceamento?.pgBruto ?? null,
   dano: null,
   efeito: DESCRICOES_ESPECIAIS_V2_1[id] || DESCRICOES_FISICAS_REVISADAS[id.replace('linhagem-v2-1-', '')] || registro.effect,
-  status: 'REVISÃO V2.1 · PARÂMETROS PENDENTES',
+  status: parametrosEspeciais ? 'TESTE CONTROLADO V2.1 · REVISÃO DE EQUILÍBRIO EM ABERTO' : 'REVISÃO V2.1 · PARÂMETROS PENDENTES',
   versao: '2.1',
   estadoCatalogo: 'em-revisao',
   sinergias: [],
@@ -1027,6 +1034,7 @@ export const TECNICAS_LINHAGEM_V2_1 = registros.map(registro => {
   };
   const efeitosConceituais = obterEfeitosConceituaisV2_1(id);
   if (efeitosConceituais.length) tecnica.efeitosV2_1 = efeitosConceituais;
+  if (parametrosEspeciais) tecnica.parametrosTecnicosDisponiveis = true;
   tecnica.auditoriaBalanceamento = auditarTecnicaV21(tecnica);
   return tecnica;
 });

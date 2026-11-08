@@ -25,7 +25,19 @@ export const CUSTOS_EFEITOS = Object.freeze([
   ['analise','Análise','Estratégia',0.5,'Revela a menor defesa entre DEF e RES','definido'],
   ['exposicao','Exposição','Estratégia',1.5,'Reduz DEF ou RES em 1 por 1 turno','definido'],
   ['precisao-aprimorada','Precisão aprimorada','Estratégia',1.5,'Reduz em 1 a penalidade do próximo golpe','definido'],
-  ['recuperacao-mp','Recuperação de MP','Estratégia',2,'Recupera 1 MP','definido']
+  ['recuperacao-mp','Recuperação de MP','Estratégia',2,'Recupera 1 MP','definido'],
+  ['reducao-atq-v21','Redução de ATQ V2.1','Controle',1,'Reduz ATQ em 1 até o fim do próximo turno do alvo','definido'],
+  ['reducao-agi-v21','Redução de AGI V2.1','Controle',1,'Reduz AGI em 1 até o fim do próximo turno do alvo','definido'],
+  ['bonus-iniciativa-v21','Bônus de iniciativa V2.1','Estratégia',1,'+1 à próxima iniciativa','definido'],
+  ['reducao-dano-geral-1-v21','Redução geral 1 V2.1','Defensivo',1,'Reduz em 1 o próximo dano geral','definido'],
+  ['reducao-dano-geral-2-v21','Redução geral 2 V2.1','Defensivo',2,'Reduz em 2 o próximo dano geral','definido'],
+  ['reducao-dano-fisico-2-v21','Redução física 2 V2.1','Defensivo',2,'Reduz em 2 o próximo dano físico','definido'],
+  ['reducao-dano-especial-2-v21','Redução especial 2 V2.1','Defensivo',2,'Reduz em 2 o próximo dano especial','definido'],
+  ['bonus-precisao-v21','Bônus de precisão V2.1','Estratégia',1.5,'+1 precisão no próximo golpe ofensivo','definido'],
+  ['penalidade-precisao-v21','Penalidade de precisão V2.1','Controle',1.5,'-1 precisão no próximo golpe ofensivo','definido'],
+  ['digestao-v21','Digestão V2.1','Ofensivo',1,'1 dano adicional em uma ocorrência','definido'],
+  ['dano-reativo-especial-v21','Dano especial reativo V2.1','Defensivo',1,'1 dano especial quando a secreção ativa','definido'],
+  ['revelacao-tatica-v21','Revelação tática V2.1','Estratégia',1,'Identifica a menor defesa entre DEF e RES','definido']
 ].map(([id,nome,grupo,custo,resultado,estado]) => Object.freeze({id,nome,grupo,custo,resultado,estado})));
 
 const custosPorId = new Map(CUSTOS_EFEITOS.map(e => [e.id,e]));
@@ -42,6 +54,50 @@ export const ALOCACOES_EFEITOS_V2_1 = Object.freeze({
   'linhagem-v2-1-morcegos-pulso-ultrassonico': [{ efeitoId:'desorientacao', estado:'correspondência textual; efeito aplicável não validado' }],
   'linhagem-v2-1-aracnideos-teia-imobilizadora': [{ efeitoId:'imobilizacao', estado:'mecânica espacial inexistente no combate atual' }]
 });
+
+// Parâmetros aprovados para os 28 especiais de combate. Os utilitários e Jato
+// Defensivo ficam fora desta tabela; as chaves são os sufixos dos IDs estáveis.
+const linhaEspecial = (P,R,M,efeitos=[]) => Object.freeze({P,R,M,custosEfeitoIds:Object.freeze(efeitos)});
+export const PARAMETROS_ESPECIAIS_V2_1 = Object.freeze({
+  'felinos-rugido-da-cacadora':linhaEspecial(1,0,0,['desorientacao']),
+  'mustelideos-secrecao-defensiva':linhaEspecial(0,1,1,['reducao-atq-v21']),
+  'roedores-alerta-da-colonia':linhaEspecial(0,1,1,['bonus-iniciativa-v21']),
+  'marsupiais-falsa-morte':linhaEspecial(0,2,2,['reducao-dano-geral-2-v21']),
+  'marsupiais-secrecao-repulsiva':linhaEspecial(1,0,0,['desorientacao']),
+  'primatas-grito-de-alerta':linhaEspecial(1,0,0,['desorientacao']),
+  'morcegos-voo-erratico':linhaEspecial(0,2,2,['reducao-dano-fisico-2-v21']),
+  'ungulados-brado-territorial':linhaEspecial(1,0,0,['desorientacao']),
+  'aves-de-rapina-grito-de-rapina':linhaEspecial(0,2,2,['reducao-dano-especial-2-v21']),
+  'aves-corredoras-e-campestres-chamado-de-advertencia':linhaEspecial(1,0,0,['bonus-precisao-v21']),
+  'psitacideos-vocalizacao-imitativa':linhaEspecial(1,0,0,['desorientacao']),
+  'serpentes-peconha-concentrada':linhaEspecial(0,2,2,['envenenamento']),
+  'lagartos-ameaca-visual':linhaEspecial(1,0,0,['desorientacao']),
+  'quelonios-vocalizacao-de-defesa':linhaEspecial(0,1,1,['reducao-dano-geral-1-v21']),
+  'anuros-vocalizacao-intimidante':linhaEspecial(0,1,1,['reducao-atq-v21']),
+  'characiformes-descarga-de-muco':linhaEspecial(1,0,0,['penalidade-precisao-v21']),
+  'siluriformes-barbilhoes-sensoriais':linhaEspecial(0,1,1,['revelacao-tatica-v21']),
+  'peixes-cartilaginosos-percepcao-do-tubarao-martelo':linhaEspecial(1,0,0,['bonus-precisao-v21']),
+  'aracnideos-pelos-urticantes':linhaEspecial(1,0,0,['penalidade-precisao-v21']),
+  'morcegos-pulso-ultrassonico':linhaEspecial(1,1,1,['desorientacao']),
+  'xenartros-lingua-capturadora':linhaEspecial(1,2,1,['reducao-agi-v21']),
+  'serpentes-bote-de-jararaca':linhaEspecial(1,2,1,['envenenamento']),
+  'anuros-secrecao-defensiva':linhaEspecial(0,1,1,['dano-reativo-especial-v21']),
+  'peixes-eletricos-descarga-do-poraque':linhaEspecial(1,2,1,['reducao-atq-v21']),
+  'peixes-eletricos-pulso-de-alta-voltagem':linhaEspecial(1,1,1,['desorientacao']),
+  'aracnideos-picada-venenosa':linhaEspecial(1,2,1,['envenenamento']),
+  'insetos-sociais-acido-defensivo':linhaEspecial(0,1,1,['reducao-atq-v21']),
+  'insetos-predadores-enzimas-digestivas':linhaEspecial(0,1,1,['digestao-v21'])
+});
+
+export function obterParametrosEspeciaisV2_1(tecnicaId) {
+  const sufixo=String(tecnicaId||'').replace(/^linhagem-v2-1-/,'');
+  return PARAMETROS_ESPECIAIS_V2_1[sufixo] || null;
+}
+
+function obterAlocacoesEspeciaisV2_1(tecnicaId) {
+  const parametros=obterParametrosEspeciaisV2_1(tecnicaId);
+  return parametros ? parametros.custosEfeitoIds.map(efeitoId=>({efeitoId,estado:'efeito V2.1 parametrizado'})) : null;
+}
 
 export function calcularPGBruto({ P=0, R=0, M=0 }={}) {
   for (const [nome,valor] of Object.entries({P,R,M})) {
@@ -82,7 +138,7 @@ export function auditarTecnicaV21(tecnica) {
   const P=tecnica.P ?? tecnica.parametrosBalanceamento?.P ?? 0;
   const R=tecnica.R ?? tecnica.parametrosBalanceamento?.R ?? 0;
   const M=tecnica.M ?? tecnica.parametrosBalanceamento?.M ?? 0;
-  const alocacoes=ALOCACOES_EFEITOS_V2_1[tecnica.id] || [];
+  const alocacoes=obterAlocacoesEspeciaisV2_1(tecnica.id) || ALOCACOES_EFEITOS_V2_1[tecnica.id] || [];
   const efeitos=alocacoes.map(a => ({...(custosPorId.get(a.efeitoId) || {}), ...a}));
   const custoConhecido=efeitos.reduce((total,e) => total + (Number.isFinite(e.custo)?e.custo:0),0);
   const efeitosPendentes=efeitos.filter(e => !['efeito-base declarado na descrição','efeito declarado na descrição'].includes(e.estado));

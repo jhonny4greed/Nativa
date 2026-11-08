@@ -47,14 +47,17 @@ test('efeito desconhecido não recebe custo e auditoria não valida técnica sem
   assert.equal(resultado.estado,'pendente de validação individual');
 });
 
-test('108 técnicas têm fórmula de referência, suporte sem dano automático e continuam bloqueadas', () => {
+test('108 técnicas têm fórmula de referência; só os 28 especiais parametrizados liberam teste controlado', () => {
   assert.equal(TECNICAS_LINHAGEM_V2_1.length,108);
+  let testaveis=0;
   for (const tecnica of TECNICAS_LINHAGEM_V2_1) {
     assert.equal(tecnica.auditoriaBalanceamento.pgBruto,tecnica.parametrosBalanceamento?.pgBruto ?? 2,tecnica.id);
     assert.equal(tecnica.auditoriaBalanceamento.pgLiquidoFinal,null,tecnica.id);
     if (tecnica.categoria==='Suporte') assert.equal(tecnica.auditoriaBalanceamento.danoAutomatico,false);
-    assert.equal(podeUsarTecnicaEmCombate(tecnica),false,tecnica.id);
+    assert.equal(podeUsarTecnicaEmCombate(tecnica),tecnica.parametrosTecnicosDisponiveis===true,tecnica.id);
+    if(tecnica.parametrosTecnicosDisponiveis)testaveis+=1;
   }
+  assert.equal(testaveis,28);
 });
 
 test('os 42 golpes físicos preservam nome/ID/categoria e só sete têm efeito secundário estruturado', () => {

@@ -9,11 +9,11 @@ export function podeAprenderTecnica(tecnica) {
   return Boolean(tecnica && tecnica.estadoCatalogo !== "arquivado");
 }
 
-/** Parâmetros em revisão impedem somente a resolução em combate. */
+/** Em revisão bloqueia o combate, exceto parâmetros liberados para teste controlado. */
 export function podeUsarTecnicaEmCombate(tecnica) {
   // V1 arquivada ainda pode ser usada em fichas existentes; só a revisão
   // técnica V2.1 bloqueia o combate.
-  return Boolean(tecnica && tecnica.estadoCatalogo !== "em-revisao");
+  return Boolean(tecnica && (tecnica.estadoCatalogo !== "em-revisao" || tecnica.parametrosTecnicosDisponiveis === true));
 }
 
 /** Estado de apresentação do cartão no seletor, compartilhado com os testes do fluxo de UI. */
@@ -25,7 +25,8 @@ export function obterEstadoSeletorTecnica(tecnica, selecionada, limiteAtingido) 
     pendenteCombate,
     botaoDesabilitado: !podeAprender || selecionada || limiteAtingido,
     textoBotao: selecionada ? "Adicionada" : !podeAprender ? "Indisponível" : limiteAtingido ? "Limite de técnicas atingido" : "Adicionar à ficha",
-    aviso: pendenteCombate ? "Pode ser aprendida; parâmetros técnicos pendentes impedem apenas o uso em combate." : ""
+    aviso: pendenteCombate ? "Pode ser aprendida; parâmetros técnicos pendentes impedem apenas o uso em combate."
+      : tecnica?.parametrosTecnicosDisponiveis ? "Disponível para teste controlado; revisão de equilíbrio em aberto." : ""
   };
 }
 
