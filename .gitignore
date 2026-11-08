@@ -12,3 +12,6 @@ node_modules/
 supabase/.temp/
 supabase/.branches/
 *.log
+
+# Build do Vite
+dist/

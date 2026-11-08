@@ -1,0 +1,29 @@
+/* Experiência dedicada ao mobile: barra de navegação inferior, alvos de toque ≥44px e áreas seguras. */
+html[data-device="mobile"] body { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
+html[data-device="mobile"] .site-header { padding: 16px 18px; gap: 14px; }
+html[data-device="mobile"] .site-header h1 { font-size: 24px; letter-spacing: 0.18em; }
+html[data-device="mobile"] .site-header p { display: none; }
+html[data-device="mobile"] .brand-mark { width: 48px; height: 48px; }
+
+html[data-device="mobile"] .main-nav {
+  position: fixed; inset: auto 0 0 0; top: auto; z-index: 40;
+  display: grid; grid-template-columns: repeat(6, 1fr); gap: 0; flex-wrap: nowrap;
+  padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+  background: #0f1a14ee; border-top: 1px solid #2d4233; border-bottom: 0; backdrop-filter: blur(16px);
+  box-shadow: 0 -12px 30px #0006;
+}
+html[data-device="mobile"] .main-nav button {
+  flex-direction: column; justify-content: center; gap: 3px; min-height: 56px; padding: 6px 2px;
+  font-size: 10.5px; line-height: 1.1; border-radius: 12px; color: #9fb2a0; white-space: normal; text-align: center;
+}
+html[data-device="mobile"] .main-nav button [data-icon] svg { width: 22px; height: 22px; }
+html[data-device="mobile"] .main-nav button.active { color: var(--lime); background: #1b2d22; }
+html[data-device="mobile"] .main-nav button.active [data-icon] { filter: drop-shadow(0 0 8px #c5df9b88); }
+
+html[data-device="mobile"] main { padding: 18px 14px 40px; }
+html[data-device="mobile"] button:not(.main-nav button) { min-height: var(--tap-min); }
+html[data-device="mobile"] input, html[data-device="mobile"] select, html[data-device="mobile"] textarea { font-size: 16px; min-height: var(--tap-min); }
+html[data-device="mobile"] .hero-panel { display: grid; gap: 16px; padding: 22px 18px; text-align: left; }
+html[data-device="mobile"] .hero-emblem { display: grid !important; justify-content: center; }
+html[data-device="mobile"] .hero-emblem img { width: 150px; }
+html[data-device="mobile"] h2 { font-size: clamp(26px, 8vw, 34px); }

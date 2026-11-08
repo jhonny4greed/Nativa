@@ -5,30 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#101a16">
   <title>NATIVA — RPG de criaturas brasileiras</title>
+  <meta name="description" content="NATIVA — RPG de criaturas inspiradas na biodiversidade brasileira. Crie, evolua e leve suas Nativas para a arena.">
+  <link rel="icon" type="image/jpeg" href="./assets/generated/logo-emblem.jpg">
   <link rel="stylesheet" href="./css/style.css">
-  <script type="module" src="./js/app.js"></script>
+  <script src="/env.js"></script>
+  <script type="module" src="./js/main.js"></script>
 </head>
 <body>
   <header class="site-header">
-    <div class="brand-mark">N</div>
+    <div class="brand-mark"><img src="./assets/generated/logo-emblem.jpg" alt="Emblema NATIVA" width="62" height="62"></div>
     <div><small>RPG DE CRIATURAS BRASILEIRAS</small><h1>NATIVA</h1><p>Construa, evolua e leve suas criaturas para a arena.</p></div>
   </header>
   <nav class="main-nav">
-    <button data-view="home" class="active">Início</button>
-    <button data-view="create">Criar Nativa</button>
-    <button data-view="list">Meu bestiário</button>
-    <button data-view="art-studio">Ateliê de imagens</button>
-    <button data-view="battle">Arena de batalha</button>
-    <button data-view="rules">Regras</button>
+    <button data-view="home" class="active"><span data-icon="home"></span><span>Início</span></button>
+    <button data-view="create"><span data-icon="paw"></span><span>Criar Nativa</span></button>
+    <button data-view="list"><span data-icon="book"></span><span>Meu bestiário</span></button>
+    <button data-view="art-studio"><span data-icon="palette"></span><span>Ateliê de imagens</span></button>
+    <button data-view="battle"><span data-icon="swords"></span><span>Arena de batalha</span></button>
+    <button data-view="rules"><span data-icon="scroll"></span><span>Regras</span></button>
   </nav>
   <main>
     <section id="home" class="view active">
       <div class="hero-panel">
         <div><span class="eyebrow">SEU MUNDO. SUAS NATIVAS.</span><h2>Uma natureza extraordinária espera por você.</h2><p>Crie criaturas inspiradas na biodiversidade brasileira, escolha suas técnicas, acompanhe a evolução e simule combates por turnos.</p><button data-go="create">Começar uma Nativa</button></div>
-        <div class="hero-emblem" aria-hidden="true">✦</div>
+        <div class="hero-emblem" aria-hidden="true"><img src="./assets/generated/logo-emblem.jpg" alt="" width="230" height="230"></div>
       </div>
       <section class="form-panel" aria-labelledby="online-account-title">
-        <div class="panel-heading"><span class="step-number">✉</span><div><h3 id="online-account-title">Conta do jogador</h3><p>Entre sem senha usando um link enviado para seu e-mail.</p></div></div>
+        <div class="panel-heading"><span class="step-number" data-icon="mail"></span><div><h3 id="online-account-title">Conta do jogador</h3><p>Entre sem senha usando um link enviado para seu e-mail.</p></div></div>
         <form id="online-auth-form">
           <div class="grid">
             <label>Nome de jogador<input name="displayName" autocomplete="nickname" maxlength="40" required placeholder="Como aparecerá nas salas"></label>
@@ -45,7 +48,7 @@
         </div>
       </section>
       <section id="online-rooms-panel" class="form-panel" aria-labelledby="online-rooms-title">
-        <div class="panel-heading"><span class="step-number">♧</span><div><h3 id="online-rooms-title">Mesas multiplayer</h3><p>Crie uma sala ou entre em uma mesa por convite. Suas fichas continuam neste navegador.</p></div></div>
+        <div class="panel-heading"><span class="step-number" data-icon="users"></span><div><h3 id="online-rooms-title">Mesas multiplayer</h3><p>Crie uma sala ou entre em uma mesa por convite. Suas fichas continuam neste navegador.</p></div></div>
         <p id="online-rooms-auth-hint" class="muted">Entre na sua conta para acessar suas salas. O jogo local continua disponível sem login.</p>
         <div id="online-rooms-content" hidden>
           <p id="online-rooms-status" role="status" aria-live="polite"></p>

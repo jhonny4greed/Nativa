@@ -7,3 +7,5 @@ supabase/.branches
 .env
 .env.*
 !.env.example
+dist
+.github
