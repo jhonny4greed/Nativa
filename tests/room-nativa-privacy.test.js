@@ -11,7 +11,7 @@ const concurrency = readFileSync(new URL("../supabase/tests/database/20261107000
 const deleteRoomMigration = readFileSync(new URL("../supabase/migrations/20261107110000_delete_room.sql", import.meta.url), "utf8");
 const deleteRoomTest = readFileSync(new URL("../supabase/tests/database/20261107110001_delete_room.test.sql", import.meta.url), "utf8");
 const rooms = readFileSync(new URL("../js/rooms.js", import.meta.url), "utf8");
-const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+const html = readFileSync(new URL("../app.html", import.meta.url), "utf8");
 const css = readFileSync(new URL("../css/style.css", import.meta.url), "utf8");
 const architecture = readFileSync(new URL("../docs/ARQUITETURA_MULTIPLAYER.md", import.meta.url), "utf8");
 

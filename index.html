@@ -1,205 +1,131 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#101a16">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>NATIVA — RPG de criaturas brasileiras</title>
-  <meta name="description" content="NATIVA — RPG de criaturas inspiradas na biodiversidade brasileira. Crie, evolua e leve suas Nativas para a arena.">
+  <meta name="description" content="Crie criaturas inspiradas na biodiversidade brasileira, evolua suas Nativas e leve-as para a arena. Jogue sozinho ou em salas multiplayer.">
+  <meta property="og:title" content="NATIVA — RPG de criaturas brasileiras">
+  <meta property="og:description" content="Crie, evolua e batalhe com criaturas inspiradas nos biomas do Brasil.">
+  <meta property="og:image" content="./assets/generated/hero-landing.jpg">
+  <meta name="theme-color" content="#0f2a1c">
   <link rel="icon" type="image/jpeg" href="./assets/generated/logo-emblem.jpg">
-  <link rel="stylesheet" href="./css/style.css">
   <script src="/env.js"></script>
-  <script type="module" src="./js/main.js"></script>
+  <link rel="stylesheet" href="./css/landing.css">
+  <script type="module" src="./js/landing.js"></script>
 </head>
-<body>
-  <header class="site-header">
-    <div class="brand-mark"><img src="./assets/generated/logo-emblem.jpg" alt="Emblema NATIVA" width="62" height="62"></div>
-    <div><small>RPG DE CRIATURAS BRASILEIRAS</small><h1>NATIVA</h1><p>Construa, evolua e leve suas criaturas para a arena.</p></div>
+<body class="landing">
+  <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
+  <header class="lp-header" data-header>
+    <a class="lp-brand" href="#topo" aria-label="NATIVA — início">
+      <img src="./assets/generated/logo-emblem.jpg" alt="" width="44" height="44">
+      <span>NATIVA</span>
+    </a>
+    <nav class="lp-nav" aria-label="Seções">
+      <a href="#como-funciona">Como funciona</a>
+      <a href="#biomas">Biomas</a>
+      <a href="#afinidades">Afinidades</a>
+      <a href="#arena">Arena</a>
+    </nav>
+    <div class="lp-actions">
+      <a class="btn btn-ghost" href="./app.html#conta">Entrar</a>
+      <a class="btn btn-primary" href="./app.html"><span data-icon="paw"></span>Jogar agora</a>
+    </div>
+    <button class="lp-menu" type="button" aria-expanded="false" aria-controls="lp-mobile-menu" aria-label="Abrir menu"><span data-icon="menu"></span></button>
   </header>
-  <nav class="main-nav">
-    <button data-view="home" class="active"><span data-icon="home"></span><span>Início</span></button>
-    <button data-view="create"><span data-icon="paw"></span><span>Criar Nativa</span></button>
-    <button data-view="list"><span data-icon="book"></span><span>Meu bestiário</span></button>
-    <button data-view="art-studio"><span data-icon="palette"></span><span>Ateliê de imagens</span></button>
-    <button data-view="battle"><span data-icon="swords"></span><span>Arena de batalha</span></button>
-    <button data-view="rules"><span data-icon="scroll"></span><span>Regras</span></button>
-  </nav>
-  <main>
-    <section id="home" class="view active">
-      <div class="hero-panel">
-        <div><span class="eyebrow">SEU MUNDO. SUAS NATIVAS.</span><h2>Uma natureza extraordinária espera por você.</h2><p>Crie criaturas inspiradas na biodiversidade brasileira, escolha suas técnicas, acompanhe a evolução e simule combates por turnos.</p><button data-go="create">Começar uma Nativa</button></div>
-        <div class="hero-emblem" aria-hidden="true"><img src="./assets/generated/logo-emblem.jpg" alt="" width="230" height="230"></div>
-      </div>
-      <section class="form-panel" aria-labelledby="online-account-title">
-        <div class="panel-heading"><span class="step-number" data-icon="mail"></span><div><h3 id="online-account-title">Conta do jogador</h3><p>Entre sem senha usando um link enviado para seu e-mail.</p></div></div>
-        <form id="online-auth-form">
-          <div class="grid">
-            <label>Nome de jogador<input name="displayName" autocomplete="nickname" maxlength="40" required placeholder="Como aparecerá nas salas"></label>
-            <label>E-mail<input name="email" type="email" autocomplete="email" required placeholder="voce@exemplo.com"></label>
-          </div>
-          <div class="form-actions"><button id="online-auth-submit" type="submit">Enviar link de acesso</button><p id="online-auth-status" role="status" aria-live="polite">Nesta etapa o login cria sua identidade. As fichas e fotos continuam somente neste navegador.</p></div>
-        </form>
-        <div id="online-account-details" hidden>
-          <p id="online-account-name"></p>
-          <p id="online-account-email" class="muted"></p>
-          <p id="online-account-status" role="status" aria-live="polite"></p>
-          <p><a id="online-open-sync-diagnostic" href="./tests/sync-diagnostic.html">Diagnóstico de sincronização</a></p>
-          <button id="online-auth-signout" class="secondary" type="button">Sair da conta</button>
+  <div id="lp-mobile-menu" class="lp-mobile-menu" hidden>
+    <a href="#como-funciona">Como funciona</a>
+    <a href="#biomas">Biomas</a>
+    <a href="#afinidades">Afinidades</a>
+    <a href="#arena">Arena</a>
+    <a class="btn btn-ghost" href="./app.html#conta">Entrar</a>
+    <a class="btn btn-primary" href="./app.html">Jogar agora</a>
+  </div>
+
+  <main id="conteudo">
+    <section id="topo" class="hero" aria-labelledby="hero-title">
+      <div class="hero-bg" data-parallax="0.25" style="--img:url('./assets/generated/hero-landing.jpg')"></div>
+      <div class="hero-veil"></div>
+      <canvas class="fireflies" data-fireflies aria-hidden="true"></canvas>
+      <div class="hero-content">
+        <span class="eyebrow" data-reveal>RPG DE CRIATURAS BRASILEIRAS</span>
+        <h1 id="hero-title" class="hero-title" data-split>Uma natureza extraordinária espera por você.</h1>
+        <p class="hero-lead" data-reveal>Crie Nativas inspiradas na biodiversidade do Brasil, escolha suas afinidades e técnicas, acompanhe a evolução e enfrente outros jogadores em salas multiplayer.</p>
+        <div class="hero-cta" data-reveal>
+          <a class="btn btn-primary btn-lg" href="./app.html" data-confetti><span data-icon="swords"></span>Começar a jogar</a>
+          <a class="btn btn-outline btn-lg" href="#como-funciona"><span data-icon="scroll"></span>Como funciona</a>
         </div>
-      </section>
-      <section id="online-rooms-panel" class="form-panel" aria-labelledby="online-rooms-title">
-        <div class="panel-heading"><span class="step-number" data-icon="users"></span><div><h3 id="online-rooms-title">Mesas multiplayer</h3><p>Crie uma sala ou entre em uma mesa por convite. Suas fichas continuam neste navegador.</p></div></div>
-        <p id="online-rooms-auth-hint" class="muted">Entre na sua conta para acessar suas salas. O jogo local continua disponível sem login.</p>
-        <div id="online-rooms-content" hidden>
-          <p id="online-rooms-status" role="status" aria-live="polite"></p>
-          <div class="grid">
-            <form id="online-create-room-form" class="form-panel">
-              <h4>Criar sala</h4>
-              <label>Nome da sala<input name="roomName" maxlength="80" required placeholder="Ex.: A jornada pela mata"></label>
-              <div class="form-actions"><button type="submit">Criar sala</button></div>
-            </form>
-            <form id="online-join-room-form" class="form-panel">
-              <h4>Entrar com convite</h4>
-              <label>Código ou link<input id="online-room-invite-token" name="invite" maxlength="2000" required autocomplete="off" placeholder="Cole o código ou link recebido"></label>
-              <div class="form-actions"><button type="submit">Entrar na sala</button></div>
-            </form>
-          </div>
-          <div class="section-heading compact"><h4>Minhas salas</h4><button id="online-refresh-rooms" class="small secondary" type="button">Atualizar lista</button></div>
-          <div id="online-room-list" class="feature-grid"></div>
-          <section id="online-room-details" class="form-panel" hidden aria-live="polite">
-            <div class="section-heading compact"><div><span class="eyebrow">SALA SELECIONADA</span><h4 id="online-room-name"></h4></div><button id="online-close-room-details" class="small secondary" type="button">Fechar detalhes</button></div>
-            <p id="online-room-meta" class="muted"></p>
-            <section aria-labelledby="online-room-participants-title">
-              <h4 id="online-room-participants-title">Participantes</h4>
-              <ul id="online-room-participants"></ul>
-            </section>
-            <section aria-labelledby="online-room-companions-title">
-              <div class="section-heading compact"><div><h4 id="online-room-companions-title">Companheiros da sala</h4><p class="muted">Cada jogador escolhe um companheiro. Sua progressão nesta sala é independente da ficha original e das outras mesas.</p></div><button id="online-refresh-room-nativas" class="small secondary" type="button">Atualizar</button></div>
-              <p class="room-privacy-note">Privacidade: você e o mestre veem sua ficha completa; jogadores veem apenas a prévia uns dos outros. O mestre pode consultar e editar os dados de campanha sem alterar fichas originais.</p>
-              <form id="online-choose-room-companion-form" class="room-companion-picker" hidden>
-                <label for="online-room-companion-choice">Escolha uma Nativa já sincronizada da sua conta</label>
-                <select id="online-room-companion-choice" required></select>
-                <button type="submit" class="small">Escolher ou trocar companheiro</button>
-              </form>
-              <p id="online-room-nativas-status" class="muted" role="status" aria-live="polite"></p>
-              <div id="online-room-nativas-list" class="room-nativas-list"></div>
-            </section>
-            <section id="online-room-admin" class="room-admin" hidden aria-labelledby="online-room-admin-title">
-              <h4 id="online-room-admin-title">Gerenciar sala</h4>
-              <p class="muted">Apenas o mestre pode administrar a sala. Encerrar preserva o histórico e as fichas originais.</p>
-              <form id="online-rename-room-form" class="room-admin-form">
-                <label for="online-rename-room-name">Nome da sala</label>
-                <div class="form-actions"><input id="online-rename-room-name" name="name" maxlength="80" required><button type="submit" class="small">Salvar nome</button></div>
-              </form>
-              <h5>Gerenciar participantes</h5>
-              <ul id="online-room-admin-participants"></ul>
-              <button id="online-close-room" class="danger small" type="button">Encerrar sala</button>
-              <div class="room-delete-zone">
-                <h5>Excluir sala permanentemente</h5>
-                <p class="muted">Remove participantes, convites e histórico desta campanha. As fichas originais dos jogadores são preservadas.</p>
-                <button id="online-delete-room" class="danger room-delete-button" type="button">Apagar sala definitivamente</button>
-              </div>
-            </section>
-            <section id="online-room-invites" hidden>
-              <h4>Convites do mestre</h4>
-              <form id="online-create-invite-form">
-                <div class="grid">
-                  <label>Formato<select name="kind"><option value="code">Código</option><option value="link">Link</option></select></label>
-                  <label>Validade em horas<input name="hours" type="number" min="1" max="720" value="168" required></label>
-                  <label>Limite de usos<input name="maxUses" type="number" min="1" max="100" value="1" required></label>
-                </div>
-                <div class="form-actions"><button type="submit">Gerar convite</button></div>
-              </form>
-              <div id="online-created-invite" hidden>
-                <p id="online-created-invite-help" role="status"></p>
-                <div class="form-actions"><input id="online-created-invite-value" type="text" readonly aria-label="Convite criado"><button id="online-copy-invite" class="small secondary" type="button">Copiar</button></div>
-              </div>
-              <h4>Convites emitidos</h4>
-              <ul id="online-room-invite-list"></ul>
-            </section>
-          </section>
+        <ul class="hero-stats" data-reveal>
+          <li><strong data-count="5">0</strong><span>biomas</span></li>
+          <li><strong data-count="5">0</strong><span>afinidades</span></li>
+          <li><strong data-count="40" data-suffix="+">0</strong><span>técnicas</span></li>
+          <li><strong>∞</strong><span>combinações</span></li>
+        </ul>
+      </div>
+      <a class="scroll-hint" href="#como-funciona" aria-label="Rolar para baixo"><span data-icon="chevron-down"></span></a>
+    </section>
+
+    <section id="como-funciona" class="lp-section steps" aria-labelledby="steps-title">
+      <div class="section-head" data-reveal>
+        <span class="eyebrow">SEU MUNDO. SUAS NATIVAS.</span>
+        <h2 id="steps-title">Três passos até a arena</h2>
+        <p>Um RPG por turnos pensado para ser jogado em qualquer lugar — do celular ao desktop.</p>
+      </div>
+      <ol class="steps-grid">
+        <li class="card step-card" data-reveal><span class="step-icon" data-icon="paw"></span><span class="step-num">01</span><h3>Crie sua Nativa</h3><p>Escolha grupo biológico, linhagem, bioma e afinidade. Distribua atributos e monte um conjunto de técnicas único.</p></li>
+        <li class="card step-card" data-reveal><span class="step-icon" data-icon="sparkles"></span><span class="step-num">02</span><h3>Evolua e ilustre</h3><p>Ganhe experiência, acumule Essência e gere a arte oficial da sua criatura no Ateliê de imagens com IA.</p></li>
+        <li class="card step-card" data-reveal><span class="step-icon" data-icon="swords"></span><span class="step-num">03</span><h3>Dispute a arena</h3><p>Enfrente a IA ou outros jogadores em salas online. Cada bioma muda o campo de batalha e favorece táticas diferentes.</p></li>
+      </ol>
+    </section>
+
+    <section id="biomas" class="lp-section biomes" aria-labelledby="biomes-title">
+      <div class="section-head" data-reveal>
+        <span class="eyebrow">CINCO CENÁRIOS DE BATALHA</span>
+        <h2 id="biomes-title">Biomas que mudam a estratégia</h2>
+        <p>Cada arena é um ecossistema brasileiro com modificadores próprios para técnicas e deslocamento.</p>
+      </div>
+      <div class="biome-grid">
+        <article class="biome-card" data-reveal data-tilt style="--img:url('./assets/generated/biome-floresta-mata.jpg')"><div class="biome-body"><h3>Floresta e Mata</h3><p>Vegetação densa, ocultação e deslocamento entre as árvores.</p></div></article>
+        <article class="biome-card" data-reveal data-tilt style="--img:url('./assets/generated/biome-rios-pantanal.jpg')"><div class="biome-body"><h3>Rios, Lagos e Pantanal</h3><p>Águas interiores, correntezas e áreas alagadas.</p></div></article>
+        <article class="biome-card" data-reveal data-tilt style="--img:url('./assets/generated/biome-caatinga-cerrado.jpg')"><div class="biome-body"><h3>Caatinga e Cerrado</h3><p>Savanas e ambientes secos, calor e vegetação sazonal.</p></div></article>
+        <article class="biome-card" data-reveal data-tilt style="--img:url('./assets/generated/biome-costa-mangue.jpg')"><div class="biome-body"><h3>Costa, Restinga e Manguezal</h3><p>Marés, areia, lama e variações de salinidade.</p></div></article>
+        <article class="biome-card" data-reveal data-tilt style="--img:url('./assets/generated/biome-pampa.jpg')"><div class="biome-body"><h3>Campos Sulinos e Pampa</h3><p>Campos abertos do sul, vegetação campestre e áreas úmidas.</p></div></article>
+      </div>
+    </section>
+
+    <section id="afinidades" class="lp-section affinities" aria-labelledby="aff-title">
+      <div class="section-head" data-reveal>
+        <span class="eyebrow">A ESSÊNCIA DE CADA CRIATURA</span>
+        <h2 id="aff-title">Cinco afinidades, incontáveis combinações</h2>
+        <p>A afinidade define o estilo de combate e abre grupos de técnicas exclusivos.</p>
+      </div>
+      <ul class="aff-grid">
+        <li class="aff-card" data-reveal data-aff="fogo"><img src="./assets/generated/affinity-fogo.jpg" alt="" width="120" height="120" loading="lazy"><h3>Fogo</h3><p>Calor, combustão, intensidade e pressão ofensiva.</p></li>
+        <li class="aff-card" data-reveal data-aff="agua"><img src="./assets/generated/affinity-agua.jpg" alt="" width="120" height="120" loading="lazy"><h3>Água</h3><p>Fluidez, adaptação, correntes e controle do movimento.</p></li>
+        <li class="aff-card" data-reveal data-aff="terra"><img src="./assets/generated/affinity-terra.jpg" alt="" width="120" height="120" loading="lazy"><h3>Terra</h3><p>Estabilidade, rocha, resistência e força de impacto.</p></li>
+        <li class="aff-card" data-reveal data-aff="vento"><img src="./assets/generated/affinity-vento.jpg" alt="" width="120" height="120" loading="lazy"><h3>Vento</h3><p>Mobilidade, velocidade, saltos e ataques à distância.</p></li>
+        <li class="aff-card" data-reveal data-aff="energia"><img src="./assets/generated/affinity-energia.jpg" alt="" width="120" height="120" loading="lazy"><h3>Energia</h3><p>Ondas, vibrações, percepção e manifestações de energia.</p></li>
+      </ul>
+    </section>
+
+    <section id="arena" class="lp-section arena-cta" aria-labelledby="arena-title">
+      <div class="arena-bg" data-parallax="0.15" style="--img:url('./assets/generated/biome-rios-pantanal.jpg')"></div>
+      <div class="arena-content" data-reveal>
+        <span class="eyebrow">MULTIPLAYER</span>
+        <h2 id="arena-title">Salas online, turnos sincronizados</h2>
+        <p>Crie uma sala, convide um amigo pelo código e leve suas Nativas para a batalha. Fichas, fotos e progresso sincronizam com sua conta.</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary btn-lg" href="./app.html#multiplayer"><span data-icon="users"></span>Abrir uma sala</a>
+          <a class="btn btn-outline btn-lg" href="./app.html#conta"><span data-icon="mail"></span>Criar conta</a>
         </div>
-      </section>
-      <div class="stat-strip"><div><strong id="count">0</strong><span>Nativas no bestiário</span></div><div><strong>42</strong><span>XPA de criação</span></div><div><strong>6</strong><span>Espaços de técnicas</span></div></div>
-      <div class="section-heading"><div><span class="eyebrow">CAMINHO DO JOGADOR</span><h3>Seu protótipo</h3></div></div>
-      <div class="feature-grid"><article class="feature-card"><span>01</span><h4>Criação</h4><p>Defina grupo biológico, linhagem, espécie, bioma e afinidade.</p></article><article class="feature-card"><span>02</span><h4>Bestiário</h4><p>Guarde retratos, atributos, técnicas e evolução das suas Nativas.</p></article><article class="feature-card"><span>03</span><h4>Combate</h4><p>Teste iniciativa, precisão, dano, MP e recargas em uma arena local.</p></article></div>
-    </section>
-
-    <section id="create" class="view">
-      <div class="section-heading"><div><span class="eyebrow">NOVA CRIATURA</span><h2>Criar Nativa</h2><p>Monte a identidade e distribua os pontos antes de salvar.</p></div></div>
-      <form id="form">
-        <section class="form-panel"><div class="panel-heading"><span class="step-number">01</span><div><h3>Identidade</h3><p>Quem é a sua Nativa?</p></div></div>
-          <div class="grid">
-            <label>Nome da Nativa<input name="name" placeholder="Ex.: Aruã" required maxlength="40"></label>
-            <label>Jogador<input name="player" placeholder="Nome do jogador"></label>
-            <label>Grupo biológico<select name="groupBio" id="groupBio" required><option value="">Selecione um grupo</option></select><small id="groupBio-description" class="description">Escolha a grande categoria biológica.</small></label>
-            <label>Linhagem<select name="lineage" id="lineage" required disabled><option value="">Escolha primeiro o grupo biológico</option></select><small id="lineage-description" class="description">A linhagem reúne características e especialidades compartilhadas.</small></label>
-            <label>Espécie ou inspiração<input name="species" id="species" placeholder="Ex.: Onça-pintada"><small class="description">Informe a espécie real ou a principal inspiração animal.</small></label>
-            <label>Bioma<select name="bioma" id="bioma" required><option value="">Selecione um bioma</option></select><small id="bioma-description" class="description">O ambiente em que sua Nativa está mais adaptada.</small></label>
-            <label>Afinidade<select name="affinity" id="affinity" required><option value="">Selecione uma afinidade</option></select><small id="affinity-description" class="description">Sua afinidade elemental inicial.</small></label>
-            <label>Arquétipo<select name="archetype" id="archetype" required><option value="">Selecione um arquétipo</option></select><small id="archetype-description" class="description">Seu estilo predominante de combate.</small></label>
-          </div>
-          <div id="lineage-profile" class="lineage-profile empty"><span class="eyebrow">GUIA BIOLÓGICO</span><p>Selecione uma linhagem para consultar exemplos, biologia e especialidades.</p></div>
-        </section>
-
-        <section class="form-panel"><div class="panel-heading"><span class="step-number">02</span><div><h3>Atributos</h3><p>Distribua os 42 XPA iniciais. Todos começam em 1.</p></div></div>
-          <div id="attrs" class="attrs"></div><div id="budget" class="budget-line">42 XPA restantes</div>
-        </section>
-
-        <section id="technique-picker" class="form-panel"><div class="panel-heading"><span class="step-number">03</span><div><h3>Técnicas iniciais</h3><p>Escolha até seis técnicas entre as opções liberadas pelas características.</p></div></div>
-          <div id="technique-groups"></div><div class="selected-area"><div class="section-heading compact"><h3>Minha ficha de técnicas</h3><span id="technique-count">0 de 6 selecionadas</span></div><div id="selected-techniques"></div></div>
-        </section>
-        <div class="form-actions"><button type="submit">Salvar Nativa no bestiário</button><p id="msg" role="status"></p></div>
-      </form>
-    </section>
-
-    <section id="list" class="view">
-      <div class="section-heading"><div><span class="eyebrow">COLEÇÃO</span><h2>Meu bestiário</h2><p>Suas Nativas salvas neste navegador.</p></div><button data-go="create">＋ Nova Nativa</button></div>
-      <p id="bestiary-status" role="status" aria-live="polite"></p>
-      <section id="sync-panel" class="form-panel sync-panel" aria-labelledby="sync-heading">
-        <div class="section-heading compact"><div><h3 id="sync-heading">Sincronização da conta</h3><p id="sync-session-state" class="sync-state" role="status">Verificando sessão…</p></div><button id="sync-run" type="button" disabled>Sincronizar agora</button></div>
-        <p class="sync-explanation">Somente fichas preparadas para esta conta entram na fila. O envio começa apenas quando você aciona este botão. Fotos permanecem neste dispositivo.</p>
-        <div class="sync-counts" aria-live="polite"><span>Pendentes: <strong id="sync-pending">—</strong></span><span>Concluídas: <strong id="sync-completed">—</strong></span><span>Falhas: <strong id="sync-failed">—</strong></span><span>Conflitos: <strong id="sync-conflicts-count">—</strong></span></div>
-        <p id="sync-progress" class="sync-state" role="status" aria-live="polite"></p>
-        <div id="sync-conflicts" class="sync-conflicts"></div>
-      </section>
-      <div id="cards" class="bestiary-grid"></div>
-    </section>
-
-    <section id="art-studio" class="view">
-      <div class="section-heading"><div><span class="eyebrow">CRIAÇÃO VISUAL</span><h2>Ateliê de imagens</h2><p>Crie arte para Nativas, biomas, técnicas e novas ideias.</p></div></div>
-      <div class="form-panel">
-        <p class="art-cost-note">A geração usa créditos da conta autorizada do provedor. Cada imagem é solicitada somente ao clicar em “Gerar imagem”. Os arquivos gerados ficam neste navegador; nenhuma ficha, foto ou imagem é enviada ao Supabase Storage.</p>
-        <form id="art-generation-form" class="art-form">
-          <label>Categoria<select id="art-kind" required><option value="nativa">Nativa</option><option value="biome">Bioma</option><option value="technique">Técnica ou golpe</option><option value="other">Outra ideia futura</option></select></label>
-          <label>Nome do tema<input id="art-title" maxlength="80" required placeholder="Ex.: Guardião das veredas"></label>
-          <label>Descrição visual<textarea id="art-prompt" maxlength="1400" rows="5" required placeholder="Descreva forma, ambiente, cores, movimento e estilo visual."></textarea></label>
-          <div class="form-actions"><button id="art-generate" type="submit">Gerar imagem</button><p id="art-status" role="status" aria-live="polite">Entre em uma conta autorizada para começar.</p></div>
-        </form>
-        <div id="art-preview" class="art-preview" hidden><img id="art-preview-image" alt="Prévia da imagem gerada"><div class="form-actions"><button id="art-save" type="button">Salvar no acervo local</button></div></div>
-      </div>
-      <div class="form-panel">
-        <div class="section-heading compact"><div><h3>Acervo deste navegador</h3><p>Separado por conta e armazenado localmente, junto às fotos do projeto.</p></div><label>Aplicar como retrato de uma Nativa<select id="art-target-nativa"><option value="">Escolha uma ficha editável</option></select></label></div>
-        <div id="art-gallery" class="art-gallery"><p class="muted">Entre em uma conta para consultar o acervo.</p></div>
-      </div>
-    </section>
-
-    <section id="battle" class="view">
-      <div class="section-heading"><div><span class="eyebrow">SIMULAÇÃO LOCAL</span><h2>Arena de batalha</h2><p>Escolha o modo e as Nativas para iniciar um combate.</p></div></div>
-      <div class="form-panel battle-setup"><div class="grid"><label>Modo de batalha<select id="battle-mode"><option value="local">Multiplayer local</option><option value="cpu">Contra CPU</option></select></label><label id="fighter-a-label">Nativa do Jogador 1<select id="fighter-a"><option value="">Selecione a primeira Nativa</option></select></label><label id="fighter-b-label">Nativa do Jogador 2<select id="fighter-b"><option value="">Selecione a segunda Nativa</option></select></label><label>Horário da partida<select id="battle-time"><option value="Aleatório">Aleatório</option></select></label><label>Bioma da arena<select id="battle-biome"><option value="Aleatório">Aleatório</option></select></label><label class="essence-drop-setting">Chance de drop de Essência <span id="essence-drop-rate-value">20%</span><input id="essence-drop-rate" type="range" min="0" max="100" step="1" value="20"><small>O vencedor rola uma chance de obter uma Essência guardada para absorção posterior.</small></label></div><button id="start-battle" type="button">Iniciar combate</button><p class="muted">A iniciativa é rolada a cada turno: 1D10 + AGI. Horário e bioma são configurados para esta partida.</p></div>
-      <div id="battle-arena" class="battle-arena empty"><p>Configure os combatentes para abrir a arena.</p></div>
-    </section>
-
-    <section id="rules" class="view">
-      <div class="section-heading"><div><span class="eyebrow">REFERÊNCIA RÁPIDA</span><h2>Regras-base</h2><p>Resumo das regras implementadas neste protótipo.</p></div></div>
-      <div class="rules-grid">
-        <article class="rule-card"><h3>Criação e progressão</h3><ul><li>42 XPA para distribuir entre sete atributos, todos iniciando em 1.</li><li>O custo para subir de N para N+1 é N+1 XPA.</li><li>Ao criar, a Nativa recebe 1 XPA de vínculo.</li><li>Para subir de nível, precisa de XP igual ao nível de destino; ao subir, recebe XPA igual ao novo nível.</li><li>Estágios: 1–9, estágio 1; 10–16, estágio 2; 17+, estágio 3.</li></ul></article>
-        <article class="rule-card"><h3>Combate</h3><ul><li>Iniciativa: 1D10 + AGI, rolada novamente a cada turno.</li><li>Precisão negativa representa penalidade: -1 erra no 1; -2 erra de 1 a 2; e assim por diante.</li><li>Dano físico: ATQ + dano da técnica − DEF.</li><li>Dano especial: POT + dano da técnica − RES.</li><li>Golpes ofensivos acertados causam pelo menos 1 de dano antes do modificador de afinidade.</li><li>Fraqueza: +2 dano. Resistência: −2 dano. O resultado final não fica abaixo de zero.</li><li>HP máximo = HP × 5. MP máximo = MP × 2.</li><li>MP é gasto ao usar técnicas; a recarga é controlada por turnos.</li></ul></article>
-        <article class="rule-card"><h3>Essências</h3><ul><li>Primeira essência: nível 5; concede repertório de outra afinidade e técnica de linhagem ou arquétipo, sem alterar defesas.</li><li>Segunda essência: nível 12 e estágio 2; concede outra afinidade e técnica, alterando fraquezas e resistências junto da afinidade original.</li><li>Terceira essência: nível 17, ainda indisponível.</li></ul></article>
-        <article class="rule-card"><h3>Limites deste protótipo</h3><ul><li>O combate é local e manual: duas fichas no mesmo navegador, sem multiplayer online.</li><li>Efeitos escritos nas técnicas são exibidos no registro; nem todos são automatizados nesta versão.</li><li>Fotos são guardadas no IndexedDB do navegador, separadas dos dados das fichas.</li><li>Os dados permanecem neste navegador e não são sincronizados entre dispositivos.</li></ul></article>
       </div>
     </section>
   </main>
-  <footer><span>NATIVA • Protótipo de desenvolvimento</span><span>Feito para testar as regras na mesa.</span></footer>
+
+  <footer class="lp-footer">
+    <div class="lp-brand"><img src="./assets/generated/logo-emblem.jpg" alt="" width="36" height="36"><span>NATIVA</span></div>
+    <p>Um RPG de criaturas inspirado na biodiversidade brasileira. © <span data-year></span> daforja.com.br</p>
+    <nav aria-label="Rodapé"><a href="./app.html#regras">Regras</a><a href="./app.html#conta">Conta</a><a href="./tests/sync-diagnostic.html">Diagnóstico</a></nav>
+  </footer>
 </body>
 </html>
