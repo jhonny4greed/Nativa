@@ -1,0 +1,10 @@
+{
+  "name": "nativa-prototipo",
+  "version": "1.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Protótipo local do RPG NATIVA",
+  "devDependencies": {
+    "supabase": "^3.0.0"
+  }
+}

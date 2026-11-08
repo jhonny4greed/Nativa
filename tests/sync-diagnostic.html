@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NATIVA · Diagnóstico de sincronização local</title>
+  <style>
+    :root{font-family:system-ui,sans-serif;color:#e9efe8;background:#111a18;color-scheme:dark}
+    body{max-width:920px;margin:0 auto;padding:24px;line-height:1.5}
+    h1,h2{color:#c5e8b7}button,a{font:inherit}button{margin:5px 6px 5px 0;padding:9px 13px;border:1px solid #719266;border-radius:8px;background:#243a2c;color:#f6fff2;cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}
+    a{color:#c5e8b7}.panel{border:1px solid #40564b;border-radius:12px;padding:16px;margin:14px 0;background:#182320}.warning{color:#ffda91}.status{white-space:pre-wrap;overflow-wrap:anywhere;background:#0c1311;border-radius:8px;padding:12px;min-height:36px}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#0c1311;border-radius:8px;padding:12px;max-height:360px;overflow:auto}code{color:#d7f3c9}.small{font-size:.92rem;color:#c0cbc3}
+  </style>
+</head>
+<body>
+  <h1>Diagnóstico local da fila 2D3</h1>
+  <p class="warning"><strong>Somente para testes:</strong> esta página grava uma ficha descartável no armazenamento real deste navegador. O botão de sincronização filtra a fila pelo ID exclusivo desta fixture e só envia após clique explícito. Não use ficha pessoal.</p>
+  <p><a id="return-to-nativa" href="../index.html">Voltar ao NATIVA</a></p>
+
+  <section class="panel">
+    <h2>Sessão e armazenamento</h2>
+    <p id="session" class="status" role="status" aria-live="polite">Inicializando cliente e consultando sessão…</p>
+    <button id="refresh">Atualizar diagnóstico</button>
+    <p class="small">As fichas legadas ficam no localStorage. Fila, metadados, snapshots e tombstones ficam no IndexedDB <code>nativa.prototype.sync</code>. Fotos ficam no IndexedDB <code>nativa.prototype.photos</code>. A sessão é lida da Auth local; login ou troca de conta não dispara sincronização.</p>
+  </section>
+
+  <section class="panel">
+    <h2>Fixture descartável</h2>
+    <button id="create">Criar ficha local e preparar primeiro save</button>
+    <button id="edit" disabled>Editar ficha e criar novo save</button>
+    <button id="sync" disabled>Sincronizar agora (ação explícita)</button>
+    <button id="delete" disabled>Registrar tombstone local</button>
+    <button id="sync-delete" disabled>Sincronizar exclusão (ação explícita)</button>
+    <button id="cleanup-photo" disabled>Remover foto descartável após tombstone confirmado</button>
+    <p class="small">ID local guardado na URL e em uma chave de diagnóstico própria. O UUID da operação e o hash do snapshot inicial permitem conferir que o registro sobrevive ao reload. A limpeza remove apenas a foto desta fixture; o tombstone permanece conforme o desenho atual.</p>
+    <p id="actions" class="status">Nenhuma ação executada nesta página.</p>
+  </section>
+
+  <section class="panel">
+    <h2>Evidência lida dos módulos reais</h2>
+    <pre id="evidence">Aguardando diagnóstico.</pre>
+  </section>
+
+  <script type="module" src="./sync-diagnostic.js"></script>
+</body>
+</html>

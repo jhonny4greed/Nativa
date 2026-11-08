@@ -1,0 +1,14 @@
+# Segredos locais de funções e variáveis de ambiente nunca devem ser versionados.
+.env
+.env.*
+!.env.example
+supabase/functions/.env
+supabase/functions/.env.*
+!supabase/functions/.env.example
+
+# Dependências, backups e estado local de desenvolvimento.
+node_modules/
+.backup*/
+supabase/.temp/
+supabase/.branches/
+*.log
