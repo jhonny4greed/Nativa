@@ -164,6 +164,7 @@ function confettiOnCta() {
   const cta = document.querySelector("[data-confetti]");
   if (!cta || reduceMotion) return;
   cta.addEventListener("click", async e => {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     e.preventDefault();
     const { default: confetti } = await import("canvas-confetti");
     const r = cta.getBoundingClientRect();
@@ -172,7 +173,15 @@ function confettiOnCta() {
   });
 }
 
+function encaminharConvite() {
+  const url = new URL(location.href);
+  if (!url.searchParams.has("convite")) return false;
+  location.replace(`./app.html${url.search}${url.hash}`);
+  return true;
+}
+
 async function boot() {
+  if (encaminharConvite()) return;
   const device = await detectDevice();
   await applyDevice(device);
   mountIcons();
