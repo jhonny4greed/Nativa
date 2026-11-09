@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { MODOS_BATALHA, escolherAcaoCpu } from "../js/battle-modes.js";
 import { TECNICAS } from "../js/techniques.js";
 import { resolverTurnoCombate } from "../js/combat-domain.js";
+import { TECNICAS_LINHAGEM_V2_1 } from "../js/techniques-v2-1.js";
 
 const tecnicasValidas = TECNICAS.filter(item => item.estadoCatalogo !== "em-revisao" && item.mp > 0);
 
@@ -62,4 +63,14 @@ test("escolha da CPU passa pelo resolvedor normal e mantém o encerramento por P
   assert.equal(resultado.ended, true);
   assert.equal(resultado.fighters[0].hp, 0);
   assert.ok(resultado.events.some(event => event.type === "defeat"));
+});
+
+test("CPU pode escolher especiais V2.1 liberados e evita Peçonha sem veneno no alvo",()=>{
+  const aviso=TECNICAS_LINHAGEM_V2_1.find(t=>t.nome==='Alerta da Colônia');
+  const peconha=TECNICAS_LINHAGEM_V2_1.find(t=>t.nome==='Peçonha Concentrada');
+  const cpu=combatente([aviso,peconha],{mp:8,maxMP:8});
+  const alvo=combatente([]);
+  assert.equal(escolherAcaoCpu(cpu,()=>0,alvo).tecnicaId,aviso.id);
+  alvo.efeitosV21=[{tipo:'envenenamento',danoPorTurno:1,turnosRestantes:2,intensificado:false}];
+  assert.equal(escolherAcaoCpu(cpu,()=>0.99,alvo).tecnicaId,peconha.id);
 });

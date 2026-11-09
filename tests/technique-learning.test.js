@@ -26,13 +26,14 @@ test("Bote de Jararaca pode ser aprendido sem Peçonha, sem Presas ou sem ambos 
   }
 });
 
-test("Bote de Jararaca atual permanece bloqueado somente por revisão técnica, qualquer que seja a lista de Traços", () => {
+test("Bote de Jararaca continua independente de Traços e fica liberado para teste controlado", () => {
   assert.equal(jararaca.estadoCatalogo, "em-revisao");
+  assert.equal(jararaca.parametrosTecnicosDisponiveis,true);
   for (const lista of [[], [tracos[0]], [tracos[1]], tracos]) {
     assert.equal(podeAprenderTecnica(jararaca), true);
-    assert.equal(podeUsarTecnicaEmCombate(jararaca), false);
+    assert.equal(podeUsarTecnicaEmCombate(jararaca), true);
     assert.deepEqual(jararaca.sinergias, []);
-    assert.match(jararaca.status, /parâmetros pendentes/i);
+    assert.match(jararaca.status, /teste controlado/i);
   }
 });
 
@@ -50,9 +51,10 @@ test("fluxo de criação Felino mostra quatro V2.1 como aprendíveis, seleciona,
   for (const tecnica of felinos) {
     const estado = obterEstadoSeletorTecnica(tecnica, false, selecionadas.size >= 6);
     assert.equal(estado.podeAprender, true);
-    assert.equal(estado.pendenteCombate, true);
+    assert.equal(estado.pendenteCombate, !podeUsarTecnicaEmCombate(tecnica));
     assert.equal(estado.botaoDesabilitado, false);
-    assert.match(estado.aviso, /Pode ser aprendida/);
+    if(estado.pendenteCombate)assert.match(estado.aviso, /Pode ser aprendida/);
+    else assert.match(estado.aviso,/teste controlado/i);
     assert.equal(adicionarTecnicaSelecionada(selecionadas, tecnica, 6), true);
   }
   assert.deepEqual([...selecionadas], felinos.map(t => t.id));
@@ -67,8 +69,11 @@ test("fluxo de criação Felino mostra quatro V2.1 como aprendíveis, seleciona,
   assert.deepEqual(carregadas[0].tracos, []);
   assert.ok(carregadas[0].techniques.every(id => obterTecnicaPorId(id)?.estadoCatalogo === "em-revisao"));
   const combatTarget = criarCombatente({ id: "target", name: "Alvo", attrs: { ATQ: 1, POT: 1, DEF: 1, RES: 1, AGI: 1, HP: 5, MP: 5 }, techniques: [] });
-  const combat = resolverTurnoCombate({ fighters: [criarCombatente(carregadas[0]), combatTarget], choices: [{ tipo: "attack", tecnicaId: felinos[0].id }, null], random: () => 0.9 });
-  assert.match(combat.error.message, /parâmetros técnicos validados para uso em combate/);
+  assert.ok(carregadas[0].techniques.every(id => obterTecnicaPorId(id)?.estadoCatalogo === "em-revisao"));
+  const golpeTestavel=felinos.find(t=>podeUsarTecnicaEmCombate(t));
+  const combat = resolverTurnoCombate({ fighters: [criarCombatente(carregadas[0]), combatTarget], choices: [{ tipo: "attack", tecnicaId: golpeTestavel.id }, null], random: () => 0.9 });
+  assert.equal(combat.error,null);
+  assert.ok(combat.fighters[1].efeitosV21.some(e=>e.tipo==='desorientacao'));
 });
 
 test("criação e Essências usam o gate técnico sem consultar Traços", () => {

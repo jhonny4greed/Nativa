@@ -21,6 +21,7 @@ test("40 parâmetros V2.1 consolidados são explícitos; dois IDs seguem pendent
     "linhagem-v2-1-ungulados-chifrada-de-impacto"
   ]);
   let count=0;
+  let countEspeciais=0;
   for (const t of TECNICAS_LINHAGEM_V2_1) {
     if (t.categoria === "Físico" && !pendentes.has(t.id)) {
       count += 1;
@@ -31,10 +32,18 @@ test("40 parâmetros V2.1 consolidados são explícitos; dois IDs seguem pendent
       assert.equal(t.dano, null, `${t.nome}: dano final não aprovado`);
       continue;
     }
+    if(t.parametrosTecnicosDisponiveis){
+      countEspeciais+=1;
+      assert.ok(Number.isFinite(t.precisao)&&Number.isFinite(t.mp)&&Number.isFinite(t.recarga),`${t.nome}: parâmetro especial ausente`);
+      assert.ok(Number.isInteger(t.parametrosBalanceamento.pgLiquido),`${t.nome}: PG líquido fracionado`);
+      assert.equal(t.dano,null,`${t.nome}: PG líquido não deve virar dano`);
+      continue;
+    }
     for (const campo of ["precisao", "mp", "recarga", "pg", "dano"]) assert.equal(t[campo], null, `${t.nome}: ${campo}`);
     assert.equal(t.parametrosBalanceamento, undefined, `${t.nome}: não deve receber parametrização genérica`);
   }
   assert.equal(count,40);
+  assert.equal(countEspeciais,28);
 });
 
 test("sinergias candidatas identificam Traços existentes dos seis grupos, mas não são executadas", () => {
