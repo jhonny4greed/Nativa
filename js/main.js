@@ -9,6 +9,8 @@ const device = await detectDevice();
 await applyDevice(device);
 observeIcons();
 await import("./app.js");
+const { inicializarPainelAdmin } = await import("./admin.js");
+void inicializarPainelAdmin();
 abrirDestinoDoHash();
 
 const DESTINOS = {

@@ -395,6 +395,11 @@ deno_version = 2
 [functions.generate-art]
 verify_jwt = false
 
+# O painel valida a sessão no handler com Auth /user e confirma o papel
+# admin em profiles antes de qualquer ação.
+[functions.admin-panel]
+verify_jwt = false
+
 # [edge_runtime.secrets]
 # secret_key = "env(SECRET_VALUE)"
 

@@ -172,6 +172,31 @@ export function createGenerateArtHandler({ env = () => undefined, fetchImpl = fe
   // O provedor NVIDIA responde de forma síncrona; o download é único.
   const results = new Map();
 
+  // Liberação: allowlist legada em env, papel admin em profiles ou linha em
+  // image_generation_allowlist (gerenciada pelo painel com chave de serviço).
+  async function consultarPermissao(userId) {
+    const staticAllowlist = (env("IMAGE_GENERATION_ALLOWED_USER_IDS") || "").split(",").map(id => id.trim()).filter(Boolean);
+    if (staticAllowlist.includes(userId)) return true;
+    const serviceKey = env("SUPABASE_SERVICE_ROLE_KEY") || env("SUPABASE_SECRET_KEY");
+    const supabaseUrl = env("SUPABASE_URL");
+    if (!serviceKey || !supabaseUrl) return false;
+    const base = supabaseUrl.replace(/\/$/, "");
+    const headers = { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` };
+    const [profileRes, allowRes] = await Promise.all([
+      fetchImpl(`${base}/rest/v1/profiles?id=eq.${encodeURIComponent(userId)}&select=role`, { headers, signal: AbortSignal.timeout(10_000) }),
+      fetchImpl(`${base}/rest/v1/image_generation_allowlist?user_id=eq.${encodeURIComponent(userId)}&select=user_id`, { headers, signal: AbortSignal.timeout(10_000) })
+    ]);
+    if (profileRes.ok) {
+      const rows = await readJsonResponse(profileRes);
+      if (Array.isArray(rows) && rows[0]?.role === "admin") return true;
+    }
+    if (allowRes.ok) {
+      const rows = await readJsonResponse(allowRes);
+      if (Array.isArray(rows) && rows.length > 0) return true;
+    }
+    return false;
+  }
+
   function sweepResults() {
     const current = now();
     for (const [id, entry] of results) if (entry.expiresAt <= current) results.delete(id);
@@ -209,8 +234,10 @@ export function createGenerateArtHandler({ env = () => undefined, fetchImpl = fe
     catch { return json({ error: "Não foi possível validar a sessão." }, 401); }
     if (!user) return json({ error: "Entre na conta para gerar imagens." }, 401);
 
-    const allowlist = (env("IMAGE_GENERATION_ALLOWED_USER_IDS") || "").split(",").map(id => id.trim()).filter(Boolean);
-    if (!allowlist.includes(user.id)) return json({ error: "Esta conta ainda não está autorizada a consumir créditos de geração." }, 403);
+    let autorizado;
+    try { autorizado = await consultarPermissao(user.id); }
+    catch { return json({ error: "Não foi possível verificar a autorização de geração." }, 503); }
+    if (!autorizado) return json({ error: "Esta conta ainda não está autorizada a consumir créditos de geração." }, 403);
 
     let body;
     try {
