@@ -47,15 +47,15 @@
       "id": "biome-costa-mangue",
       "width": 1344,
       "height": 768,
-      "seed": 71,
-      "prompt": "Wide panoramic scene of a Brazilian coastal mangrove and restinga at dusk. Tangled mangrove roots rising from dark reflective tidal water, sandy dunes with low restinga shrubs and coconut palms in the background, gentle waves on a beach, wet sand reflecting a violet and gold sky, tide pools, a firm wet-sand flat forming a natural arena in the foreground. Fantasy concept art background for a creature battle arena, extremely detailed, teal, sand, violet and gold palette, no creatures, no text, no watermark."
+      "seed": 72,
+      "prompt": "Wide panoramic landscape of a Brazilian coastal mangrove forest and sandy restinga at sunset. Mangrove trees with tall arching roots standing in calm shallow water, sand dunes with low shrubs and coconut palms in the background, gentle ocean waves on a beach, orange and gold sky reflected on the water, small tide pools among rocks, a flat sandy clearing in the foreground. Fantasy concept art background for a creature battle arena, extremely detailed, teal, sand, orange and gold palette, no creatures, no text, no watermark."
     },
     {
       "id": "biome-pampa",
       "width": 1344,
       "height": 768,
-      "seed": 81,
-      "prompt": "Wide panoramic scene of the southern Brazilian Pampa grasslands at dawn. Endless rolling hills of silver-green grass swaying in the wind, scattered granite outcrops, a lone araucaria tree on a ridge, a small marsh with reeds catching mist, cool blue and soft gold sky with long dramatic clouds, dew sparkling, a flat grassy knoll forming a natural arena in the foreground. Fantasy concept art background for a creature battle arena, extremely detailed, sage green, silver, teal and gold palette, no creatures, no text, no watermark."
+      "seed": 3,
+      "prompt": "Wide panoramic scene of the southern Brazilian Pampa grasslands at blue hour just after rain. Deep green rolling fields of wet grass under a dramatic dark teal and indigo sky with the first stars, a line of araucaria pine silhouettes on the horizon, dark grey granite rocks, a mirror like pond reflecting the sky, cool mist in the low valleys, faint cold moonlight, a flat open grass clearing in the foreground forming a natural arena. Fantasy concept art background for a creature battle game, extremely detailed, deep green, teal and indigo palette with small silver highlights, no creatures, no text, no watermark."
     },
     {
       "id": "affinity-fogo",
@@ -89,8 +89,8 @@
       "id": "affinity-energia",
       "width": 1024,
       "height": 1024,
-      "seed": 106,
-      "prompt": "Round game icon emblem representing the element of Energy. A stylized glowing orb of pure light surrounded by concentric vibration rings and soft radiating waves, electric lime, violet and gold against a dark forest-green circular background with a thin gold ring border. Flat vector-style illustration with clean edges and subtle inner glow, centered, symmetrical, high contrast, suitable as a small UI icon, no text, no letters, no watermark."
+      "seed": 107,
+      "prompt": "Round game icon emblem representing the element of Energy. A stylized glowing sphere of light at the center, surrounded by concentric circular ripples and gentle radiating waves, bright lime green, soft purple and gold colors against a dark forest green circular background with a thin gold ring border. Flat vector style illustration with clean edges and soft inner glow, centered, symmetrical, high contrast, suitable as a small user interface icon, no text, no letters, no watermark."
     },
     {
       "id": "pattern-foliage",

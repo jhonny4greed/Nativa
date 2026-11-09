@@ -1,14 +1,14 @@
 // Ícones SVG (lucide) no lugar de glifos Unicode, que viram caixas em fontes sem o caractere.
 import {
   createElement, Plus, Minus, Sparkles, Mail, Users, Home, PawPrint, BookOpen, Palette, Swords, ScrollText,
-  LogIn, LogOut, RefreshCw, Trash2, Save, Shield, Flame, Droplets, Mountain, Wind, Zap, Menu, X, Check, ChevronRight
+  LogIn, LogOut, RefreshCw, Trash2, Save, Shield, Flame, Droplets, Mountain, Wind, Zap, Menu, X, Check, ChevronRight, ChevronDown
 } from "lucide";
 
 export const ICONS = {
   plus: Plus, minus: Minus, sparkles: Sparkles, mail: Mail, users: Users, home: Home, paw: PawPrint, book: BookOpen,
   palette: Palette, swords: Swords, scroll: ScrollText, login: LogIn, logout: LogOut, refresh: RefreshCw, trash: Trash2,
   save: Save, shield: Shield, fogo: Flame, agua: Droplets, terra: Mountain, vento: Wind, energia: Zap, menu: Menu, close: X,
-  check: Check, chevron: ChevronRight
+  check: Check, chevron: ChevronRight, "chevron-down": ChevronDown
 };
 
 export function iconElement(name, attrs = {}) {

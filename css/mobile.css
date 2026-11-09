@@ -1,5 +1,5 @@
 /* Experiência dedicada ao mobile: barra de navegação inferior, alvos de toque ≥44px e áreas seguras. */
-html[data-device="mobile"] body { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
+html[data-device="mobile"] body:not(.landing) { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
 html[data-device="mobile"] .site-header { padding: 16px 18px; gap: 14px; }
 html[data-device="mobile"] .site-header h1 { font-size: 24px; letter-spacing: 0.18em; }
 html[data-device="mobile"] .site-header p { display: none; }

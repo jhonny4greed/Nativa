@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 
 const source = readFileSync(new URL("./sync-diagnostic.js", import.meta.url), "utf8");
 const diagnosticHtml = readFileSync(new URL("./sync-diagnostic.html", import.meta.url), "utf8");
-const appHtml = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+const appHtml = readFileSync(new URL("../app.html", import.meta.url), "utf8");
 const authSource = readFileSync(new URL("../js/auth.js", import.meta.url), "utf8");
 
 test("acesso ao diagnóstico fica dentro da área autenticada e retorna ao NATIVA na mesma origem", () => {
