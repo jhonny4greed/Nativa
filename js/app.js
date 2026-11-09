@@ -418,6 +418,7 @@ $("#form").addEventListener("submit", async e => {
     submit.disabled = false;
     return;
   }
+  if($("#generate-art-on-create")?.checked){try{const art=await estudioImagens.gerar({kind:"nativa",title:n.name,prompt:`Full-body creature concept for a Brazilian fantasy RPG. Species inspiration: ${n.species}. Biological group: ${n.groupBio}. Lineage: ${n.lineageName||n.lineage}. Habitat: ${n.bioma}. Elemental affinity: ${n.affinity}. Combat archetype: ${n.archetype}. ${n.inspiracao||n.inspiration||n.descricao||""}`.slice(0,1400)});const savedArt=await galeriaImagens.salvar(art);const before=JSON.parse(JSON.stringify(n));n.photoId=savedArt.photoId;await salvarEdicaoNativa(n,before);}catch(error){console.warn("A ficha foi criada, mas a ilustração automática falhou.",error);}}
   let origemPreparada = true;
   try {
     await repositorioLocal.registrarOrigemNativa(n.id, "player");
