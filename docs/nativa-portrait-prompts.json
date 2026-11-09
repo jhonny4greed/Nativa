@@ -1,0 +1,32 @@
+[
+  {
+    "id": "preset-guara",
+    "file": "assets/generated/nativa-guara.png",
+    "method": "built-in image_gen",
+    "prompt": "Use case: stylized-concept. Asset type: square collectible creature portrait for the Brazilian biodiversity fantasy RPG NATIVA. Subject: Guarã, a Brazilian maned wolf with very long black legs, russet orange fur, black mane, fire affinity, a subtle glowing ember tail and fiery eyes, in the cerrado at dusk. Premium hand-painted fantasy game illustration, intricate natural anatomy, expressive but majestic creature, painterly realistic textures, dark deep forest green and antique gold art direction, luminous atmosphere, cinematic rim light. Entire creature fits centrally within the middle 80 percent of frame with some breathing room, atmospheric habitat background, strong readable silhouette for a card crop. No text, no UI, no frame, no watermark, no humans."
+  },
+  {
+    "id": "preset-arua",
+    "file": "assets/generated/nativa-arua.png",
+    "method": "built-in image_gen",
+    "prompt": "Use case: stylized-concept. Asset type: square collectible creature portrait for the Brazilian biodiversity fantasy RPG NATIVA. Subject: Aruã, a golden dorado fish (Salminus brasiliensis), powerful streamlined golden body and dark striped scales, water affinity, leaping in a crescent of turquoise river water in the Pantanal. Premium hand-painted fantasy game illustration, intricate natural anatomy, expressive but majestic creature, painterly realistic textures, dark deep forest green and antique gold art direction, luminous atmosphere, cinematic rim light. Entire creature fits centrally within the middle 80 percent of frame with some breathing room, atmospheric habitat background, strong readable silhouette for a card crop. No text, no UI, no frame, no watermark, no humans."
+  },
+  {
+    "id": "preset-tatua",
+    "file": "assets/generated/nativa-tatua.png",
+    "method": "built-in image_gen",
+    "prompt": "Use case: stylized-concept. Asset type: square collectible creature portrait for the Brazilian biodiversity fantasy RPG NATIVA. Subject: Tatuá, a Brazilian giant armadillo, earth affinity, segmented stone-like armor with moss and tiny amber crystals, strong digging claws, on an Atlantic rainforest floor. Premium hand-painted fantasy game illustration, intricate natural anatomy, expressive but majestic creature, painterly realistic textures, dark deep forest green and antique gold art direction, luminous atmosphere, cinematic rim light. Entire creature fits centrally within the middle 80 percent of frame with some breathing room, atmospheric habitat background, strong readable silhouette for a card crop. No text, no UI, no frame, no watermark, no humans."
+  },
+  {
+    "id": "preset-quira",
+    "file": "assets/generated/nativa-quira.png",
+    "method": "built-in image_gen",
+    "prompt": "Use case: stylized-concept. Asset type: square collectible creature portrait for the Brazilian biodiversity fantasy RPG NATIVA. Subject: Quirã, a southern lapwing (quero-quero) with its distinctive crest, red eyes, grey brown black and white feathers, wind affinity, wings spread with delicate wind trails over the Pampa grassland. Premium hand-painted fantasy game illustration, intricate natural anatomy, expressive but majestic creature, painterly realistic textures, dark deep forest green and antique gold art direction, luminous atmosphere, cinematic rim light. Entire creature fits centrally within the middle 80 percent of frame with some breathing room, atmospheric habitat background, strong readable silhouette for a card crop. No text, no UI, no frame, no watermark, no humans."
+  },
+  {
+    "id": "preset-ecoa",
+    "file": "assets/generated/nativa-ecoa.png",
+    "method": "built-in image_gen",
+    "prompt": "Use case: stylized-concept. Asset type: square collectible creature portrait for the Brazilian biodiversity fantasy RPG NATIVA. Subject: Ecoã, a greater bulldog fishing bat (Noctilio leporinus), orange brown fur, long pointed ears, broad membranous wings and large fishing feet, energy affinity, delicate violet electric echolocation rings above a moonlit mangrove. Premium hand-painted fantasy game illustration, intricate natural anatomy, expressive but majestic creature, painterly realistic textures, dark deep forest green and antique gold art direction, luminous atmosphere, cinematic rim light. Entire creature fits centrally within the middle 80 percent of frame with some breathing room, atmospheric habitat background, strong readable silhouette for a card crop. No text, no UI, no frame, no watermark, no humans."
+  }
+]

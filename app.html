@@ -11,62 +11,30 @@
   <script src="/env.js"></script>
   <script type="module" src="./js/main.js"></script>
 </head>
-<body>
-  <header class="site-header">
-    <div class="brand-mark"><img src="./assets/generated/logo-emblem.jpg" alt="Emblema NATIVA" width="62" height="62"></div>
-    <div><small>RPG DE CRIATURAS BRASILEIRAS</small><h1>NATIVA</h1><p>Construa, evolua e leve suas criaturas para a arena.</p></div>
-  </header>
-  <nav class="main-nav">
-    <button data-view="home" class="active"><span data-icon="home"></span><span>Início</span></button>
-    <button data-view="create"><span data-icon="paw"></span><span>Criar Nativa</span></button>
-    <button data-view="list"><span data-icon="book"></span><span>Meu bestiário</span></button>
-    <button data-view="art-studio"><span data-icon="palette"></span><span>Ateliê de imagens</span></button>
-    <button data-view="battle"><span data-icon="swords"></span><span>Arena de batalha</span></button>
-    <button data-view="rules"><span data-icon="scroll"></span><span>Regras</span></button>
-    <button data-view="admin" id="admin-nav-button" hidden><span data-icon="shield"></span><span>Admin</span></button>
-  </nav>
-  <main>
+<body class="dashboard">
+<a class="skip-link" href="#main-content">Pular para o conteúdo</a><aside class="refuge-sidebar"><a class="refuge-brand" href="./index.html"><img src="./assets/generated/logo-emblem.jpg" alt=""><div><strong>NATIVA</strong><small>Seu mundo selvagem</small></div></a><span class="nav-caption">O seu refúgio</span><nav class="main-nav" aria-label="Navegação do jogo"><button data-view="home"><span data-icon="home"></span><span>Refúgio</span></button>
+<button data-view="list"><span data-icon="book"></span><span>Bestiário</span></button>
+<button data-view="battle"><span data-icon="swords"></span><span>Arena</span></button>
+<button data-view="create"><span data-icon="paw"></span><span>Criar Nativa</span></button>
+<div class="nav-divider"></div><button data-view="art-studio" data-secondary-nav><span data-icon="palette"></span><span>Ateliê de imagens</span></button>
+<button data-view="gallery" data-secondary-nav><span data-icon="book"></span><span>Acervo e retratos</span></button>
+<button data-view="multiplayer" data-secondary-nav><span data-icon="users"></span><span>Mesas multiplayer</span></button>
+<button data-view="rules" data-secondary-nav><span data-icon="scroll"></span><span>Guia de jogo</span></button>
+<div class="nav-divider"></div><button data-view="account" data-secondary-nav><span data-icon="shield"></span><span>Minha conta</span></button>
+<button data-view="admin" data-secondary-nav data-admin-only hidden><span data-icon="shield"></span><span>Administração</span></button>
+<button class="more-button" aria-expanded="false" aria-label="Mais opções de navegação"><span data-icon="menu"></span><span>Mais</span></button></nav><div class="sidebar-foot"><p><span class="status-dot"></span>A natureza conecta.</p><a href="./index.html">← Voltar ao mundo NATIVA</a></div></aside>
+  <div class="refuge-shell"><header class="refuge-topbar"><div class="breadcrumb">NATIVA <span>/</span> <strong data-current-view>Refúgio</strong></div><div class="player-chip"><span class="avatar" data-player-initial>E</span><div><strong data-player-name>Explorador</strong><small data-player-role>Jogador · NATIVA</small></div><button type="button" data-signout aria-label="Sair da conta"><span data-icon="logout"></span></button></div></header>
+  <main id="main-content">
     <section id="home" class="view active">
-      <div class="hero-panel">
-        <div><span class="eyebrow">SEU MUNDO. SUAS NATIVAS.</span><h2>Uma natureza extraordinária espera por você.</h2><p>Crie criaturas inspiradas na biodiversidade brasileira, escolha suas técnicas, acompanhe a evolução e simule combates por turnos.</p><button data-go="create">Começar uma Nativa</button></div>
-        <div class="hero-emblem" aria-hidden="true"><img src="./assets/generated/logo-emblem.jpg" alt="" width="230" height="230"></div>
-      </div>
-      <section class="form-panel auth-panel" aria-labelledby="online-account-title">
-        <div class="panel-heading"><span class="step-number" data-icon="mail"></span><div><h3 id="online-account-title">Conta do jogador</h3><p>Entre com e-mail e senha ou Google, ou crie sua conta agora.</p></div></div>
-        <div id="online-auth-area">
-          <div class="auth-tabs" role="tablist" aria-label="Entrada ou cadastro">
-            <button id="online-auth-tab-signin" type="button" class="active" data-auth-tab="signin" role="tab" aria-selected="true">Entrar</button>
-            <button id="online-auth-tab-signup" type="button" data-auth-tab="signup" role="tab" aria-selected="false">Criar conta</button>
-          </div>
-          <form id="online-auth-signin-form" data-auth-pane="signin">
-            <div class="grid">
-              <label>E-mail<input name="email" type="email" autocomplete="email" required placeholder="voce@exemplo.com"></label>
-              <label>Senha<input name="password" type="password" autocomplete="current-password" minlength="6" required placeholder="Sua senha"></label>
-            </div>
-            <div class="form-actions"><button type="submit">Entrar</button></div>
-          </form>
-          <form id="online-auth-signup-form" data-auth-pane="signup" hidden>
-            <div class="grid">
-              <label>Nome de jogador<input name="displayName" autocomplete="nickname" maxlength="40" required placeholder="Como aparecerá nas salas"></label>
-              <label>E-mail<input name="email" type="email" autocomplete="email" required placeholder="voce@exemplo.com"></label>
-              <label>Senha<input name="password" type="password" autocomplete="new-password" minlength="6" required placeholder="Mínimo de 6 caracteres"></label>
-              <label>Confirmar senha<input name="confirmPassword" type="password" autocomplete="new-password" minlength="6" required placeholder="Repita a senha"></label>
-            </div>
-            <div class="form-actions"><button type="submit">Criar conta</button></div>
-          </form>
-          <div id="online-auth-turnstile" class="auth-turnstile" hidden></div>
-          <div class="auth-divider" role="separator"><span>ou</span></div>
-          <button id="online-auth-google" class="secondary auth-google" type="button"><span data-icon="globe"></span>Entrar com Google</button>
-          <p id="online-auth-status" role="status" aria-live="polite">Entre ou crie sua conta para sincronizar fichas e salas. O jogo local continua disponível sem login.</p>
-        </div>
-        <div id="online-account-details" hidden>
-          <p id="online-account-name"></p>
-          <p id="online-account-email" class="muted"></p>
-          <p id="online-account-status" role="status" aria-live="polite"></p>
-          <p><a id="online-open-sync-diagnostic" href="./tests/sync-diagnostic.html">Diagnóstico de sincronização</a></p>
-          <button id="online-auth-signout" class="secondary" type="button">Sair da conta</button>
-        </div>
-      </section>
+
+      <div class="welcome-line"><div><span class="eyebrow">SEU REFÚGIO NA NATUREZA</span><h2>Bem-vindo de volta, <span data-player-name>explorador</span>.</h2><p>Há um mundo extraordinário esperando por vocês.</p></div><span class="season-label">Biodiversidade brasileira</span></div>
+      <article class="expedition-hero"><div class="hero-sparks" aria-hidden="true"></div><div class="hero-copy"><span class="eyebrow">CADA VÍNCULO, UMA NOVA HISTÓRIA</span><h3>A sua próxima<br>jornada começa aqui.</h3><p>Encontre a força da natureza. Crie sua Nativa e descubra o que vocês podem se tornar.</p><button class="gold-button" data-go="create"><span data-icon="paw"></span>Criar minha Nativa <span data-icon="chevron"></span></button></div><span class="hero-coordinate">TERRITÓRIO NATIVA · BRASIL</span></article>
+      <div class="journey-stats"><div class="journey-stat"><span data-icon="paw"></span><div><strong id="count">0</strong><small>Nativas no refúgio</small></div></div><div class="journey-stat"><span data-icon="globe"></span><div><strong>5</strong><small>Biomas para explorar</small></div></div><div class="journey-stat"><span data-icon="sparkles"></span><div><strong>5</strong><small>Afinidades da natureza</small></div></div></div>
+      <div class="refuge-grid"><div><div class="refuge-section-title"><h3>Seus companheiros</h3><button class="text-button" data-go="list">Ver bestiário →</button></div><div id="dashboard-companions" class="companion-grid" aria-live="polite"></div><section class="refuge-world"><div class="refuge-section-title"><h3>Um Brasil extraordinário</h3><span class="eyebrow">CONHEÇA OS BIOMAS</span></div><div class="biome-paths">
+      <article class="biome-path" style="--biome-image:url('./assets/generated/biome-floresta-mata.jpg')"><div><small>VIDA EM CADA DETALHE</small><h4>Floresta e Mata</h4></div></article><article class="biome-path" style="--biome-image:url('./assets/generated/biome-rios-pantanal.jpg')"><div><small>O PULSO DAS ÁGUAS</small><h4>Rios e Pantanal</h4></div></article><article class="biome-path" style="--biome-image:url('./assets/generated/biome-caatinga-cerrado.jpg')"><div><small>FORÇA QUE FLORESCE</small><h4>Caatinga e Cerrado</h4></div></article></div></section></div>
+      <aside class="refuge-aside"><section class="activity-panel"><span class="eyebrow">SEU CAMINHO</span><h3>Diário de jornada</h3><div class="journey-task"><span data-icon="paw"></span><div><b>Um vínculo com a natureza</b><small data-task-create>Crie sua primeira Nativa</small></div></div><div class="journey-task"><span data-icon="palette"></span><div><b>Dê vida à sua imaginação</b><small>Crie um retrato no ateliê</small></div></div><div class="journey-task"><span data-icon="swords"></span><div><b>Prepare seus companheiros</b><small>Experimente a arena local</small></div></div><button class="text-button" data-go="rules">Consultar o guia de jogo →</button></section><article class="arena-teaser"><span class="eyebrow">O DESAFIO CHAMA</span><h3>Entre na arena.</h3><p>Estratégia, afinidade e a força do seu vínculo. Teste suas Nativas em combate por turnos.</p><button data-go="battle">Preparar batalha <span data-icon="chevron"></span></button></article></aside></div>
+    </section>
+    <section id="multiplayer" class="view"><div class="section-heading"><div><span class="eyebrow">JORNADAS COMPARTILHADAS</span><h2>Suas mesas</h2><p>Reúna seus amigos e escrevam uma história juntos.</p></div></div>
       <section id="online-rooms-panel" class="form-panel" aria-labelledby="online-rooms-title">
         <div class="panel-heading"><span class="step-number" data-icon="users"></span><div><h3 id="online-rooms-title">Mesas multiplayer</h3><p>Crie uma sala ou entre em uma mesa por convite. Suas fichas continuam neste navegador.</p></div></div>
         <p id="online-rooms-auth-hint" class="muted">Entre na sua conta para acessar suas salas. O jogo local continua disponível sem login.</p>
@@ -140,9 +108,6 @@
           </section>
         </div>
       </section>
-      <div class="stat-strip"><div><strong id="count">0</strong><span>Nativas no bestiário</span></div><div><strong>42</strong><span>XPA de criação</span></div><div><strong>6</strong><span>Espaços de técnicas</span></div></div>
-      <div class="section-heading"><div><span class="eyebrow">CAMINHO DO JOGADOR</span><h3>Seu protótipo</h3></div></div>
-      <div class="feature-grid"><article class="feature-card"><span>01</span><h4>Criação</h4><p>Defina grupo biológico, linhagem, espécie, bioma e afinidade.</p></article><article class="feature-card"><span>02</span><h4>Bestiário</h4><p>Guarde retratos, atributos, técnicas e evolução das suas Nativas.</p></article><article class="feature-card"><span>03</span><h4>Combate</h4><p>Teste iniciativa, precisão, dano, MP e recargas em uma arena local.</p></article></div>
     </section>
 
     <section id="create" class="view">
@@ -189,7 +154,7 @@
     <section id="art-studio" class="view">
       <div class="section-heading"><div><span class="eyebrow">CRIAÇÃO VISUAL</span><h2>Ateliê de imagens</h2><p>Crie arte para Nativas, biomas, técnicas e novas ideias.</p></div></div>
       <div class="form-panel">
-        <p class="art-cost-note">A geração usa créditos da conta autorizada do provedor. Cada imagem é solicitada somente ao clicar em “Gerar imagem”. Os arquivos gerados ficam neste navegador; nenhuma ficha, foto ou imagem é enviada ao Supabase Storage.</p>
+        <p class="art-cost-note">Dê forma à sua Nativa. A geração pode consumir créditos e está disponível para contas autorizadas. Suas artes ficam salvas neste dispositivo.</p>
         <form id="art-generation-form" class="art-form">
           <label>Categoria<select id="art-kind" required><option value="nativa">Nativa</option><option value="biome">Bioma</option><option value="technique">Técnica ou golpe</option><option value="other">Outra ideia futura</option></select></label>
           <label>Nome do tema<input id="art-title" maxlength="80" required placeholder="Ex.: Guardião das veredas"></label>
@@ -198,6 +163,9 @@
         </form>
         <div id="art-preview" class="art-preview" hidden><img id="art-preview-image" alt="Prévia da imagem gerada"><div class="form-actions"><button id="art-save" type="button">Salvar no acervo local</button></div></div>
       </div>
+      <p><button class="secondary" data-go="gallery">Abrir acervo e vincular um retrato →</button></p>
+    </section>
+    <section id="gallery" class="view"><div class="section-heading"><div><span class="eyebrow">SUA COLEÇÃO VISUAL</span><h2>Acervo e retratos</h2><p>Escolha uma arte do acervo e vincule à Nativa que ela representa.</p></div><button data-go="art-studio">Criar nova imagem</button></div>
       <div class="form-panel">
         <div class="section-heading compact"><div><h3>Acervo deste navegador</h3><p>Separado por conta e armazenado localmente, junto às fotos do projeto.</p></div><label>Aplicar como retrato de uma Nativa<select id="art-target-nativa"><option value="">Escolha uma ficha editável</option></select></label></div>
         <div id="art-gallery" class="art-gallery"><p class="muted">Entre em uma conta para consultar o acervo.</p></div>
@@ -210,9 +178,18 @@
       <div id="battle-arena" class="battle-arena empty"><p>Configure os combatentes para abrir a arena.</p></div>
     </section>
 
-    <section id="admin" class="view">
-      <div class="section-heading"><div><span class="eyebrow">ADMINISTRAÇÃO</span><h2>Painel do administrador</h2><p>Gerencie usuários, permissões de geração de imagens e papéis de acesso.</p></div></div>
-      <div class="form-panel">
+    <section id="rules" class="view">
+      <div class="section-heading"><div><span class="eyebrow">REFERÊNCIA RÁPIDA</span><h2>Regras-base</h2><p>Resumo das regras implementadas neste protótipo.</p></div></div>
+      <div class="rules-grid">
+        <article class="rule-card"><h3>Criação e progressão</h3><ul><li>42 XPA para distribuir entre sete atributos, todos iniciando em 1.</li><li>O custo para subir de N para N+1 é N+1 XPA.</li><li>Ao criar, a Nativa recebe 1 XPA de vínculo.</li><li>Para subir de nível, precisa de XP igual ao nível de destino; ao subir, recebe XPA igual ao novo nível.</li><li>Estágios: 1–9, estágio 1; 10–16, estágio 2; 17+, estágio 3.</li></ul></article>
+        <article class="rule-card"><h3>Combate</h3><ul><li>Iniciativa: 1D10 + AGI, rolada novamente a cada turno.</li><li>Precisão negativa representa penalidade: -1 erra no 1; -2 erra de 1 a 2; e assim por diante.</li><li>Dano físico: ATQ + dano da técnica − DEF.</li><li>Dano especial: POT + dano da técnica − RES.</li><li>Golpes ofensivos acertados causam pelo menos 1 de dano antes do modificador de afinidade.</li><li>Fraqueza: +2 dano. Resistência: −2 dano. O resultado final não fica abaixo de zero.</li><li>HP máximo = HP × 5. MP máximo = MP × 2.</li><li>MP é gasto ao usar técnicas; a recarga é controlada por turnos.</li></ul></article>
+        <article class="rule-card"><h3>Essências</h3><ul><li>Primeira essência: nível 5; concede repertório de outra afinidade e técnica de linhagem ou arquétipo, sem alterar defesas.</li><li>Segunda essência: nível 12 e estágio 2; concede outra afinidade e técnica, alterando fraquezas e resistências junto da afinidade original.</li><li>Terceira essência: nível 17, ainda indisponível.</li></ul></article>
+        <article class="rule-card"><h3>Limites deste protótipo</h3><ul><li>O combate é local e manual: duas fichas no mesmo navegador, sem multiplayer online.</li><li>Efeitos escritos nas técnicas são exibidos no registro; nem todos são automatizados nesta versão.</li><li>Fotos são guardadas no IndexedDB do navegador, separadas dos dados das fichas.</li><li>Os dados permanecem neste navegador e não são sincronizados entre dispositivos.</li></ul></article>
+      </div>
+    </section>
+
+    <section id="account" class="view refuge-account"><div class="section-heading"><div><span class="eyebrow">SEU PERFIL</span><h2>Minha conta</h2><p>Seu ponto de encontro com o mundo NATIVA.</p></div></div><div class="account-card"><h3 data-player-name>Explorador</h3><p data-player-email></p><p class="muted">Suas fotos e artes ficam neste dispositivo. Prepare suas fichas no bestiário para sincronizar com a conta.</p><button data-go="list">Abrir bestiário</button><button class="secondary" data-signout>Sair da conta</button><p style="margin-top:20px"><a href="./tests/sync-diagnostic.html">Diagnóstico de sincronização</a></p></div></section>
+    <section id="admin" class="view" data-admin-only hidden><div class="section-heading"><div><span class="eyebrow">ADMINISTRAÇÃO</span><h2>Observatório NATIVA</h2><p>Visão geral do mundo, disponível apenas para administradores.</p></div><button id="admin-refresh" class="secondary">Atualizar</button></div><p id="admin-overview-status" role="status"></p><div id="admin-overview" class="admin-metrics"></div>      <div class="form-panel">
         <p id="admin-status" class="muted" role="status" aria-live="polite">Verificando permissões…</p>
         <div class="section-heading compact"><div><h3>Usuários do projeto</h3><p class="muted">Contas registradas no Supabase Auth do projeto.</p></div><button id="admin-refresh-users" class="small secondary" type="button"><span data-icon="refresh"></span>Atualizar</button></div>
         <div id="admin-user-list" class="admin-user-list"></div>
@@ -226,18 +203,8 @@
         </form>
         <p id="admin-assistant-status" class="muted" role="status" aria-live="polite"></p>
       </div>
-    </section>
-
-    <section id="rules" class="view">
-      <div class="section-heading"><div><span class="eyebrow">REFERÊNCIA RÁPIDA</span><h2>Regras-base</h2><p>Resumo das regras implementadas neste protótipo.</p></div></div>
-      <div class="rules-grid">
-        <article class="rule-card"><h3>Criação e progressão</h3><ul><li>42 XPA para distribuir entre sete atributos, todos iniciando em 1.</li><li>O custo para subir de N para N+1 é N+1 XPA.</li><li>Ao criar, a Nativa recebe 1 XPA de vínculo.</li><li>Para subir de nível, precisa de XP igual ao nível de destino; ao subir, recebe XPA igual ao novo nível.</li><li>Estágios: 1–9, estágio 1; 10–16, estágio 2; 17+, estágio 3.</li></ul></article>
-        <article class="rule-card"><h3>Combate</h3><ul><li>Iniciativa: 1D10 + AGI, rolada novamente a cada turno.</li><li>Precisão negativa representa penalidade: -1 erra no 1; -2 erra de 1 a 2; e assim por diante.</li><li>Dano físico: ATQ + dano da técnica − DEF.</li><li>Dano especial: POT + dano da técnica − RES.</li><li>Golpes ofensivos acertados causam pelo menos 1 de dano antes do modificador de afinidade.</li><li>Fraqueza: +2 dano. Resistência: −2 dano. O resultado final não fica abaixo de zero.</li><li>HP máximo = HP × 5. MP máximo = MP × 2.</li><li>MP é gasto ao usar técnicas; a recarga é controlada por turnos.</li></ul></article>
-        <article class="rule-card"><h3>Essências</h3><ul><li>Primeira essência: nível 5; concede repertório de outra afinidade e técnica de linhagem ou arquétipo, sem alterar defesas.</li><li>Segunda essência: nível 12 e estágio 2; concede outra afinidade e técnica, alterando fraquezas e resistências junto da afinidade original.</li><li>Terceira essência: nível 17, ainda indisponível.</li></ul></article>
-        <article class="rule-card"><h3>Limites deste protótipo</h3><ul><li>O combate é local e manual: duas fichas no mesmo navegador, sem multiplayer online.</li><li>Efeitos escritos nas técnicas são exibidos no registro; nem todos são automatizados nesta versão.</li><li>Fotos são guardadas no IndexedDB do navegador, separadas dos dados das fichas.</li><li>Os dados permanecem neste navegador e não são sincronizados entre dispositivos.</li></ul></article>
-      </div>
-    </section>
-  </main>
-  <footer><span>NATIVA • Protótipo de desenvolvimento</span><span>Feito para testar as regras na mesa.</span></footer>
+<div class="form-panel"><h3>Acesso administrativo</h3><p>O acesso é definido pelo papel admin no perfil da conta no servidor. A permissão de mestre de uma mesa é independente da administração do jogo.</p></div></section>
+  </main></div>
+  <footer><span>NATIVA · Um mundo extraordinariamente brasileiro</span><span>Natureza. Vínculo. Jornada.</span></footer>
 </body>
 </html>

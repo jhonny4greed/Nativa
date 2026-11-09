@@ -15,3 +15,5 @@ supabase/.branches/
 
 # Build do Vite
 dist/
+
+.codex-review-remote/

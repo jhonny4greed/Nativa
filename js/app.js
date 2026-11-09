@@ -1,3 +1,4 @@
+import { defaultPortrait } from "./creature-art.js";
 import { AFINIDADES, GRUPOS_BIOLOGICOS, LINHAGENS, GRUPOS_POR_LINHAGEM, BIOMAS, ARQUETIPOS, normalizarArquetipoLegado } from "./data.js";
 import { TECNICAS, obterTecnicaPorId } from "./techniques.js";
 import { CATALOGO_TRACOS, CATALOGO_HABITOS, PERIODOS_BATALHA, nativaPossuiTraco, obterTracoPorId, obterTracosPadraoLinhagem } from "./traits.js";
@@ -7,7 +8,7 @@ import { CONFIG_ESSENCIA_PADRAO, MODOS_RECOMPENSA_ESSENCIA, criarEssenciaPendent
 import { criarNativa } from "./nativa-domain.js";
 import { podeAprenderTecnica, podeUsarTecnicaEmCombate, obterEstadoSeletorTecnica, adicionarTecnicaSelecionada } from "./technique-learning.js";
 import { repositorioLocal } from "./repository.js";
-import { inicializarAutenticacao, obterClienteSupabase } from "./auth.js";
+import { obterClienteSupabase } from "./auth.js";
 import { inicializarSalas } from "./rooms.js";
 import { servicoSincronizacao } from "./sync-service.js";
 import { estudioImagens } from "./art-studio.js";
@@ -423,7 +424,7 @@ $("#form").addEventListener("submit", async e => {
   submit.disabled = false;
 });
 
-function mostrarTela(id){document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active",v.id===id));document.querySelectorAll("[data-view]").forEach(b=>b.classList.toggle("active",b.dataset.view===id));if(id==="list")void renderizarLista();if(id==="art-studio"){void carregarAlvosArte();void renderizarAcervoArte();}if(id==="battle")atualizarSelectsBatalha();}
+function mostrarTela(id){document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active",v.id===id));document.querySelectorAll("[data-view]").forEach(b=>b.classList.toggle("active",b.dataset.view===id));if(id==="list")void renderizarLista();if(id==="art-studio"||id==="gallery"){void carregarAlvosArte();void renderizarAcervoArte();}if(id==="battle")atualizarSelectsBatalha();document.dispatchEvent(new CustomEvent("nativa:view",{detail:{id}}));}
 document.querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>mostrarTela(b.dataset.view)));
 document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>mostrarTela(b.dataset.go)));
 
@@ -616,6 +617,7 @@ async function renderizarLista(){
   await origensPresetsProntas;
   if (versao !== versaoRenderLista) return;
   $("#count").textContent=fichasParaRenderizar.length;
+  document.dispatchEvent(new CustomEvent("nativa:updated"));
   const statusEl=$("#bestiary-status");
   if(!fichasParaRenderizar.length){if(versao!==versaoRenderLista)return;$("#cards").innerHTML='<div class="form-panel"><p class="muted">Seu bestiário está vazio. Crie sua primeira Nativa para começar.</p></div>';if(statusEl)statusEl.textContent="";return;}
   const ids=fichasParaRenderizar.map(n=>typeof n.id==="string"&&n.id.trim()?n.id:null).filter(Boolean);
@@ -645,7 +647,7 @@ async function renderizarLista(){
     else if(estado?.associationState==="no-session")estadoTexto="Somente leitura · entre na conta associada";
     else if(estado?.associationState==="ambiguous")estadoTexto="Somente leitura · vínculo entre contas ambíguo";
     if(estado?.queueCount)estadoTexto+=` · fila local ${estado.pendingCount} pendente${estado.pendingCount===1?"":"s"}${estado.hasBlockedOperations?", dependência ou resolução necessária":""} · ainda não enviada`;
-    const foto=await obterFoto(n.photoId);let photoUrl=foto?URL.createObjectURL(foto):null;const t=(n.techniques||[]).map(id=>obterTecnicaPorId(id)).filter(Boolean);const maxHP=(n.attrs.HP||1)*5,maxMP=(n.attrs.MP||1)*2;const resumo=obterResumoProgressao(n);const essenciasGuardadas=(n.essenciasDisponiveis||[]).map(x=>x.oponenteNome||"Combate");const fotoHtml=photoUrl?`<img class="creature-photo" src="${photoUrl}" alt="Retrato de ${escapar(n.name)}">`:'<div class="photo-placeholder">✦</div>';
+    const foto=await obterFoto(n.photoId);let photoUrl=foto?URL.createObjectURL(foto):defaultPortrait(n);const t=(n.techniques||[]).map(id=>obterTecnicaPorId(id)).filter(Boolean);const maxHP=(n.attrs.HP||1)*5,maxMP=(n.attrs.MP||1)*2;const resumo=obterResumoProgressao(n);const essenciasGuardadas=(n.essenciasDisponiveis||[]).map(x=>x.oponenteNome||"Combate");const fotoHtml=photoUrl?`<img class="creature-photo" src="${photoUrl}" alt="Retrato de ${escapar(n.name)}">`:'<div class="photo-placeholder">✦</div>';
     const idCard=idValido?n.id:`ficha-local-${index}`;
     const disabled=somenteLeitura?"disabled":"";
     const deleteDisabled=somenteLeitura&&estado?.associationState!=="deleted"?"disabled":"";
@@ -814,6 +816,7 @@ async function iniciarBatalha(){
     for(const c of combatentes){
       const foto=await obterFoto(c.nativa.photoId);
       substituirFotoCombatente(c,foto);
+      if(!foto)c.fotoUrl=defaultPortrait(c.nativa);
     }
   }catch(error){
     // Essas URLs ainda não foram inseridas na arena; limpa também carregamentos parciais.
@@ -1350,7 +1353,7 @@ void repositorioLocal.consultarEstadoPersistencia().catch(error => {
   const status = $("#bestiary-status");
   if (status) status.textContent = `O armazenamento local está indisponível: ${error.message}`;
 });
-void inicializarAutenticacao();
+
 void atualizarPainelSincronizacao();
 void obterClienteSupabase().then(client => {
   client.auth.onAuthStateChange(() => {

@@ -9,3 +9,5 @@ supabase/.branches
 !.env.example
 dist
 .github
+.codex-review-remote
+scripts/preview-dashboard.js

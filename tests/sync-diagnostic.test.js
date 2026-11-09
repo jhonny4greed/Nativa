@@ -8,7 +8,7 @@ const appHtml = readFileSync(new URL("../app.html", import.meta.url), "utf8");
 const authSource = readFileSync(new URL("../js/auth.js", import.meta.url), "utf8");
 
 test("acesso ao diagnóstico fica dentro da área autenticada e retorna ao NATIVA na mesma origem", () => {
-  assert.match(appHtml, /<div id="online-account-details" hidden>[\s\S]*?<a id="online-open-sync-diagnostic" href="\.\/tests\/sync-diagnostic\.html">Diagnóstico de sincronização<\/a>[\s\S]*?<\/div>/);
+  assert.match(appHtml, /<section id="account"[\s\S]*?<a href="\.\/tests\/sync-diagnostic\.html">Diagnóstico de sincronização<\/a>[\s\S]*?<\/section>/);
   assert.match(diagnosticHtml, /<a id="return-to-nativa" href="\.\.\/app\.html#conta">Voltar ao NATIVA<\/a>/);
 });
 

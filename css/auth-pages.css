@@ -1,0 +1,36 @@
+body.auth-page { margin:0; min-height:100svh; background:#101e16; color:#e9e2cd; font-family:var(--font-body); }
+.auth-layout { display:grid; grid-template-columns:1.1fr 1fr; min-height:100svh; }
+.auth-story { position:relative; isolation:isolate; padding:42px 55px; display:flex; flex-direction:column; justify-content:space-between; background:linear-gradient(0deg,#0c1c15ed, #0b1b1433 70%),url('../assets/generated/auth-backdrop.jpg') center/cover; }
+.auth-story::after { content:""; position:absolute; inset:0; border-right:1px solid #c7b17c44; z-index:-1; background:linear-gradient(90deg,transparent,#0f211733); }
+.auth-brand { display:flex; align-items:center; gap:13px; text-decoration:none; color:#f1e6c8; }
+.auth-brand img { width:45px; height:45px; border-radius:50%; border:1px solid #d5bd7b77; }
+.auth-brand strong { font:600 27px var(--font-display); letter-spacing:5px; }
+.auth-story h2 { font:400 clamp(36px,4vw,60px)/1.1 var(--font-display); max-width:470px; margin:15px 0 22px; }
+.auth-story p { max-width:350px; color:#bdccb1; font-size:13px; line-height:1.8; }
+.auth-story small,.auth-kicker { color:#d4c08b; font-size:9px; letter-spacing:2.5px; text-transform:uppercase; }
+.auth-form-side { padding:40px 55px; display:flex; flex-direction:column; justify-content:center; position:relative; background:radial-gradient(ellipse at 80% 90%,#253a22aa,transparent 70%); }
+.auth-back { position:absolute; top:30px; right:38px; color:#9fae93; font-size:11px; text-decoration:none; }
+.auth-form-wrap { width:100%; max-width:370px; margin:40px auto; }
+.auth-form-wrap h1 { font:400 39px var(--font-display); letter-spacing:-1px; margin:10px 0 10px; color:#eee4c9; }
+.auth-intro { color:#9eae93; font-size:12px; line-height:1.7; margin-bottom:25px; }
+.auth-form-wrap label { display:grid; gap:7px; margin:15px 0; color:#cbd3ba; font-size:11px; }
+.auth-form-wrap input { width:100%; box-sizing:border-box; padding:13px 14px; min-height:46px; color:#ebead8; background:#0d1c14; border:1px solid #7d966044; border-radius:7px; font:13px var(--font-body); }
+.auth-form-wrap input:focus { border-color:#d3bb7e; outline:1px solid #d3bb7e; }
+.auth-form-wrap button { font:600 12px var(--font-body); min-height:46px; width:100%; cursor:pointer; border-radius:7px; padding:12px; }
+.auth-submit { margin-top:12px; background:linear-gradient(135deg,#e4ce98,#bea36b); border:1px solid #dbc28b; color:#17251a; }
+.auth-google { display:flex; justify-content:center; align-items:center; gap:10px; background:#243729; border:1px solid #a5b18444; color:#e1dfca; }
+.google-mark { font:700 17px Arial; color:#d9c58e; }
+.auth-divider { display:flex; align-items:center; gap:14px; color:#85977d; font-size:10px; margin:20px 0; }
+.auth-divider::before,.auth-divider::after { content:""; height:1px; background:#b2bc8c22; flex:1; }
+.auth-switch { margin:22px 0 0; font-size:11px; color:#a0ae95; text-align:center; }
+.auth-switch a,.auth-form-wrap a { color:#d6bf89; text-underline-offset:4px; }
+.auth-status { color:#c7d3b4; font-size:11px; min-height:20px; line-height:1.6; }
+.auth-footnote { margin-top:30px; color:#7f9478; font-size:9px; line-height:1.7; text-align:center; }
+.auth-turnstile { margin-top:16px; }
+.auth-page button:disabled { opacity:.5; cursor:wait; }
+.auth-page [hidden] { display:none!important; }
+.auth-showcase { display:flex; align-items:center; gap:12px; margin-top:30px; border-top:1px solid #c5b37e44; padding-top:21px; }
+.auth-showcase img { width:48px; height:48px; border-radius:50%; object-fit:cover; border:1px solid #c9b37a77; }
+.auth-showcase p { font-size:10px; margin:0; }
+@media(max-width:760px) { .auth-layout { grid-template-columns:1fr; } .auth-story { min-height:200px; padding:24px; justify-content:flex-start; gap:25px; background-position:center 40%; } .auth-story h2 { font-size:29px; margin:0; max-width:280px; } .auth-story p,.auth-story small,.auth-showcase { display:none; } .auth-brand img { width:32px;height:32px; } .auth-brand strong { font-size:22px; } .auth-form-side { padding:30px 25px; } .auth-back { top:15px; right:25px; } .auth-form-wrap { margin:28px auto 10px; } .auth-form-wrap h1 { font-size:33px; } .auth-form-wrap input { font-size:16px; } }
+@media(prefers-reduced-motion:reduce) { * { scroll-behavior:auto!important; } }

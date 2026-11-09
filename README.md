@@ -12,7 +12,10 @@ Outros comandos: `npm test` (testes), `npm run lint`, `npm run build` (gera `dis
 
 ## Arquivos
 
-- `index.html`: estrutura das telas.
+- `index.html`: landing page.
+- `cadastro.html` e `login.html`: páginas independentes de autenticação.
+- `app.html`: dashboard autenticada, com navegação de jogo.
+- `js/dashboard.js` e `css/dashboard.css`: refúgio, menu lateral e menu inferior mobile.
 - `css/style.css`: identidade visual e responsividade.
 - `js/app.js`: criação, bestiário, fotos, progressão e arena.
 - `js/data.js`: grupos biológicos, linhagens, biomas, afinidades e arquétipos.
@@ -24,7 +27,7 @@ Outros comandos: `npm test` (testes), `npm run lint`, `npm run build` (gera `dis
 
 - Mantém a chave `localStorage` `nativa.prototype.v1` para preservar fichas existentes.
 - Fotos são armazenadas no IndexedDB do navegador, separadas dos dados textuais.
-- Os dados não são enviados a um servidor e não sincronizam entre dispositivos.
+- As fichas podem ser preparadas e sincronizadas explicitamente com a conta. Fotos e artes permanecem locais.
 
 ## O que está implementado
 
@@ -41,3 +44,9 @@ Outros comandos: `npm test` (testes), `npm run lint`, `npm run build` (gera `dis
 - Efeitos textuais de suporte/condição são registrados no histórico, mas não são todos aplicados automaticamente.
 - A batalha atual não restaura MP nem HP automaticamente entre partidas; inicie uma nova simulação para testar fichas novamente.
 - A terceira essência permanece desativada, conforme as regras atuais.
+
+## Nova experiência de jogo
+
+Veja [Dashboard e autenticação](docs/DASHBOARD_E_AUTENTICACAO.md) para rotas, configuração do Supabase e role administrativa. A [pesquisa de bibliotecas](docs/BIBLIOTECAS_ANIMACAO.md) registra as alternativas avaliadas.
+
+Os cinco retratos originais estão em `assets/generated/nativa-*.png`; a aplicação usa versões WebP leves, reproduzíveis com `npm run assets:optimize`. Os prompts estão em `docs/nativa-portrait-prompts.json`.
