@@ -24,7 +24,7 @@ Esta implementação prepara a migration; não a aplica a um banco remoto. Para 
 
 `npm ci`, `npm run dev`, `npm test` e `npm run build`. O Docker serve somente `dist`.
 
-Configure `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` e `TURNSTILE_SITE_KEY` no ambiente de destino. No Supabase Auth, autorize as URLs de retorno `/login.html` dos domínios utilizados. Configure o provedor Google e CAPTCHA no serviço correspondente. A site key de desenvolvimento já presente no repositório pode recusar localhost; isso não deve ser contornado pela interface.
+Configure `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` e `TURNSTILE_SITE_KEY` no ambiente de destino. No Supabase Auth, autorize as URLs de retorno `/login.html` dos domínios utilizados. Configure o provedor Google e CAPTCHA no serviço correspondente. Em desenvolvimento com Vite, o CAPTCHA é desativado automaticamente somente em localhost, 127.0.0.1 e ::1; o SDK do Turnstile não é carregado e login/cadastro não exigem token CAPTCHA. Builds de produção mantêm a chave configurada, inclusive quando servidos localmente. O Auth local deve manter CAPTCHA desativado no servidor.
 
 A antiga prévia sem sessão foi removida. `/__preview/dashboard` redireciona para `app.html`, que exige login real. Não há fixture de usuário ou cliente simulado servida pelo Vite. O conteúdo permanece oculto até a validação do usuário pelo Supabase.
 
