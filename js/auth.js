@@ -115,7 +115,12 @@ export async function inicializarAutenticacao() {
     client = await obterClienteSupabase();
     const { data, error } = await client.auth.getSession();
     if (error) throw error;
-    if (data.session) { location.replace(next); return; }
+    if (data.session) {
+      const verified = await client.auth.getUser();
+      if (!verified.error && verified.data?.user?.id === data.session.user.id) { location.replace(next); return; }
+      // Clear an invalid cached session instead of looping between login and app.
+      await client.auth.signOut({ scope: "local" });
+    }
     await protection.init();
     block(false);
   } catch {

@@ -1,10 +1,16 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { isAdmin, safeDestination, authHref } from "../js/access.js";
+import { isAdmin, safeDestination, authHref, getApplicationRole } from "../js/access.js";
 
 test("administration requires the role returned by the server; user metadata cannot grant access", () => {
   for (const value of [null, {}, "player", "master", { role: "admin" }, { user_metadata: { role: "admin" } }, { app_metadata: { role: "admin" } }]) assert.equal(isAdmin(value), false);
   assert.equal(isAdmin("admin"), true);
+});
+
+test("role lookup supports Supabase thenable builders without a catch method and fails closed", async () => {
+  assert.equal(await getApplicationRole({rpc:()=>({then:resolve=>resolve({data:"admin",error:null})})}),"admin");
+  assert.equal(await getApplicationRole({rpc:()=>({then:resolve=>resolve({data:null,error:{message:"missing RPC"}})})}),"player");
+  assert.equal(await getApplicationRole({rpc:()=>{throw new Error("offline");}}),"player");
 });
 
 test("authentication returns to the same-origin game and preserves invitations and view", () => {

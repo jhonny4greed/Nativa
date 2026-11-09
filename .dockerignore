@@ -10,4 +10,3 @@ supabase/.branches
 dist
 .github
 .codex-review-remote
-scripts/preview-dashboard.js

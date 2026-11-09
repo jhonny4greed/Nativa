@@ -1,4 +1,6 @@
 import { defaultPortrait } from "./creature-art.js";
+import { requireAuthenticatedUser } from "./session-gate.js";
+import { authHref, safeDestination } from "./access.js";
 import { AFINIDADES, GRUPOS_BIOLOGICOS, LINHAGENS, GRUPOS_POR_LINHAGEM, BIOMAS, ARQUETIPOS, normalizarArquetipoLegado } from "./data.js";
 import { TECNICAS, obterTecnicaPorId } from "./techniques.js";
 import { CATALOGO_TRACOS, CATALOGO_HABITOS, PERIODOS_BATALHA, nativaPossuiTraco, obterTracoPorId, obterTracosPadraoLinhagem } from "./traits.js";
@@ -381,6 +383,12 @@ const { guardarFoto, obterFoto, removerFoto } = repositorioLocal;
 $("#form").addEventListener("submit", async e => {
   e.preventDefault();
   const form = e.currentTarget;
+  try { await requireAuthenticatedUser(await obterClienteSupabase()); }
+  catch {
+    document.documentElement.removeAttribute("data-authenticated");
+    location.replace(authHref("login", safeDestination(location.href, location.href)));
+    return;
+  }
   if (xpUsado() !== 42) {
     $("#msg").textContent = `Distribua exatamente os 42 XPA. Você utilizou ${xpUsado()}.`;
     return;

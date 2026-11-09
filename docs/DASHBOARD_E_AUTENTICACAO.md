@@ -7,7 +7,7 @@ Implementação baseada no remoto `ae184358f90b34e46982cc670322df5a3898881c`, de
 - `index.html`: landing preservada. Jogar leva a `cadastro.html`; Entrar leva a `login.html`.
 - `cadastro.html`: nome, e-mail, senha e confirmação; alternativa Google; confirmação por e-mail quando exigida pelo Supabase.
 - `login.html`: formulário independente, com e-mail/senha e alternativa Google. Uma sessão existente segue para o jogo.
-- `app.html`: dashboard autenticada, sem formulários de cadastro/login. Sessão ausente volta ao login. O destino `next` aceita apenas `app.html` na mesma origem e conserva o convite e a tela desejada.
+- `app.html`: dashboard autenticada, sem formulários de cadastro/login. Sessão ausente, revogada, expirada ou não validada pelo Auth volta ao login antes de carregar os módulos do jogo. A criação revalida a sessão antes de salvar. O destino `next` aceita apenas `app.html` na mesma origem e conserva o convite e a tela desejada.
 - O menu organiza Refúgio, Bestiário, Arena, Criação, Ateliê, Mesas, Guia e Conta. No celular, a barra inferior mostra os quatro destinos principais e Mais. O menu expandido expõe os outros destinos.
 - Ateliê concentra a geração; Acervo e retratos concentra a coleção da conta, escolha da ficha e aplicação do retrato. Não há envio automático de fotos nem geração paga automática.
 - As cinco Nativas de teste recebem retratos padrão por ID. Um retrato carregado/aplicado pelo jogador prevalece. Fichas e IDs permanecem intactos.
@@ -26,8 +26,12 @@ Esta implementação prepara a migration; não a aplica a um banco remoto. Para 
 
 Configure `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` e `TURNSTILE_SITE_KEY` no ambiente de destino. No Supabase Auth, autorize as URLs de retorno `/login.html` dos domínios utilizados. Configure o provedor Google e CAPTCHA no serviço correspondente. A site key de desenvolvimento já presente no repositório pode recusar localhost; isso não deve ser contornado pela interface.
 
-Prévia visual isolada: com Vite iniciado, `/__preview/dashboard` apresenta a dashboard e as fichas locais sem conta real. A rota existe somente no middleware de desenvolvimento; não entra no build. A identidade da prévia é indicada no cabeçalho. Não use a prévia para validar autorização ou chamadas remotas.
+A antiga prévia sem sessão foi removida. `/__preview/dashboard` redireciona para `app.html`, que exige login real. Não há fixture de usuário ou cliente simulado servida pelo Vite. O conteúdo permanece oculto até a validação do usuário pelo Supabase.
 
 ## Validação
 
-Testes Node cobrem domínio existente, persistência, sincronização simulada e regras de acesso/redirecionamento. A verificação visual usa a prévia local e as páginas públicas. Login real, Google, e-mail, Turnstile e RPC administrativa exigem o ambiente configurado; a prévia não substitui esses testes.
+Testes Node cobrem domínio existente, persistência, sincronização simulada e regras de acesso/redirecionamento. A verificação visual usa um build local com uma conta descartável no Auth local e as páginas públicas. Login real, Google, e-mail, Turnstile e RPC administrativa exigem o ambiente configurado; os testes locais não substituem a validação desses serviços em produção.
+
+## Direção visual do refúgio
+
+As referências de hubs de jogos orientam o painel de seleção: criatura em destaque, dossiê de atributos, seletor circular, progresso real de XP e atalhos. A paleta de floresta e ouro e as ilustrações existentes preservam a identidade NATIVA. As transições respeitam redução de movimento; os controles têm foco visível, estado selecionado e resposta ao toque. Nenhum dado de progresso ou conquista é inventado para preencher o layout.

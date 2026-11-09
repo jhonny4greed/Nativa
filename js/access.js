@@ -1,6 +1,13 @@
 // Role comes exclusively from get_application_role, which derives auth.uid in SQL.
 export function isAdmin(role) { return role === "admin"; }
 
+export async function getApplicationRole(client) {
+  try {
+    const { data, error } = await client.rpc("get_application_role");
+    return !error && data === "admin" ? "admin" : "player";
+  } catch { return "player"; }
+}
+
 export function safeDestination(value, base = "http://localhost/") {
   try {
     const origin = new URL(base).origin;
