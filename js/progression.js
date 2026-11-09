@@ -1,6 +1,7 @@
 import { atualizarEstagio } from "./essences.js";
 
 export const ATRIBUTOS_PROGRESSAO = ["ATQ", "POT", "DEF", "RES", "AGI", "HP", "MP"];
+export const NIVEL_MAXIMO_TEMPORARIO = 17;
 
 export function xpTotalParaNivel(nivel) {
   if (!Number.isInteger(nivel) || nivel < 1) throw new Error("Nível inválido.");
@@ -37,10 +38,11 @@ export function adicionarXP(nativa, quantidade) {
   if (!Number.isInteger(nativa.nivel) || nativa.nivel < 1 || !Number.isInteger(nativa.xp) || nativa.xp < 0 || !Number.isInteger(nativa.xpTotal) || nativa.xpTotal < 0) {
     throw new Error("Os dados de XP ou nível desta ficha são inválidos.");
   }
+  if(nativa.nivel>=NIVEL_MAXIMO_TEMPORARIO){nativa.xp=0;return {xpAtual:0,xpNecessario:0,niveisConquistados:[],nivelMaximo:true};}
   nativa.xp += quantidade;
   nativa.xpTotal += quantidade;
   const niveis = [];
-  while (nativa.xp >= xpNecessario(nativa)) {
+  while (nativa.nivel<NIVEL_MAXIMO_TEMPORARIO && nativa.xp >= xpNecessario(nativa)) {
     const anterior = nativa.nivel;
     const custo = xpNecessario(nativa);
     nativa.xp -= custo;
@@ -52,7 +54,8 @@ export function adicionarXP(nativa, quantidade) {
     nativa.historicoProgressao.push(registro);
     niveis.push(registro);
   }
-  return { xpAtual: nativa.xp, xpNecessario: xpNecessario(nativa), niveisConquistados: niveis };
+  if(nativa.nivel===NIVEL_MAXIMO_TEMPORARIO)nativa.xp=0;
+  return { xpAtual: nativa.xp, xpNecessario: nativa.nivel===NIVEL_MAXIMO_TEMPORARIO?0:xpNecessario(nativa), niveisConquistados: niveis,nivelMaximo:nativa.nivel===NIVEL_MAXIMO_TEMPORARIO };
 }
 
 export function custoAtributo(valorAtual) { return valorAtual + 1; }

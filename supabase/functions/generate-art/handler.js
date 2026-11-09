@@ -172,31 +172,6 @@ export function createGenerateArtHandler({ env = () => undefined, fetchImpl = fe
   // O provedor NVIDIA responde de forma síncrona; o download é único.
   const results = new Map();
 
-  // Liberação: allowlist legada em env, papel admin em profiles ou linha em
-  // image_generation_allowlist (gerenciada pelo painel com chave de serviço).
-  async function consultarPermissao(userId) {
-    const staticAllowlist = (env("IMAGE_GENERATION_ALLOWED_USER_IDS") || "").split(",").map(id => id.trim()).filter(Boolean);
-    if (staticAllowlist.includes(userId)) return true;
-    const serviceKey = env("SUPABASE_SERVICE_ROLE_KEY") || env("SUPABASE_SECRET_KEY");
-    const supabaseUrl = env("SUPABASE_URL");
-    if (!serviceKey || !supabaseUrl) return false;
-    const base = supabaseUrl.replace(/\/$/, "");
-    const headers = { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` };
-    const [profileRes, allowRes] = await Promise.all([
-      fetchImpl(`${base}/rest/v1/profiles?id=eq.${encodeURIComponent(userId)}&select=role`, { headers, signal: AbortSignal.timeout(10_000) }),
-      fetchImpl(`${base}/rest/v1/image_generation_allowlist?user_id=eq.${encodeURIComponent(userId)}&select=user_id`, { headers, signal: AbortSignal.timeout(10_000) })
-    ]);
-    if (profileRes.ok) {
-      const rows = await readJsonResponse(profileRes);
-      if (Array.isArray(rows) && rows[0]?.role === "admin") return true;
-    }
-    if (allowRes.ok) {
-      const rows = await readJsonResponse(allowRes);
-      if (Array.isArray(rows) && rows.length > 0) return true;
-    }
-    return false;
-  }
-
   function sweepResults() {
     const current = now();
     for (const [id, entry] of results) if (entry.expiresAt <= current) results.delete(id);
@@ -234,11 +209,6 @@ export function createGenerateArtHandler({ env = () => undefined, fetchImpl = fe
     catch { return json({ error: "Não foi possível validar a sessão." }, 401); }
     if (!user) return json({ error: "Entre na conta para gerar imagens." }, 401);
 
-    let autorizado;
-    try { autorizado = await consultarPermissao(user.id); }
-    catch { return json({ error: "Não foi possível verificar a autorização de geração." }, 503); }
-    if (!autorizado) return json({ error: "Esta conta ainda não está autorizada a consumir créditos de geração." }, 403);
-
     let body;
     try {
       const contentType = request.headers.get("content-type") || "";
@@ -264,6 +234,12 @@ export function createGenerateArtHandler({ env = () => undefined, fetchImpl = fe
         return json({ error: "Informe uma categoria, um tema de até 80 caracteres e uma descrição de até 1.400 caracteres." }, 400);
       }
       try {
+        const serviceKey=env("SUPABASE_SERVICE_ROLE_KEY")||env("SUPABASE_SECRET_KEY");
+        const supabaseUrl=(env("SUPABASE_URL")||"").replace(/\/$/,"");
+        if(!serviceKey||!supabaseUrl)return json({error:"Limite de geração indisponível no servidor."},503);
+        const quota=await fetchImpl(`${supabaseUrl}/rest/v1/rpc/reserve_image_generation`,{method:"POST",headers:{apikey:serviceKey,Authorization:`Bearer ${serviceKey}`,"Content-Type":"application/json"},body:JSON.stringify({p_user_id:user.id}),signal:AbortSignal.timeout(10_000)});
+        if(!quota.ok)return json({error:"Não foi possível reservar uma geração."},503);
+        if(await readJsonResponse(quota)===false)return json({error:"Limite diário atingido: até 20 imagens por conta a cada 24 horas UTC."},429);
         sweepResults();
         const image = await generateImage(makePrompt(kind, title, prompt));
         const taskId = randomUUID();

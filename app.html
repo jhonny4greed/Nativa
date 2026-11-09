@@ -138,6 +138,7 @@
         <section id="technique-picker" class="form-panel"><div class="panel-heading"><span class="step-number">03</span><div><h3>Técnicas iniciais</h3><p>Escolha até seis técnicas entre as opções liberadas pelas características.</p></div></div>
           <div id="technique-groups"></div><div class="selected-area"><div class="section-heading compact"><h3>Minha ficha de técnicas</h3><span id="technique-count">0 de 6 selecionadas</span></div><div id="selected-techniques"></div></div>
         </section>
+        <section class="form-panel"><div class="panel-heading"><span class="step-number">04</span><div><h3>Vocalização e sons</h3><p>Busque gravações naturais e efeitos que combinem com a criatura. O catálogo fornece efeitos de áudio, não síntese de voz.</p></div></div><div class="grid"><label>Descreva o som<input id="native-sound-query" maxlength="240" placeholder="Ex.: vocalização rouca de lobo ao entardecer"></label><button id="native-sound-search" class="secondary" type="button">Recomendar efeitos</button><label>Efeito escolhido<select id="native-sound-choice"><option value="">Sem efeito</option></select></label><audio id="native-sound-preview" controls preload="none" hidden></audio></div><div id="native-sound-status" role="status"></div></section>
         <div class="form-actions"><button type="submit">Salvar Nativa no bestiário</button><p id="msg" role="status"></p></div>
       </form>
     </section>
@@ -158,12 +159,13 @@
     <section id="art-studio" class="view">
       <div class="section-heading"><div><span class="eyebrow">CRIAÇÃO VISUAL</span><h2>Ateliê de imagens</h2><p>Crie arte para Nativas, biomas, técnicas e novas ideias.</p></div></div>
       <div class="form-panel">
-        <p class="art-cost-note">Dê forma à sua Nativa. A geração pode consumir créditos e está disponível para contas autorizadas. Suas artes ficam salvas neste dispositivo.</p>
+        <p class="art-cost-note">Geração disponível para qualquer conta autenticada. Cada conta tem limite diário para proteger os créditos; as imagens e vínculos ficam neste dispositivo.</p>
+        <label>Vincular a uma Nativa após salvar (opcional)<select id="art-studio-target"><option value="">Salvar apenas no acervo</option></select></label>
         <form id="art-generation-form" class="art-form">
           <label>Categoria<select id="art-kind" required><option value="nativa">Nativa</option><option value="biome">Bioma</option><option value="technique">Técnica ou golpe</option><option value="other">Outra ideia futura</option></select></label>
           <label>Nome do tema<input id="art-title" maxlength="80" required placeholder="Ex.: Guardião das veredas"></label>
           <label>Descrição visual<textarea id="art-prompt" maxlength="1400" rows="5" required placeholder="Descreva forma, ambiente, cores, movimento e estilo visual."></textarea></label>
-          <div class="form-actions"><button id="art-generate" type="submit">Gerar imagem</button><p id="art-status" role="status" aria-live="polite">Entre em uma conta autorizada para começar.</p></div>
+          <div class="form-actions"><button id="art-generate" type="submit">Gerar imagem</button><p id="art-status" role="status" aria-live="polite">Entre em sua conta para começar.</p></div>
         </form>
         <div id="art-preview" class="art-preview" hidden><img id="art-preview-image" alt="Prévia da imagem gerada"><div class="form-actions"><button id="art-save" type="button">Salvar no acervo local</button></div></div>
       </div>

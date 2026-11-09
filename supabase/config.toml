@@ -406,6 +406,9 @@ verify_jwt = false
 [functions.arena-online]
 verify_jwt = false
 
+[functions.epidemic-sound]
+verify_jwt = false
+
 # [edge_runtime.secrets]
 # secret_key = "env(SECRET_VALUE)"
 
