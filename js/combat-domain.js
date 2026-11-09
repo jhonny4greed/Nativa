@@ -385,7 +385,7 @@ function aplicarAcaoEspecial(combatentes, indice, tipo, eventos) {
  * Resolve uma rodada seguindo a ordem e os cálculos usados anteriormente em app.js.
  * random deve ter a semântica de Math.random; no uso normal, Math.random é usado.
  */
-export function resolverTurnoCombate({ fighters, choices, random = Math.random, biomaArena = null }) {
+export function resolverTurnoCombate({ fighters, choices, random = Math.random, biomaArena = null, invalidActionPolicy = "error" }) {
   const combatentes = fighters.map(clonarCombatente);
   const eventos = [];
   const rolls = combatentes.map(combatente => {
@@ -415,7 +415,14 @@ export function resolverTurnoCombate({ fighters, choices, random = Math.random, 
       const adversario = combatentes[1 - indice];
       if (combatente.hp <= 0 || adversario.hp <= 0) continue;
       const escolha = choices[indice];
-      if (escolha?.tipo === "attack") aplicarTecnica(combatentes, indice, escolha.tecnicaId, random, eventos, biomaArena);
+      if (escolha?.tipo === "attack") {
+        try { aplicarTecnica(combatentes, indice, escolha.tecnicaId, random, eventos, biomaArena); }
+        catch (invalid) {
+          if(invalidActionPolicy!=="defend")throw invalid;
+          eventos.push({type:"invalid-action",message:`A ação de ${combatente.nativa.name} ficou indisponível durante o turno. A Nativa defende.`});
+          aplicarAcaoEspecial(combatentes,indice,"defend",eventos);
+        }
+      }
       if (escolha?.tipo === "defend" || escolha?.tipo === "recover") {
         aplicarAcaoEspecial(combatentes, indice, escolha.tipo, eventos);
       }

@@ -22,6 +22,7 @@ if (user) {
   await import("../css/dashboard.css");
   await import("../css/game-hub.css");
   await import("../css/arena-game.css");
+  await import("../css/arena-online.css");
   observeIcons();
   const { initializeDashboard } = await import("./dashboard.js");
   // Preserve the existing profile bootstrap for new e-mail and OAuth accounts.

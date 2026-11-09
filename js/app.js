@@ -1,6 +1,9 @@
 import { defaultPortrait } from "./creature-art.js";
 import { requireAuthenticatedUser } from "./session-gate.js";
 import { authHref, safeDestination } from "./access.js";
+import { arenaPortrait } from "./arena-art.js";
+import { initializeArenaFullscreen } from "./arena-fullscreen.js";
+import { initializeOnlineArena } from "./online-arena.js";
 import { AFINIDADES, GRUPOS_BIOLOGICOS, LINHAGENS, GRUPOS_POR_LINHAGEM, BIOMAS, ARQUETIPOS, normalizarArquetipoLegado } from "./data.js";
 import { TECNICAS, obterTecnicaPorId } from "./techniques.js";
 import { CATALOGO_TRACOS, CATALOGO_HABITOS, PERIODOS_BATALHA, nativaPossuiTraco, obterTracoPorId, obterTracosPadraoLinhagem } from "./traits.js";
@@ -30,6 +33,7 @@ const DEFINICOES_ATRIBUTOS = [["ATQ","Ataque"],["POT","Potência"],["DEF","Defes
 let atributos = Object.fromEntries(DEFINICOES_ATRIBUTOS.map(([key])=>[key,1]));
 let tecnicasSelecionadas = new Set();
 let batalha = null;
+let onlineArena = null;
 const urlsFotosArena = criarRegistroUrlsFotosArena({
   criarUrl: blob => URL.createObjectURL(blob),
   revogarUrl: url => URL.revokeObjectURL(url)
@@ -800,6 +804,7 @@ function liberarFotosBatalha({manterBatalha=false}={}){
 }
 
 async function iniciarBatalha(){
+  if(onlineArena?.isActive()){alert("Finalize o duelo online antes de iniciar uma simulação local.");return;}
   const a=nativas.find(n=>n.id===$("#fighter-a").value);
   const b=nativas.find(n=>n.id===$("#fighter-b").value);
   const modo=$("#battle-mode")?.value===MODOS_BATALHA.CPU?MODOS_BATALHA.CPU:MODOS_BATALHA.LOCAL;
@@ -824,7 +829,8 @@ async function iniciarBatalha(){
     for(const c of combatentes){
       const foto=await obterFoto(c.nativa.photoId);
       substituirFotoCombatente(c,foto);
-      if(!foto)c.fotoUrl=defaultPortrait(c.nativa);
+      if(!foto)c.fotoUrl=arenaPortrait(c.nativa)||defaultPortrait(c.nativa);
+      c.arenaCutout=!foto&&Boolean(arenaPortrait(c.nativa));
     }
   }catch(error){
     // Essas URLs ainda não foram inseridas na arena; limpa também carregamentos parciais.
@@ -887,6 +893,7 @@ function selecionarAcao(indice,tipo,tecnicaId=null){
     batalha.processando||
     batalha.aguardandoProximoTurno
   )return;
+  if(batalha.modo==="online"&&(batalha.onlineSubmitted||indice!==batalha.onlineSelfIndex))return;
 
   const c=batalha.fighters[indice];
 
@@ -1100,7 +1107,7 @@ function renderizarCombatente(c,indice){
     :`<div class="combatant-photo-placeholder" role="img" aria-label="${escapar(n.name)}, sem imagem cadastrada"><span></span></div>`;
 
   return `
-    <div class="arena-creature ${indice===0?"contestant-left":"contestant-right"} ${c.animacao?`anim-${c.animacao}`:""}" role="group" aria-label="${escapar(n.name)}">
+    <div class="arena-creature ${c.arenaCutout?"has-cutout":""} ${indice===0?"contestant-left":"contestant-right"} ${c.animacao?`anim-${c.animacao}`:""}" role="group" aria-label="${escapar(n.name)}">
       <div class="combatant-art">${foto}</div>
     </div>
   `;
@@ -1173,7 +1180,7 @@ function renderizarPainelAcao(c,indice){
           <h3>${escapar(c.nativa.name)}</h3>
         </div>
         <span class="action-selected">
-          ${escolha
+          ${batalha.modo==="online"&&batalha.onlineSubmitted?"Ação confirmada":escolha
             ?escolha.tipo==="attack"?escapar(obterTecnicaPorId(escolha.tecnicaId)?.nome||"Ataque escolhido")
               :escolha.tipo==="defend"?"Defender escolhido"
               :"Recuperação escolhida"
@@ -1241,9 +1248,9 @@ function renderizarArena(){
         id="execute-turn"
         class="execute-battle-button"
         type="button"
-        ${Object.keys(batalha.escolhas).length<(batalha.modo===MODOS_BATALHA.CPU?1:2)||batalha.processando||batalha.aguardandoProximoTurno?"disabled":""}
+        ${Object.keys(batalha.escolhas).length<(batalha.modo===MODOS_BATALHA.CPU||batalha.modo==="online"?1:2)||batalha.processando||batalha.aguardandoProximoTurno||batalha.onlineSubmitted?"disabled":""}
       >
-        ${batalha.aguardandoProximoTurno?"Aguarde o próximo turno...":"REALIZAR AÇÃO"}
+        ${batalha.modo==="online"?(batalha.onlineSubmitted?"AÇÃO CONFIRMADA · AGUARDANDO":"CONFIRMAR AÇÃO ONLINE"):batalha.aguardandoProximoTurno?"Aguarde o próximo turno...":"REALIZAR AÇÃO"}
       </button>
     `;
 
@@ -1252,12 +1259,12 @@ function renderizarArena(){
       <div class="battle-result">
         <span>🏆</span>
         <div>
-          <strong>Combate encerrado</strong>
-          <p>Vitória: ${escapar(f.find(c=>c.hp>0)?.nativa.name||"Sem vencedor")}</p>
+          <strong>${batalha.onlineCancelled?"Duelo cancelado":"Combate encerrado"}</strong>
+          <p>${batalha.onlineCancelled?"Sem resultado · fichas preservadas":`Vitória: ${escapar(batalha.modo==="online"?(f[batalha.onlineWinnerIndex]?.nativa.name||"Sem vencedor"):f.find(c=>c.hp>0)?.nativa.name||"Sem vencedor")}`}</p>
         </div>
       </div>
 
-      <button id="new-battle" class="secondary" type="button">
+      <button id="new-battle" class="secondary" type="button" ${batalha.modo==="online"?"hidden":""}>
         Novo combate
       </button>
     `
@@ -1286,8 +1293,9 @@ function renderizarArena(){
       </div>
       <div class="battle-commands">
         <div class="battle-commands-grid">
-          ${!batalha.encerrada?renderizarPainelAcao(f[0],0):""}
+          ${!batalha.encerrada&&(batalha.modo!=="online"||batalha.onlineSelfIndex===0)?renderizarPainelAcao(f[0],0):""}
           ${!batalha.encerrada&&batalha.modo===MODOS_BATALHA.LOCAL?renderizarPainelAcao(f[1],1):""}
+          ${!batalha.encerrada&&batalha.modo==="online"&&batalha.onlineSelfIndex===1?renderizarPainelAcao(f[1],1):""}
         </div>
         ${botaoExecutar}
         ${resultado}
@@ -1306,7 +1314,13 @@ function renderizarArena(){
     });
   });
 
-  $("#execute-turn")?.addEventListener("click",executarTurno);
+  $("#execute-turn")?.addEventListener("click",()=>{
+    if(batalha?.modo!=="online"){void executarTurno();return;}
+    const current=batalha;
+    const choice=current.escolhas[current.onlineSelfIndex];if(!choice)return;
+    current.processando=true;renderizarArena();
+    void onlineArena.submit(choice,current.turno).catch(error=>{current.log.push(error.message);}).finally(()=>{if(batalha===current){current.processando=false;renderizarArena();}});
+  });
 
   $("#new-battle")?.addEventListener("click",()=>{
     liberarFotosBatalha();
@@ -1382,4 +1396,24 @@ void obterClienteSupabase().then(client => {
   // A autenticação é opcional: a interface local permanece disponível offline.
 });
 void inicializarSalas();
+
+initializeArenaFullscreen();
+onlineArena=initializeOnlineArena({
+  onLocal(){if(batalha?.modo==="online")liberarFotosBatalha();},
+  onMatch(match){
+    const previous=batalha?.modo==="online"&&batalha.onlineMatchId===match.id?batalha:null;
+    if(batalha&&batalha.modo!=="online")liberarFotosBatalha();
+    const sameTurn=previous?.turno===match.turn;
+    const fighters=match.state.fighters.map((fighter,index)=>({
+      ...fighter,nativa:{...fighter.nativa,player:index===0?match.hostName:match.guestName},
+      fotoUrl:arenaPortrait(fighter.nativa),arenaCutout:Boolean(arenaPortrait(fighter.nativa))
+    }));
+    batalha={modo:"online",onlineMatchId:match.id,onlineSelfIndex:match.selfIndex,onlineSubmitted:match.ownConfirmed,
+      onlineWinnerIndex:match.winnerIndex,onlineCancelled:match.status==="cancelled",fighters,turno:match.turn,
+      horario:"Duelo online",bioma:match.biome,ordem:match.state.order||[],log:[...match.state.history],
+      escolhas:match.ownChoice?{[match.selfIndex]:match.ownChoice}:sameTurn?previous.escolhas:{},
+      paineisGolpesAbertos:previous?.paineisGolpesAbertos||[],encerrada:match.status!=="active",processando:false,aguardandoProximoTurno:false};
+    renderizarArena();
+  }
+});
 

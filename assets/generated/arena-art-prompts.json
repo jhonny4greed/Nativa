@@ -1,0 +1,11 @@
+{
+  "method": "ImageGen isolated cutout from supplied Nativa artwork; transparent background requested; resized and encoded with Sharp without changing alpha",
+  "prompt": "Preserve the full creature and its identity from the supplied Nativa reference. Create an isolated game sprite with a transparent background. Remove all environment and background; only the animal remains, including its body parts and attached details.",
+  "files": [
+    "arena-guara.png",
+    "arena-arua.png",
+    "arena-tatua.png",
+    "arena-quira.png",
+    "arena-ecoa.png"
+  ]
+}

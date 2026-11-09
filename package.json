@@ -30,7 +30,10 @@
     "lint": "eslint .",
     "format": "prettier --write \"js/**/*.js\" \"css/**/*.css\" \"scripts/**/*.{js,mjs,json}\" \"tests/**/*.js\"",
     "assets": "node scripts/generate-assets.mjs",
-    "assets:optimize": "node scripts/optimize-portraits.mjs"
+    "assets:optimize": "node scripts/optimize-portraits.mjs",
+    "assets:arena": "node scripts/optimize-arena-art.mjs",
+    "test:online:local": "node tests/online-arena.local.integration.mjs",
+    "combat:sync": "node scripts/sync-combat-server.mjs"
   },
   "engines": {
     "node": ">=20"
