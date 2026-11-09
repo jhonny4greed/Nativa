@@ -1174,7 +1174,7 @@ function renderizarPainelAcao(c,indice){
         </div>
         <span class="action-selected">
           ${escolha
-            ?escolha.tipo==="attack"?"Ataque escolhido"
+            ?escolha.tipo==="attack"?escapar(obterTecnicaPorId(escolha.tecnicaId)?.nome||"Ataque escolhido")
               :escolha.tipo==="defend"?"Defender escolhido"
               :"Recuperação escolhida"
             :"Escolha uma ação"}
@@ -1209,14 +1209,12 @@ function renderizarPainelAcao(c,indice){
         </button>
       </div>
 
-      <div class="technique-selection-heading">
-        <h4>Escolher técnica</h4>
-        <span>${tecnicasCombatente(c).filter(t=>podeUsarTecnicaEmCombate(t)).length} liberadas para combate · ${tecnicasCombatente(c).length} na ficha</span>
-      </div>
-
-      <div class="battle-technique-grid">
-        ${cartoesTecnicas(c,indice)}
-      </div>
+      <details class="battle-moves" data-moves-fighter="${indice}" ${batalha.paineisGolpesAbertos?.includes(indice)?"open":""}>
+        <summary><span data-icon="swords"></span><span><strong>Golpes</strong><small>${tecnicasCombatente(c).filter(t=>podeUsarTecnicaEmCombate(t)).length} liberados · ${tecnicasCombatente(c).length} na ficha</small></span><span class="moves-chevron" aria-hidden="true">⌄</span></summary>
+        <div class="battle-technique-grid">
+          ${cartoesTecnicas(c,indice)}
+        </div>
+      </details>
     </section>
   `;
 }
@@ -1269,7 +1267,8 @@ function renderizarArena(){
 
   $("#battle-arena").innerHTML=`
     <section class="battlefield battle-layout" data-mode="${escapar(batalha.modo)}" data-biome="${escapar(batalha.bioma||"")}" aria-label="Arena: ${escapar(batalha.bioma||"Bioma não definido")}">
-      <header class="battlefield-topline"><span class="arena-location">${escapar(batalha.bioma||"Arena")} · ${escapar(batalha.horario||"")}</span><span class="battle-state">${batalha.encerrada?"Combate encerrado":"Combate em andamento"}</span></header>
+      <header class="battlefield-topline"><span class="arena-location">${escapar(batalha.bioma||"Arena")} · ${escapar(batalha.horario||"")}</span><span class="battle-state">${batalha.encerrada?"Combate encerrado":`Turno ${batalha.turno} · ${batalha.processando?"Resolvendo ações":"Combate em andamento"}`}</span></header>
+      <div class="arena-stage" aria-label="Campo de batalha">
       <div class="arena-hud-row">
         ${renderizarHudCombatente(f[0],0)}
         <div class="turn-order ${batalha.ordem.length?"initiative-revealed":""}">
@@ -1279,7 +1278,7 @@ function renderizarArena(){
         </div>
         ${renderizarHudCombatente(f[1],1)}
       </div>
-      <div class="arena-stage" aria-label="Campo de batalha">
+
         <div class="scene-backdrop" aria-hidden="true"><span class="scene-canopy"></span><span class="scene-ridge"></span><span class="scene-water"></span><span class="scene-ground"></span><span class="scene-rocks"></span><span class="scene-plants"></span><span class="scene-light"></span></div>
         <div class="arena-fighter arena-fighter-one">${renderizarCombatente(f[0],0)}</div>
         <div class="arena-stage-mark" aria-hidden="true"><span></span><b>VS</b><span></span></div>
@@ -1296,6 +1295,16 @@ function renderizarArena(){
       </div>
     </section>
   `;
+
+  $("#battle-arena").querySelectorAll("[data-moves-fighter]").forEach(details=>{
+    details.addEventListener("toggle",()=>{
+      if(!details.isConnected||!batalha)return;
+      const indice=Number(details.dataset.movesFighter);
+      const abertos=new Set(batalha.paineisGolpesAbertos||[]);
+      if(details.open)abertos.add(indice);else abertos.delete(indice);
+      batalha.paineisGolpesAbertos=[...abertos];
+    });
+  });
 
   $("#execute-turn")?.addEventListener("click",executarTurno);
 

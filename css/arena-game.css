@@ -1,0 +1,102 @@
+/* A habitat fills the field. Opponents share the same scene at different depths. */
+html body.dashboard:has(#battle.active) main { max-width:1700px; padding:22px 26px 40px; }
+.dashboard .battlefield.battle-layout { grid-template-columns:minmax(0,1fr); grid-template-areas:"top" "stage" "commands"; gap:0; padding:0; border-radius:18px; border-color:#bdb78544; background:#0e1e15; overflow:hidden; }
+.battle-layout .battlefield-topline { position:relative; inset:auto; grid-area:top; display:flex; justify-content:space-between; align-items:center; padding:11px 17px; background:#14251c; z-index:4; gap:10px; }
+.battle-layout .battlefield-topline .arena-location,.battle-layout .battlefield-topline .battle-state { background:none; border:0; font-size:10px; color:#d5dcc0; padding:0; }
+.battle-layout .battlefield-topline .battle-state { color:#aebc98; font-size:9px; }
+.battle-layout .arena-stage { grid-area:stage; display:block; height:clamp(420px,59vh,650px); min-height:420px; border:0; overflow:hidden; background:#314d2e; }
+.battle-layout .arena-stage .scene-backdrop { position:absolute; inset:0; z-index:0; opacity:1; background-position:center 55%; filter:brightness(1.14) saturate(1.08); }
+.battle-layout .arena-stage::after { content:""; position:absolute; inset:0; pointer-events:none; z-index:1; background:linear-gradient(0deg,#07140f80,transparent 30%,transparent 75%,#07140f22),radial-gradient(ellipse at 50% 55%,transparent 40%,#0a1a1444); }
+.battle-layout .arena-hud-row { position:absolute; inset:0; display:block; z-index:4; grid-area:auto; pointer-events:none; }
+.battle-layout .battle-hud { position:absolute; width:clamp(225px,28%,335px); display:grid; grid-template-columns:1fr; gap:6px; padding:11px 15px; margin:0; border:1px solid #c9d4a977; border-left:4px solid #9bc678; border-radius:3px 16px 3px 16px; background:linear-gradient(110deg,#10231af5,#0c1c17dc); box-shadow:0 7px 20px #0005,inset 0 1px #fbf5c01a; text-align:left; backdrop-filter:blur(8px); }
+.battle-layout .hud-player { left:18px; bottom:19px; }
+.battle-layout .hud-opponent { right:18px; top:20px; border-left-color:#d4ab72; text-align:left; }
+.battle-layout .combatant-heading { display:block; }
+.battle-layout .combatant-info { position:relative; padding-right:45px; }
+.battle-layout .combatant-info h3 { font:650 18px/1.15 var(--font-body); letter-spacing:-.4px; color:#f2ead1; margin:0 0 4px; }
+.battle-layout .combatant-info .identity { color:#b6c5a0; font-size:8px; }
+.battle-layout .combatant-player { position:absolute; right:0; top:0; font-size:8px; color:#d8c28b; background:#c7b17310; border:1px solid #d2c68b33; border-radius:4px; padding:3px 5px; max-width:70px; overflow:hidden; text-overflow:ellipsis; }
+.battle-layout .combatant-vitals { display:grid; grid-template-columns:1fr; gap:5px; padding:0; background:none; border:0; }
+.battle-layout .vital-line { display:grid; grid-template-columns:1fr; }
+.battle-layout .bar-label { display:flex; justify-content:space-between; margin:0 0 3px; font-size:8px; line-height:1; color:#d6dfc3; }
+.battle-layout .bar-label b { font-size:8px; font-weight:500; }
+.battle-layout .bar { height:7px; border-radius:2px; background:#dce1c525; border:1px solid #ced5a61a; box-shadow:inset 0 1px 3px #0006; }
+.battle-layout .bar>span { height:100%; border-radius:1px; transition:width .5s ease; }
+.battle-layout .bar.hp>span { background:linear-gradient(90deg,#6bb66a,#b8d883); }
+.battle-layout .bar.mp>span { background:linear-gradient(90deg,#659fbb,#a2cfda); }
+.battle-layout .condition-state { color:#91a788; font-size:7px; line-height:1; margin-top:1px; }
+.battle-layout .arena-hud-row .turn-order { position:absolute; top:12px; left:18px; max-width:250px; width:auto; padding:7px 11px; border-radius:5px; border:1px solid #c5d6ab2e; background:#112318b3; text-align:left; justify-items:start; }
+.battle-layout .turn-order strong { font-size:7px; letter-spacing:1.4px; color:#c6d6a6; }
+.battle-layout .turn-order span { font-size:9px; line-height:1.4; max-width:200px; }
+.battle-layout .turn-order small { display:none; }
+.battle-layout .arena-fighter { position:absolute; display:block; flex:none; z-index:2; min-width:0; height:70%; width:43%; }
+.battle-layout .arena-fighter-one { left:3%; bottom:9%; }
+.battle-layout .arena-fighter-two { right:7%; top:16%; width:37%; height:61%; z-index:1; }
+.battle-layout .arena-fighter::before { content:""; position:absolute; width:68%; height:12%; bottom:6%; left:16%; border-radius:50%; background:radial-gradient(ellipse,#101d125c,transparent 70%); transform:rotate(-8deg); }
+.battle-layout .arena-fighter::after { content:""; position:absolute; bottom:8%; left:16%; width:68%; height:13%; border:1px solid #e4e6b740; border-radius:50%; background:radial-gradient(ellipse,#cee9a11a,transparent 68%); transform:rotate(-8deg); z-index:-1; }
+.battle-layout .arena-creature { position:relative; height:100%; width:100%; display:block; }
+.battle-layout .combatant-art { position:relative; display:block; width:100%; height:100%; }
+.battle-layout .arena-creature .combatant-photo { position:absolute; inset:0; width:100%; height:100%; min-height:0; max-height:100%; object-fit:contain; mask-image:radial-gradient(ellipse 46% 49% at 50% 45%,#000 45%,#000d 66%,transparent 100%); border:0; border-radius:0; filter:drop-shadow(0 18px 10px #091c1344); background:none; }
+.battle-layout .arena-fighter-two .combatant-art { transform:scaleX(-1); }
+.battle-layout .arena-fighter-two .contestant-right .combatant-photo { transform:none; }
+.battle-layout .arena-stage-mark { top:53%; left:50%; width:42px; opacity:.45; }
+.battle-layout .arena-stage-mark b { font:600 11px var(--font-body); letter-spacing:2px; }
+.battle-layout .battle-commands { padding:17px; gap:13px; background:linear-gradient(150deg,#192e21,#101f18); border-top:1px solid #bfcb9a40; }
+.battle-layout .battle-commands-grid { gap:14px; }
+.battle-layout .action-panel { padding:13px; border-radius:12px; border-color:#b9c49b33; background:#0d1e17b3; box-shadow:inset 0 1px #ffffe00a; }
+.battle-layout .action-panel-heading { margin-bottom:10px; }
+.battle-layout .action-panel-heading h3 { font:550 16px var(--font-body); color:#e4e6ca; margin-top:3px; }
+.battle-layout .action-panel-heading .eyebrow { font-size:7px; letter-spacing:1.2px; }
+.battle-layout .action-selected { font-size:8px; max-width:55%; color:#d8c78f; }
+.battle-layout .special-actions { gap:8px; margin-bottom:9px; }
+.dashboard .battle-layout .special-action { background:#253e2b!important; border:1px solid #b6c79740!important; color:#d2dec1!important; min-height:44px; padding:8px 10px; border-radius:8px; gap:8px; }
+.battle-layout .special-action strong { font-size:10px; }
+.battle-layout .special-action small { font-size:8px; color:#9db38e; }
+.battle-layout .special-action.selected { outline:2px solid #d2c28c; outline-offset:1px; }
+.battle-moves { border:1px solid #d0c38b4d; border-radius:9px; background:linear-gradient(110deg,#35453155,#192c21); overflow:visible; }
+.battle-moves>summary { display:flex; align-items:center; gap:10px; min-height:49px; padding:10px 13px; cursor:pointer; list-style:none; color:#e5d5a5; border-radius:9px; transition:background .2s; }
+.battle-moves>summary::-webkit-details-marker { display:none; }
+.battle-moves>summary:hover { background:#d1d8a30a; }
+.battle-moves>summary:focus-visible { outline:2px solid #e8d099; outline-offset:2px; }
+.battle-moves>summary strong,.battle-moves>summary small { display:block; }
+.battle-moves>summary strong { font:600 12px var(--font-body); }
+.battle-moves>summary small { font-size:8px; margin-top:3px; color:#a0b28e; }
+.moves-chevron { margin-left:auto; font-size:19px; transition:transform .2s; }
+.battle-moves[open] .moves-chevron { transform:rotate(180deg); }
+.battle-layout .battle-moves>.battle-technique-grid { padding:9px; border-top:1px solid #afc18c20; gap:7px; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); }
+.battle-moves:not([open])>.battle-technique-grid { display:none!important; }
+.battle-layout .battle-technique-card { border-radius:7px; min-height:55px; }
+.dashboard .battle-layout .battle-technique { background:transparent!important; color:#e0e4c7!important; border:0!important; min-height:55px; padding:10px 26px 10px 11px; }
+.battle-layout .technique-card-name { font-size:11px; }
+.battle-layout .technique-badge { font-size:8px; }
+.battle-layout .execute-battle-button { margin:0 auto; min-height:44px; max-width:350px; border-radius:8px; font-size:11px; letter-spacing:1px; }
+.battle-layout .battle-log { border-radius:10px; border-color:#b8c29822; padding:13px; background:#0c1b1499; }
+.battle-layout .battle-log-heading h3 { font:500 16px var(--font-display); }
+.battle-layout .battle-log-list { max-height:175px; }
+.battle-layout .battle-log-entry { padding:7px 9px; font-size:10px; border-radius:4px; }
+@media(max-width:760px) {
+  html body.dashboard:has(#battle.active) main { padding:18px 10px 35px; }
+  .battle-layout .battlefield-topline { padding:10px; gap:8px; }
+  .battle-layout .battlefield-topline .arena-location { max-width:60%; font-size:8px; }
+  .battle-layout .battlefield-topline .battle-state { max-width:40%; text-align:right; font-size:7px; }
+  .battle-layout .arena-stage { height:440px; min-height:440px; }
+  .battle-layout .battle-hud { width:190px; padding:8px 10px; gap:5px; }
+  .battle-layout .hud-player { left:10px; bottom:11px; }
+  .battle-layout .hud-opponent { right:10px; top:12px; }
+  .battle-layout .combatant-info h3 { font-size:15px; }
+  .battle-layout .combatant-info .identity { font-size:7px; }
+  .battle-layout .combatant-player { font-size:7px; }
+  .battle-layout .arena-hud-row .turn-order { top:12px; left:10px; max-width:110px; padding:6px; }
+  .battle-layout .turn-order span { font-size:7px; }
+  .battle-layout .turn-order strong { font-size:6px; }
+  .battle-layout .arena-fighter-one { width:69%; height:61%; left:-10%; bottom:12%; }
+  .battle-layout .arena-fighter-two { width:60%; height:52%; right:-4%; top:19%; }
+  .battle-layout .arena-stage-mark { top:54%; width:24px; }
+  .battle-layout .battle-commands { padding:10px; gap:11px; }
+  .battle-layout .battle-commands-grid { grid-template-columns:1fr; gap:10px; }
+  .battle-layout .action-panel { padding:11px; }
+  .battle-layout .battle-moves>.battle-technique-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .battle-layout .technique-detail-panel { position:static; width:100%; max-width:none; margin-top:6px; }
+}
+@media(prefers-reduced-motion:reduce) { .battle-layout .arena-creature,.battle-layout .combatant-photo { animation:none!important; } .battle-layout .bar>span,.moves-chevron { transition:none; } }
+@media(prefers-reduced-transparency:reduce) { .battle-layout .battle-hud { background:#10231a; backdrop-filter:none; } }

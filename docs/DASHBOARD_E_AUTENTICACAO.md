@@ -35,3 +35,11 @@ Testes Node cobrem domínio existente, persistência, sincronização simulada e
 ## Direção visual do refúgio
 
 As referências de hubs de jogos orientam o painel de seleção: criatura em destaque, dossiê de atributos, seletor circular, progresso real de XP e atalhos. A paleta de floresta e ouro e as ilustrações existentes preservam a identidade NATIVA. As transições respeitam redução de movimento; os controles têm foco visível, estado selecionado e resposta ao toque. Nenhum dado de progresso ou conquista é inventado para preencher o layout.
+
+## Arena em perspectiva
+
+O cenário usa a imagem do bioma selecionado, com a Nativa do jogador em primeiro plano e a adversária em um plano mais distante. Retratos personalizados prevalecem sobre os retratos padrão. Os HUDs acompanham os cantos inferior esquerdo e superior direito, com PV/PM reais.
+
+Cada painel de ações tem uma seção nativa `details` chamada Golpes, inicialmente fechada. Somente sua expansão revela os cartões; a preferência de cada jogador é preservada durante os rerenders da batalha e reiniciada em uma nova partida. Defender e recuperar MP continuam como ações diretas. O golpe selecionado aparece pelo nome no painel.
+
+A revisão visual foi conferida com sessão real no Auth local, combate com dano/MP/recarga e tela de 390 px. A alteração é de interface e não modifica fórmulas de combate nem o banco de dados.

@@ -21,6 +21,7 @@ if (user) {
   await applyDevice(await detectDevice());
   await import("../css/dashboard.css");
   await import("../css/game-hub.css");
+  await import("../css/arena-game.css");
   observeIcons();
   const { initializeDashboard } = await import("./dashboard.js");
   // Preserve the existing profile bootstrap for new e-mail and OAuth accounts.
