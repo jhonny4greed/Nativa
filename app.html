@@ -217,6 +217,15 @@
         <div class="section-heading compact"><div><h3>Usuários do projeto</h3><p class="muted">Contas registradas no Supabase Auth do projeto.</p></div><button id="admin-refresh-users" class="small secondary" type="button"><span data-icon="refresh"></span>Atualizar</button></div>
         <div id="admin-user-list" class="admin-user-list"></div>
       </div>
+      <div class="form-panel">
+        <div class="panel-heading"><span class="step-number" data-icon="sparkles"></span><div><h3>Assistente do projeto</h3><p>Peça ajuda para gerenciar contas ou criar arte. Ações sugeridas só rodam após sua confirmação.</p></div></div>
+        <div id="admin-assistant-log" class="assistant-log" role="log" aria-live="polite"></div>
+        <form id="admin-assistant-form" class="assistant-form">
+          <input id="admin-assistant-input" maxlength="2000" autocomplete="off" placeholder="Ex.: gere a arte de um sapo-jade guardião do Pantanal" required>
+          <button id="admin-assistant-send" type="submit">Enviar</button>
+        </form>
+        <p id="admin-assistant-status" class="muted" role="status" aria-live="polite"></p>
+      </div>
     </section>
 
     <section id="rules" class="view">

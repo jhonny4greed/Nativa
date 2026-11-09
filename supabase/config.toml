@@ -400,6 +400,9 @@ verify_jwt = false
 [functions.admin-panel]
 verify_jwt = false
 
+[functions.admin-assistant]
+verify_jwt = false
+
 # [edge_runtime.secrets]
 # secret_key = "env(SECRET_VALUE)"
 
