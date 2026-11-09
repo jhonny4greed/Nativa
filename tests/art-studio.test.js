@@ -9,7 +9,7 @@ const USER_A = "user-account-a";
 const USER_B = "user-account-b";
 const SIGNING_KEY = "test-only-signing-key-with-at-least-32-bytes";
 const API_KEY = "server-test-nvidia-key";
-const NVIDIA_URL = "https://integrate.api.nvidia.com/v1/genai/black-forest-labs/flux.1-schnell";
+const NVIDIA_URL = "https://integrate.api.nvidia.com/v1/genai/black-forest-labs/flux.1-dev";
 const PNG_BYTES = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
 const PNG_BASE64 = Buffer.from(PNG_BYTES).toString("base64");
 const PNG = () => new Blob([PNG_BYTES], { type: "image/png" });

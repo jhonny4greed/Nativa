@@ -11,7 +11,7 @@ const RESULT_LIMIT = 15_000_000;
 const RESULT_TTL = 15 * 60 * 1000;
 const TASK_TOKEN_TTL = 30 * 60 * 1000;
 const TASK_ID_PATTERN = /^[A-Za-z0-9_-]{1,128}$/;
-const DEFAULT_MODEL = "black-forest-labs/flux.1-schnell";
+const DEFAULT_MODEL = "black-forest-labs/flux.1-dev";
 const DEFAULT_BASE_URL = "https://integrate.api.nvidia.com";
 
 const json = (body, status = 200) => new Response(JSON.stringify(body), {
