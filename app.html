@@ -30,15 +30,34 @@
         <div><span class="eyebrow">SEU MUNDO. SUAS NATIVAS.</span><h2>Uma natureza extraordinária espera por você.</h2><p>Crie criaturas inspiradas na biodiversidade brasileira, escolha suas técnicas, acompanhe a evolução e simule combates por turnos.</p><button data-go="create">Começar uma Nativa</button></div>
         <div class="hero-emblem" aria-hidden="true"><img src="./assets/generated/logo-emblem.jpg" alt="" width="230" height="230"></div>
       </div>
-      <section class="form-panel" aria-labelledby="online-account-title">
-        <div class="panel-heading"><span class="step-number" data-icon="mail"></span><div><h3 id="online-account-title">Conta do jogador</h3><p>Entre sem senha usando um link enviado para seu e-mail.</p></div></div>
-        <form id="online-auth-form">
-          <div class="grid">
-            <label>Nome de jogador<input name="displayName" autocomplete="nickname" maxlength="40" required placeholder="Como aparecerá nas salas"></label>
-            <label>E-mail<input name="email" type="email" autocomplete="email" required placeholder="voce@exemplo.com"></label>
+      <section class="form-panel auth-panel" aria-labelledby="online-account-title">
+        <div class="panel-heading"><span class="step-number" data-icon="mail"></span><div><h3 id="online-account-title">Conta do jogador</h3><p>Entre com e-mail e senha ou Google, ou crie sua conta agora.</p></div></div>
+        <div id="online-auth-area">
+          <div class="auth-tabs" role="tablist" aria-label="Entrada ou cadastro">
+            <button id="online-auth-tab-signin" type="button" class="active" data-auth-tab="signin" role="tab" aria-selected="true">Entrar</button>
+            <button id="online-auth-tab-signup" type="button" data-auth-tab="signup" role="tab" aria-selected="false">Criar conta</button>
           </div>
-          <div class="form-actions"><button id="online-auth-submit" type="submit">Enviar link de acesso</button><p id="online-auth-status" role="status" aria-live="polite">Nesta etapa o login cria sua identidade. As fichas e fotos continuam somente neste navegador.</p></div>
-        </form>
+          <form id="online-auth-signin-form" data-auth-pane="signin">
+            <div class="grid">
+              <label>E-mail<input name="email" type="email" autocomplete="email" required placeholder="voce@exemplo.com"></label>
+              <label>Senha<input name="password" type="password" autocomplete="current-password" minlength="6" required placeholder="Sua senha"></label>
+            </div>
+            <div class="form-actions"><button type="submit">Entrar</button></div>
+          </form>
+          <form id="online-auth-signup-form" data-auth-pane="signup" hidden>
+            <div class="grid">
+              <label>Nome de jogador<input name="displayName" autocomplete="nickname" maxlength="40" required placeholder="Como aparecerá nas salas"></label>
+              <label>E-mail<input name="email" type="email" autocomplete="email" required placeholder="voce@exemplo.com"></label>
+              <label>Senha<input name="password" type="password" autocomplete="new-password" minlength="6" required placeholder="Mínimo de 6 caracteres"></label>
+              <label>Confirmar senha<input name="confirmPassword" type="password" autocomplete="new-password" minlength="6" required placeholder="Repita a senha"></label>
+            </div>
+            <div class="form-actions"><button type="submit">Criar conta</button></div>
+          </form>
+          <div id="online-auth-turnstile" class="auth-turnstile" hidden></div>
+          <div class="auth-divider" role="separator"><span>ou</span></div>
+          <button id="online-auth-google" class="secondary auth-google" type="button"><span data-icon="globe"></span>Entrar com Google</button>
+          <p id="online-auth-status" role="status" aria-live="polite">Entre ou crie sua conta para sincronizar fichas e salas. O jogo local continua disponível sem login.</p>
+        </div>
         <div id="online-account-details" hidden>
           <p id="online-account-name"></p>
           <p id="online-account-email" class="muted"></p>

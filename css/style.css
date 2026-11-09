@@ -1446,3 +1446,11 @@ body:has(#battle.active) main { max-width:none; padding:16px clamp(12px,2vw,30px
 .room-delete-button:hover{background:#a53a3e!important}
 @media(max-width:760px){.room-companion-hero{grid-template-columns:minmax(100px,30%) minmax(0,1fr);gap:12px;padding:12px}.room-companion-stats{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:480px){.room-companion-hero{grid-template-columns:92px minmax(0,1fr);gap:10px;padding:10px}.room-companion-portrait{min-height:115px;border-radius:9px}.room-companion-identity h5{font-size:19px}.room-companion-facts{grid-template-columns:repeat(2,minmax(0,1fr));padding:11px}.room-companion-stats{grid-template-columns:repeat(4,minmax(0,1fr));padding:10px}.room-companion-stat strong{font-size:18px}.room-companion-campaign{padding:10px 12px}}
+.auth-tabs{display:flex;gap:6px;margin-bottom:18px;padding:4px;border:1px solid var(--line);border-radius:11px;background:#101c15}
+.auth-tabs button{flex:1;padding:10px;background:transparent;color:#c6d2c6;border-color:transparent;border-radius:8px}
+.auth-tabs button.active{background:#2b4030;color:var(--lime);border-color:#4b6448}
+.auth-turnstile{display:flex;justify-content:center;margin:16px 0 4px}
+.auth-divider{display:flex;align-items:center;gap:12px;margin:18px 0;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:2px}
+.auth-divider::before,.auth-divider::after{content:"";flex:1;height:1px;background:var(--line)}
+.auth-google{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:12px}
+#online-auth-status{margin:14px 0 0;color:var(--lime);font-size:13px}
