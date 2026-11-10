@@ -51,4 +51,6 @@ A fonte ativa `js/techniques.js` injeta oito sinergias confirmadas nos IDs corre
 
 ## Estado desta etapa
 
-Esta é uma auditoria estrutural e de critérios. Nenhum golpe foi aprovado ou removido de revisão nesta etapa. A próxima alteração de estado será feita somente após a revisão individual e a correção de eventuais divergências.
+## Liberação operacional solicitada
+
+Por solicitação explícita do usuário, os 178 golpes ativos foram alterados para `estadoCatalogo: aprovado`, liberando o uso na arena. Os IDs, nomes, grupos, categorias, afinidades e parâmetros originais foram preservados. O marcador `parametrosTecnicosDisponiveis` não foi alterado: 108 registros estão `true` e 70 permanecem `false`, como sinalização para revisão técnica detalhada. A liberação remove o bloqueio de combate, mas não certifica o balanceamento nem implementa efeitos descritivos ainda pendentes. Os golpes arquivados não foram alterados.
