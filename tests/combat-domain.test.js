@@ -50,16 +50,17 @@ function rodada(fighters, choices, values) {
   assert.equal(combatente.turnoV21, 0);
 });
 
-test("golpes em revisão continuam bloqueados mesmo com parâmetros preenchidos", () => {
+test("golpes V2.2.1 aprovados entram em combate mesmo sem depender de Traços", () => {
   const bico = golpe("Bico Poderoso", "Psitacídeos");
-  assert.equal(bico.estadoCatalogo, "em-revisao");
+  assert.equal(bico.estadoCatalogo, "aprovado");
   assert.equal(bico.parametrosTecnicosDisponiveis, true);
-  assert.equal(podeUsarTecnicaEmCombate(bico), false);
+  assert.equal(podeUsarTecnicaEmCombate(bico), true);
   const a = criarCombatente(nativa("a", "Aruã", { techniques: [bico.id] }));
   const b = criarCombatente(nativa("b", "Bento"));
   const result = rodada([a, b], [{ tipo: "attack", tecnicaId: bico.id }, { tipo: "defend" }], [10, 1]);
-  assert.match(result.error.message, /não foi liberado/);
-  assert.equal(result.fighters[0].mp, a.mp);
+  assert.equal(result.error, null);
+  assert.ok(result.events.some(event => event.type === "hit"));
+  assert.equal(result.fighters[0].mp, a.mp - bico.mp);
 });
 
 test("dano físico usa ATQ contra DEF e preserva ficha e sinergia opcional", () => {
