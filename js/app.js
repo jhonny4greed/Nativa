@@ -887,6 +887,7 @@ function prepararTurno(inicial=false){
   batalha.aguardandoProximoTurno=false;
 
   if(inicial)batalha.fighters=batalha.fighters.map(c=>({...c,animacao:""}));
+  batalha.tecnicaDetalhesAberta=null;
 
   renderizarArena();
 }
@@ -1093,6 +1094,19 @@ function slugVisualTecnica(value){
   return String(value||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 }
 
+function iconeOrigemTecnica(tecnica){
+  const grupo=slugVisualTecnica(tecnica.grupo);
+  if(tecnica.origem==="afinidade")return ({fogo:"✹",agua:"≈",terra:"◆",vento:"〰",energia:"ϟ"})[grupo]||"✦";
+  if(tecnica.origem==="bioma")return ({"floresta-e-mata":"♣","rios-lagos-e-pantanal":"〰","caatinga-e-cerrado":"☀","costa-restinga-e-manguezal":"❋"})[grupo]||"❋";
+  if(tecnica.origem==="arquetipo")return "✧";
+  if(["siluriformes","characiformes","peixes-eletricos","peixes-cartilaginosos"].includes(grupo))return "≋";
+  if(["aves-de-rapina","aves-corredoras-e-campestres","aves-aquaticas-e-pernaltas","psitacideos"].includes(grupo))return "⌁";
+  if(["serpentes","lagartos","quelonios","crocodilianos","anuros"].includes(grupo))return "◈";
+  if(["insetos-sociais","insetos-predadores","aracnideos","crustaceos"].includes(grupo))return "✣";
+  if(grupo==="felinos")return "🐾";
+  return "❧";
+}
+
 function cartoesTecnicas(c,indice){
   const lista=tecnicasCombatente(c);
 
@@ -1119,16 +1133,19 @@ function cartoesTecnicas(c,indice){
     const afinidade=t.origem==="afinidade"?t.grupo:(t.afinidade||"");
     const categoria=t.categoria||"Suporte";
     const categoriaIcone=categoria==="Físico"?"⚔":categoria==="Especial"?"✦":"✿";
+    const origemNome=({linhagem:"Linhagem",bioma:"Bioma",arquetipo:"Arquétipo",afinidade:"Afinidade"})[t.origem]||"Técnica";
+    const detalhesAbertos=batalha.tecnicaDetalhesAberta===t.id;
     return `
-      <article class="battle-technique-card ${selecionada?"selected":""} ${bloqueada?"unavailable":""}" data-source="${escapar(slugVisualTecnica(t.origem))}" data-family="${escapar(t.origem==="linhagem"?slugVisualTecnica(t.grupo):"")}" data-biome="${escapar(t.origem==="bioma"?slugVisualTecnica(t.grupo):"")}" data-element="${escapar(t.origem==="afinidade"?slugVisualTecnica(t.grupo):"")}" data-category="${escapar(slugVisualTecnica(categoria))}">
-        <button type="button" class="battle-technique" data-battle-technique="${escapar(t.id)}" data-fighter="${indice}" aria-label="${escapar(`${t.nome}. ${afinidade?`Afinidade ${afinidade}. `:""}${categoria}. Custo ${t.mp??"não definido"} PM. Dano ${t.dano??"não definido"}. Efeito: ${t.efeito||"sem efeito descrito"}`)}" ${bloqueada?"disabled":""}>
+      <article class="battle-technique-card ${selecionada?"selected":""} ${bloqueada?"unavailable":""} ${detalhesAbertos?"details-open":""}" data-source="${escapar(slugVisualTecnica(t.origem))}" data-group="${escapar(slugVisualTecnica(t.grupo))}" data-family="${escapar(t.origem==="linhagem"?slugVisualTecnica(t.grupo):"")}" data-biome="${escapar(t.origem==="bioma"?slugVisualTecnica(t.grupo):"")}" data-element="${escapar(t.origem==="afinidade"?slugVisualTecnica(t.grupo):"")}" data-category="${escapar(slugVisualTecnica(categoria))}">
+        <button type="button" class="battle-technique" data-battle-technique="${escapar(t.id)}" data-fighter="${indice}" aria-expanded="${detalhesAbertos}" ${bloqueada?'aria-disabled="true"':""} aria-label="${escapar(`${t.nome}. ${afinidade?`Afinidade ${afinidade}. `:""}${categoria}. Custo ${t.mp??"não definido"} PM. Dano ${t.dano??"não definido"}. Efeito: ${t.efeito||"sem efeito descrito"}`)}">
           <span class="technique-card-top"><span class="technique-card-name">${escapar(t.nome)}</span><span class="technique-cost">${t.mp??"—"} PM</span></span>
           <span class="technique-card-badges">
-            ${afinidade?`<span class="technique-badge affinity-badge">Afinidade · ${escapar(afinidade)}</span>`:""}
+            <span class="technique-badge source-badge" data-source="${escapar(slugVisualTecnica(t.origem))}"><i aria-hidden="true">${iconeOrigemTecnica(t)}</i><span class="source-label">${escapar(origemNome)} · ${escapar(t.grupo||"geral")}</span></span>
+            ${afinidade&&t.origem!=="afinidade"?`<span class="technique-badge affinity-badge">Afinidade · ${escapar(afinidade)}</span>`:""}
             <span class="technique-badge category-badge" data-category="${escapar(categoria)}">${categoriaIcone} ${escapar(categoria)}</span>
           </span>
           <span class="technique-card-stats"><span>Dano <b>${t.dano??"—"}</b></span></span>
-          <span class="technique-hover-effect"><strong>Efeito</strong>${escapar(t.efeito||"Sem efeito descrito.")}${bloqueada?`<small>${escapar(motivo)}</small>`:""}</span>
+          <span class="technique-hover-effect"><strong>Efeito do golpe</strong>${escapar(t.efeito||"Sem efeito descrito.")}${bloqueada?`<small>${escapar(motivo)}</small>`:""}${detalhesAbertos?'<small class="touch-effect-hint">Toque outra vez no golpe para fechar</small>':""}</span>
         </button>
       </article>
     `;
@@ -1355,6 +1372,15 @@ function renderizarArena(){
 
   $("#battle-arena").querySelectorAll("[data-battle-technique]").forEach(btn=>{
     btn.addEventListener("click",()=>{
+      const modoToque=window.matchMedia("(hover: none), (pointer: coarse)").matches;
+      const bloqueada=btn.closest(".battle-technique-card")?.classList.contains("unavailable");
+      if(modoToque){
+        batalha.tecnicaDetalhesAberta=batalha.tecnicaDetalhesAberta===btn.dataset.battleTechnique?null:btn.dataset.battleTechnique;
+      }else batalha.tecnicaDetalhesAberta=null;
+      const acaoTravada=bloqueada||batalha.encerrada||batalha.processando||batalha.aguardandoProximoTurno
+        ||(batalha.modo==="online"&&(batalha.onlineSubmitted||Number(btn.dataset.fighter)!==batalha.onlineSelfIndex))
+        ||(batalha.modo==="room"&&(batalha.roomSubmitted||Number(btn.dataset.fighter)!==batalha.roomSelfIndex));
+      if(acaoTravada){if(modoToque)renderizarArena();return;}
       selecionarAcao(
         Number(btn.dataset.fighter),
         "attack",
@@ -1431,6 +1457,7 @@ onlineArena=initializeOnlineArena({
       onlineWinnerIndex:match.winnerIndex,onlineCancelled:match.status==="cancelled",fighters,turno:match.turn,
       horario:"Duelo online",bioma:match.biome,ordem:match.state.order||[],log:[...match.state.history],
       escolhas:match.ownChoice?{[match.selfIndex]:match.ownChoice}:sameTurn?previous.escolhas:{},
+      tecnicaDetalhesAberta:sameTurn?previous?.tecnicaDetalhesAberta:null,
       paineisGolpesAbertos:previous?.paineisGolpesAbertos||[],encerrada:match.status!=="active",processando:false,aguardandoProximoTurno:false};
     renderizarArena();
   }
@@ -1460,6 +1487,7 @@ function atualizarArenaDaSala(detail){
     roomSubmit,fighters,turno:encounter.turn,horario:"Encontro da campanha",
     bioma:fighters[0]?.nativa?.bioma||"Habitat da campanha",ordem:encounter.state.order||[],
     log:[...history],escolhas:encounter.own_choice?{[selfIndex]:encounter.own_choice}:sameTurn?same.escolhas:{},
+    tecnicaDetalhesAberta:sameTurn?same?.tecnicaDetalhesAberta:null,
     encerrada:encounter.status!=="active",processando:false,aguardandoProximoTurno:false};
   renderizarArena();
 }

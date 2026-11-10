@@ -116,3 +116,114 @@ body.arena-fullscreen-open { overflow:hidden; }
   #battle:fullscreen:has(.battlefield) .battle-result,#battle.arena-expanded:has(.battlefield) .battle-result { grid-column:1; grid-row:3; }
   #battle:fullscreen:has(.battlefield) .battle-log,#battle.arena-expanded:has(.battlefield) .battle-log { grid-column:2; grid-row:1/4; max-height:none; }
 }
+
+/* Arena move relics: visible source identity, stronger material and elemental art. */
+.battle-layout .battle-technique-card {
+  --technique-accent:#b9d58c;
+  position:relative;
+  border:1px solid color-mix(in srgb,var(--technique-accent) 62%,#f3e4bc 12%);
+  border-radius:5px 17px 5px 17px;
+  background:linear-gradient(145deg,#263c2beF,#101c16 68%,#18271d);
+  box-shadow:inset 0 1px #fff2,inset 0 -8px 16px #030a0755,0 7px 16px #0007;
+  transition:transform .22s cubic-bezier(.2,.75,.25,1),border-color .22s,box-shadow .22s,filter .22s;
+}
+.battle-layout .battle-technique-card::before { opacity:1; mix-blend-mode:screen; }
+.battle-layout .battle-technique-card::after {
+  position:absolute; z-index:2; inset:3px; width:auto; height:auto; top:3px; right:3px; bottom:3px; left:3px;
+  border:1px solid color-mix(in srgb,var(--technique-accent) 38%,transparent); border-radius:3px 14px 3px 14px;
+  background:none; content:""; opacity:.65; pointer-events:none;
+}
+.battle-layout .battle-technique-card:hover { transform:translateY(-3px) scale(1.015); border-color:var(--technique-accent); box-shadow:inset 0 1px #fff3,0 0 0 1px color-mix(in srgb,var(--technique-accent) 48%,transparent),0 12px 25px #0009,0 0 22px color-mix(in srgb,var(--technique-accent) 23%,transparent); }
+.battle-layout .battle-technique-card.selected { border-color:#f0d38d; background:linear-gradient(145deg,#495438,#1c2e20 67%,#213126); box-shadow:inset 0 1px #fff5,0 0 0 2px #e7ce8277,0 0 26px color-mix(in srgb,var(--technique-accent) 38%,transparent),0 12px 25px #0008; }
+.battle-layout .battle-technique-card.selected::after { border-color:#f4d990a6; opacity:.9; }
+.battle-layout .battle-technique-card.unavailable { filter:saturate(.5) brightness(.78); }
+.dashboard .battle-layout .battle-technique { gap:9px; min-height:94px; padding:12px!important; }
+.battle-layout .technique-card-top { order:0; align-items:center; min-width:0; min-height:29px; }
+.battle-layout .technique-card-name { display:block; min-width:0; color:#fff6dc; font-size:13px; font-weight:850; letter-spacing:.005em; line-height:1.16; overflow-wrap:anywhere; text-shadow:0 2px 8px #000b; }
+.battle-layout .technique-cost { padding:5px 8px; border:1px solid #b9e0eb77; border-radius:4px 11px 4px 11px; color:#dcf6ff; background:linear-gradient(140deg,#397786aa,#142d38dd); box-shadow:inset 0 1px #fff4,0 0 12px #6bd6ec24; font-size:9px; font-weight:900; white-space:nowrap; }
+.battle-layout .technique-card-badges { order:1; align-items:center; gap:5px; min-width:0; }
+.battle-layout .technique-badge { max-width:100%; padding:4px 7px; border-radius:3px 9px 3px 9px; font-size:8px; font-weight:800; line-height:1.2; letter-spacing:.025em; }
+.battle-layout .source-badge { display:inline-flex; align-items:center; gap:4px; border:1px solid color-mix(in srgb,var(--technique-accent) 55%,transparent); border-left:2px solid var(--technique-accent); color:color-mix(in srgb,var(--technique-accent) 55%,#fff); background:linear-gradient(100deg,color-mix(in srgb,var(--technique-accent) 18%,#07120d),#101b15d9); text-transform:uppercase; letter-spacing:.045em; }
+.battle-layout .source-badge i { display:inline-grid; place-items:center; min-width:16px; height:16px; border:1px solid color-mix(in srgb,var(--technique-accent) 50%,transparent); border-radius:50%; color:var(--technique-accent); font-size:11px; font-style:normal; line-height:1; }
+.battle-layout .source-label { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.battle-layout .category-badge { border:1px solid #ffffff32; box-shadow:inset 0 1px #ffffff15; text-transform:uppercase; letter-spacing:.04em; }
+.battle-layout .category-badge[data-category="Físico"] { border-color:#f0af7370; color:#ffcf9f; background:linear-gradient(120deg,#75412f9c,#302117cc); }
+.battle-layout .category-badge[data-category="Especial"] { border-color:#8ed9fa75; color:#c8f0ff; background:linear-gradient(120deg,#265d79a8,#17293dcc); }
+.battle-layout .category-badge[data-category="Suporte"] { border-color:#9eebbd75; color:#ceffdb; background:linear-gradient(120deg,#2a6a4fa8,#172c22cc); }
+.battle-layout .affinity-badge { border:1px solid #f1d48a78; color:#fff0bd; background:linear-gradient(120deg,#87652a99,#352a18dd); }
+.battle-layout .technique-card-stats { order:2; justify-content:flex-end; margin-top:auto; }
+.battle-layout .technique-card-stats>span { display:inline-flex; align-items:center; gap:5px; padding:4px 8px; border:1px solid color-mix(in srgb,var(--technique-accent) 42%,transparent); border-radius:4px 10px 4px 10px; color:#d8e0ca; background:linear-gradient(120deg,#0a130ee8,#1a291ce8); box-shadow:inset 0 1px #fff1; font-size:8px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; }
+.battle-layout .technique-card-stats>span::before { color:var(--technique-accent); content:"✦"; font-size:10px; }
+.battle-layout .technique-card-stats b { color:#fff1b9; font-size:13px; font-weight:950; text-shadow:0 0 10px #f3d98655; }
+
+/* Linhagem: hide, claws, scales and feathers. */
+.battle-layout .battle-technique-card[data-source="linhagem"] { --technique-accent:#b5d58d; background:linear-gradient(145deg,#263b2b,#102019 72%,#1c2d20); }
+.battle-layout .battle-technique-card[data-family="felinos"]::before { background:radial-gradient(ellipse at 84% 25%,transparent 0 5px,#f2d08b70 6px 8px,transparent 9px),radial-gradient(ellipse at 98% 55%,transparent 0 6px,#e8c37b55 7px 9px,transparent 10px),repeating-linear-gradient(133deg,transparent 0 26px,#f1d19038 27px 29px,transparent 30px 42px),radial-gradient(ellipse at 100% 0%,#d5a55252,transparent 68%); background-size:38px 35px,46px 42px,auto,auto; }
+.battle-layout .battle-technique-card[data-family="felinos"]::after { border-left:2px solid #e8c37b; }
+.battle-layout .battle-technique-card[data-family*="peixes"]::before,.battle-layout .battle-technique-card[data-family="siluriformes"]::before,.battle-layout .battle-technique-card[data-family="characiformes"]::before { background:radial-gradient(circle at 88% 20%,#a5edf55c 0 3px,transparent 3.5px),radial-gradient(circle at 100% 44%,#a5edf540 0 4px,transparent 4.5px),repeating-radial-gradient(ellipse at 100% 100%,transparent 0 8px,#8fe1e638 9px 11px,transparent 12px 19px),linear-gradient(135deg,transparent 30%,#2e9aa738); background-size:23px 20px,29px 25px,100% 100%,100% 100%; }
+.battle-layout .battle-technique-card[data-family*="aves"]::before,.battle-layout .battle-technique-card[data-family="psitacideos"]::before { background:repeating-linear-gradient(145deg,transparent 0 9px,#e3d29d3b 10px 12px,transparent 13px 20px),radial-gradient(ellipse at 100% 0%,#b6dff04a,transparent 65%); }
+.battle-layout .battle-technique-card[data-family="serpentes"]::before,.battle-layout .battle-technique-card[data-family="lagartos"]::before { background:repeating-linear-gradient(135deg,transparent 0 9px,#d5c08138 10px 11px,transparent 12px 19px),radial-gradient(ellipse at 100% 20%,#a2b65c3f,transparent 56%); }
+.battle-layout .battle-technique-card[data-family*="insetos"]::before,.battle-layout .battle-technique-card[data-family="aracnideos"]::before { background:linear-gradient(30deg,transparent 45%,#f0d77738 46% 47%,transparent 48%),linear-gradient(150deg,transparent 44%,#e9c95735 45% 46%,transparent 47%),radial-gradient(ellipse at 100% 0%,#d2bd5f43,transparent 60%); }
+.battle-layout .battle-technique-card[data-family="morcegos"]::before { background:repeating-radial-gradient(ellipse at 100% 50%,transparent 0 8px,#a5ccf35c 9px 10px,transparent 11px 17px),radial-gradient(ellipse at 100% 50%,#618aca55,transparent 61%); }
+.battle-layout .battle-technique-card[data-family="canideos"]::before { background:repeating-radial-gradient(ellipse at 100% 100%,transparent 0 12px,#e7c18448 13px 14px,transparent 15px 24px),linear-gradient(145deg,transparent 35%,#8c6a374d); }
+.battle-layout .battle-technique-card[data-family="roedores"]::before { background:radial-gradient(circle at 88% 20%,#e0c38356 0 2px,transparent 3px),radial-gradient(circle at 100% 45%,#e0c38344 0 3px,transparent 4px),repeating-linear-gradient(0deg,transparent 0 17px,#c8ad7a26 18px 20px,transparent 21px 30px); }
+.battle-layout .battle-technique-card[data-family="primatas"]::before { background:repeating-linear-gradient(125deg,transparent 0 13px,#91c97750 14px 16px,transparent 17px 28px),radial-gradient(ellipse at 100% 100%,#699e4c5c,transparent 58%); }
+.battle-layout .battle-technique-card[data-family="ungulados"]::before { background:linear-gradient(145deg,transparent 43%,#e4c88350 44% 46%,transparent 47%),radial-gradient(ellipse at 100% 0%,#ab9b6a55,transparent 61%); }
+.battle-layout .battle-technique-card[data-family="quelonios"]::before,.battle-layout .battle-technique-card[data-family="crocodilianos"]::before { background:repeating-linear-gradient(45deg,transparent 0 16px,#d3c28240 17px 18px,transparent 19px 31px),repeating-linear-gradient(135deg,transparent 0 16px,#b0c48335 17px 18px,transparent 19px 31px),linear-gradient(145deg,#53674435,transparent 64%); }
+.battle-layout .battle-technique-card[data-source="bioma"] { --technique-accent:#86d3a2; background:linear-gradient(180deg,#294d42,#11241d 68%,#183225); }
+.battle-layout .battle-technique-card[data-biome*="floresta"]::before { background:radial-gradient(ellipse at 88% 12%,#7dd39a72,transparent 25%),radial-gradient(ellipse at 100% 38%,#377f614f,transparent 40%),linear-gradient(180deg,transparent 45%,#0c191ad9 90%),repeating-linear-gradient(75deg,transparent 0 25px,#c5e2a521 26px 28px,transparent 29px 43px); }
+.battle-layout .battle-technique-card[data-biome*="rios"]::before { background:repeating-radial-gradient(ellipse at 100% 100%,transparent 0 10px,#8ce5e052 11px 13px,transparent 14px 25px),linear-gradient(165deg,transparent 35%,#2697a350 62%,#112c27aa); }
+.battle-layout .battle-technique-card[data-biome*="caatinga"]::before { background:radial-gradient(ellipse at 100% 15%,#f6c46c6b,transparent 29%),linear-gradient(160deg,transparent 45%,#9e794e70 47% 57%,transparent 59%),repeating-linear-gradient(160deg,transparent 0 25px,#d1b47632 26px 28px,transparent 29px 43px); }
+.battle-layout .battle-technique-card[data-biome*="costa"]::before { background:repeating-radial-gradient(ellipse at 100% 100%,transparent 0 9px,#7fe1d14a 10px 12px,transparent 13px 23px),radial-gradient(ellipse at 0% 0%,#84d4a550,transparent 50%),linear-gradient(150deg,transparent 42%,#266c5c77); }
+.battle-layout .battle-technique-card[data-source="arquetipo"] { --technique-accent:#d5bbff; background:linear-gradient(145deg,#403353,#171c2b 74%,#24203a); }
+.battle-layout .battle-technique-card[data-source="arquetipo"]::before { background:radial-gradient(circle at 85% 15%,#eee0ff85 0 1px,transparent 2px),radial-gradient(circle at 100% 35%,#c1a5fb88 0 2px,transparent 3px),radial-gradient(circle at 75% 54%,#a6d3ff70 0 1px,transparent 2px),linear-gradient(135deg,transparent 36%,#bda1f327); background-size:27px 26px,38px 37px,45px 43px,100% 100%; }
+.battle-layout .battle-technique-card[data-group="predador"] { --technique-accent:#f08c67; background:linear-gradient(145deg,#542f2a,#201817 72%,#3a211d); }
+.battle-layout .battle-technique-card[data-group="predador"]::before { background:repeating-linear-gradient(135deg,transparent 0 24px,#f4a17835 25px 27px,transparent 28px 40px),radial-gradient(ellipse at 100% 0%,#e65c4366,transparent 55%); }
+.battle-layout .battle-technique-card[data-group="guardiao"] { --technique-accent:#d5bc78; background:linear-gradient(145deg,#4c4930,#1e2117 72%,#35341f); }
+.battle-layout .battle-technique-card[data-group="guardiao"]::before { background:repeating-linear-gradient(45deg,transparent 0 16px,#d5bc7850 17px 19px,transparent 20px 30px),linear-gradient(145deg,transparent 42%,#93ad5855); }
+.battle-layout .battle-technique-card[data-group="veloz"] { --technique-accent:#82d5ef; background:linear-gradient(145deg,#27485b,#131e28 72%,#1d3542); }
+.battle-layout .battle-technique-card[data-group="veloz"]::before { background:repeating-linear-gradient(165deg,transparent 0 9px,#a5e8fa65 10px 12px,transparent 13px 27px),radial-gradient(ellipse at 100% 0%,#51a9d35f,transparent 56%); }
+.battle-layout .battle-technique-card[data-group="canalizador"] { --technique-accent:#c9a0fa; background:linear-gradient(145deg,#49366b,#1a1830 72%,#302349); }
+.battle-layout .battle-technique-card[data-group="canalizador"]::before { background:repeating-radial-gradient(ellipse at 100% 0%,transparent 0 9px,#d8b9ff4f 10px 12px,transparent 13px 21px),radial-gradient(ellipse at 100% 0%,#9b75dd69,transparent 59%); }
+
+/* Elemental schools get moving light, kept behind the text and stats. */
+.battle-layout .battle-technique-card[data-element="fogo"] { --technique-accent:#ff955c; background:linear-gradient(150deg,#522b24,#211719 70%,#382117); }
+.battle-layout .battle-technique-card[data-element="fogo"]::before { background:radial-gradient(ellipse at 16% 100%,#ff6b2b9c,transparent 43%),radial-gradient(ellipse at 100% 7%,#ffd07873,transparent 34%),repeating-linear-gradient(165deg,transparent 0 16px,#ffbb5022 17px 19px,transparent 20px 31px); background-size:200% 200%; animation:move-fire-glow 3.2s ease-in-out infinite alternate; }
+.battle-layout .battle-technique-card[data-element="agua"] { --technique-accent:#69d8f0; background:linear-gradient(145deg,#16495b,#10232d 72%,#14363e); }
+.battle-layout .battle-technique-card[data-element="agua"]::before { background:repeating-radial-gradient(ellipse at 100% 100%,transparent 0 9px,#a8f1ff52 10px 12px,transparent 13px 22px),linear-gradient(135deg,transparent 24%,#35bde05c 55%,transparent 75%); background-size:100% 100%,180% 180%; animation:move-water-current 6s linear infinite; }
+.battle-layout .battle-technique-card[data-element="terra"] { --technique-accent:#dfb969; background:linear-gradient(145deg,#51402b,#231d16 72%,#3b2d1e); }
+.battle-layout .battle-technique-card[data-element="terra"]::before { background:linear-gradient(145deg,transparent 43%,#efce7652 44% 46%,transparent 47%),linear-gradient(28deg,transparent 56%,#a9773b60 57% 59%,transparent 60%),radial-gradient(ellipse at 100% 100%,#ad733d5c,transparent 52%); }
+.battle-layout .battle-technique-card[data-element="vento"] { --technique-accent:#cbecaa; background:linear-gradient(145deg,#36543d,#15241d 74%,#263827); }
+.battle-layout .battle-technique-card[data-element="vento"]::before { background:repeating-linear-gradient(160deg,transparent 0 11px,#e3f6c566 12px 14px,transparent 15px 28px),radial-gradient(ellipse at 100% 0%,#c4e49d59,transparent 56%); background-size:210% 100%,100% 100%; animation:move-wind-stream 7s linear infinite; }
+.battle-layout .battle-technique-card[data-element="energia"] { --technique-accent:#c5a7ff; background:linear-gradient(145deg,#45366b,#18192b 72%,#2d2452); }
+.battle-layout .battle-technique-card[data-element="energia"]::before { background:repeating-radial-gradient(ellipse at 100% 0%,transparent 0 10px,#d7baff55 11px 13px,transparent 14px 24px),radial-gradient(ellipse at 100% 0%,#af8dfb66,transparent 58%); animation:pulse-energy-glyphs 2.8s ease-in-out infinite alternate; }
+.battle-layout .battle-technique-card[data-source="linhagem"] .source-badge { background:linear-gradient(100deg,#34523bcf,#121c15eb); }
+.battle-layout .battle-technique-card[data-source="bioma"] .source-badge { background:linear-gradient(100deg,#28634ebf,#10231ceb); }
+.battle-layout .battle-technique-card[data-source="arquetipo"] .source-badge { background:linear-gradient(100deg,#624f82c9,#19192beb); }
+.battle-layout .battle-technique-card[data-element="fogo"] .source-badge { background:linear-gradient(100deg,#9a482fcf,#301b17eb); }
+.battle-layout .battle-technique-card[data-element="agua"] .source-badge { background:linear-gradient(100deg,#1d7890cf,#102530ed); }
+.battle-layout .battle-technique-card[data-element="terra"] .source-badge { background:linear-gradient(100deg,#866233c9,#2b2118eb); }
+.battle-layout .battle-technique-card[data-element="vento"] .source-badge { background:linear-gradient(100deg,#4b7042c9,#15241aed); }
+.battle-layout .battle-technique-card[data-element="energia"] .source-badge { background:linear-gradient(100deg,#69519ecf,#201b39eb); }
+.battle-layout .technique-card-top { order:0!important; }
+.battle-layout .technique-card-badges { order:1!important; }
+.battle-layout .technique-card-stats { order:2!important; }
+.battle-layout .technique-hover-effect { z-index:5; border-color:var(--technique-accent); background:linear-gradient(145deg,#101b15f7,#07110cf5); box-shadow:inset 0 0 22px color-mix(in srgb,var(--technique-accent) 17%,transparent),0 0 20px #0009; }
+.battle-layout .technique-hover-effect strong { display:flex; align-items:center; gap:7px; }
+.battle-layout .technique-hover-effect strong::before { color:var(--technique-accent); content:"✧"; font-size:16px; }
+@keyframes move-fire-glow { from { background-position:0% 100%; } to { background-position:100% 0%; } }
+@keyframes move-water-current { from { background-position:0 0,0% 0%; } to { background-position:35px 18px,100% 100%; } }
+@keyframes move-wind-stream { from { background-position:0 0,0 0; } to { background-position:45px 0,0 0; } }
+@keyframes pulse-energy-glyphs { from { opacity:.62; } to { opacity:1; } }
+@media(hover:none),(max-width:760px) {
+  .battle-layout .technique-hover-effect { display:none; }
+  .battle-layout .battle-technique-card.details-open { z-index:30; transform:none; }
+  .battle-layout .battle-technique-card.details-open .technique-hover-effect { display:grid; visibility:visible; opacity:1; transform:none; }
+  .battle-layout .touch-effect-hint { display:block; margin-top:3px; color:#bfceb7; font-size:8px; }
+  .dashboard .battle-layout .battle-technique { min-height:104px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .battle-layout .battle-technique-card,.battle-layout .battle-technique-card:hover { animation:none!important; transition:none!important; transform:none!important; }
+  .battle-layout .battle-technique-card[data-element]::before { animation:none!important; }
+  .battle-layout .technique-hover-effect { transition:none; }
+}
