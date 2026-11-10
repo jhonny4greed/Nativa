@@ -16,7 +16,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa +1 dano se o alvo ainda não realizou sua ação no turno atual.",
     "status": "Revisado V2.2",
     "pg": 4,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -44,7 +44,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Aplica Exposição: −2 DEF do alvo por 2 turnos.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -72,7 +72,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Aplica Desorientação: −2 no próximo golpe ofensivo do alvo.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -100,7 +100,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Observa um adversário e prepara uma resposta mais eficaz contra ele.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -128,7 +128,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Fora de combate, identifica e acompanha rastros, inclusive após tentativa de fuga; não concede bônus automático de combate.",
     "status": "Revisado V2.2",
     "pg": 3,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
@@ -156,7 +156,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Aplica Sangramento: 1 dano ao final do turno do alvo por 2 turnos.",
     "status": "Revisado V2.2",
     "pg": 4,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -184,7 +184,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico direto; +1 dano quando a condição de matilha estiver presente no cenário narrativo, sem exigir aliado como regra de combate.",
     "status": "Revisado V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 2,
@@ -212,7 +212,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Coordena aliados e permite que reajustem suas ações diante da movimentação inimiga.",
     "status": "Revisado V2.2",
     "pg": 3,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
@@ -240,7 +240,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico direto; se acertar, reduz AGI do alvo em 2 por 2 turnos.",
     "status": "Revisado V2.2",
     "pg": 4,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -268,7 +268,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico direto; se acertar, reduz DEF do alvo em 2 por 2 turnos.",
     "status": "Revisado V2.2",
     "pg": 4,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
@@ -296,7 +296,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ativa por 2 turnos. Quando o usuário recebe golpe físico de contato, o atacante sofre −2 ATQ por 2 turnos.",
     "status": "Revisado V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -324,7 +324,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Reage a uma ameaça iminente, priorizando preservação e fuga.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -352,7 +352,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Utiliza as extremidades para manipular objetos ou explorar pontos vulneráveis.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -380,7 +380,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico direto; recebe +1 dano quando houver superfície natural apropriada para impulsão.",
     "status": "Revisado V2.2",
     "pg": 4,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -408,7 +408,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Investiga o ambiente e identifica pistas, objetos úteis, esconderijos e perigos próximos.",
     "status": "Revisado V2.2",
     "pg": 3,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
@@ -436,7 +436,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Prepara um ataque contra um alvo distraído ou comprometido.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -464,7 +464,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Executa fuga rápida em direção a uma posição protegida.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -492,7 +492,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico direto; causa +1 dano contra alvo sob proteção ou escudo ativo.",
     "status": "Revisado V2.2",
     "pg": 3,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
@@ -520,7 +520,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Executa dois impactos de mordida de 2 de dano cada; cada impacto faz teste de precisão.",
     "status": "Revisado V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 2,
@@ -548,7 +548,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Fora de combate, alerta sobre ameaças; em combate, concede +2 na próxima iniciativa.",
     "status": "Revisado V2.2",
     "pg": 3,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
@@ -576,7 +576,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Reduz em 3 o próximo dano recebido, físico ou especial.",
     "status": "Revisado V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -604,7 +604,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Contra-ataque físico: se o adversário acertou o usuário com golpe de contato no turno anterior, este golpe causa +2 dano.",
     "status": "Revisado V2.2",
     "pg": 5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -632,7 +632,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ativa por 2 turnos. Quando o usuário recebe golpe físico de contato, aplica Desorientação ao atacante.",
     "status": "Revisado V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -660,7 +660,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Aproveita uma abertura para recuperar parte da capacidade de sobrevivência.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -688,7 +688,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico adaptado; causa +1 dano quando houver objeto natural apropriado disponível na cena.",
     "status": "Revisado V2.2",
     "pg": 5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -716,7 +716,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Combina o movimento da Nativa com a ação de um aliado.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -744,7 +744,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Aplica Desorientação: −2 no próximo golpe ofensivo do alvo.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -772,7 +772,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Analisa o comportamento do adversário e identifica padrões exploráveis.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -800,7 +800,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Detecta criaturas e obstáculos sem depender da visão, inclusive em escuridão ou visibilidade prejudicada.",
     "status": "Revisado V2.2",
     "pg": 3,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
@@ -828,7 +828,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico direto; causa +1 dano se o usuário agir antes do alvo.",
     "status": "Revisado V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 2,
@@ -856,7 +856,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa dano especial e aplica Desorientação: −2 no próximo golpe ofensivo do alvo.",
     "status": "Revisado V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -884,7 +884,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Reduz em 2 o próximo dano físico recebido.",
     "status": "Revisado V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -912,7 +912,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Recolhe o corpo e reduz a exposição a ataques.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -940,7 +940,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico direto; causa +1 dano se acertar após escavar ou preparar o solo na cena.",
     "status": "Revisado V2.2",
     "pg": 4,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -968,7 +968,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa dano especial e reduz AGI do alvo em 2 até o final do próximo turno dele.",
     "status": "Revisado V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -996,7 +996,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Assume postura defensiva e reduz a eficácia de ataques recebidos.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -1024,7 +1024,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa dano físico e aplica Desorientação: −2 no próximo golpe ofensivo do alvo.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -1052,7 +1052,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico direto; se acertar, reduz DEF do alvo em 2 por 2 turnos.",
     "status": "Revisado V2.2",
     "pg": 5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -1080,7 +1080,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Pressiona um alvo próximo ou caído e dificulta sua recuperação de posição.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -1108,7 +1108,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Aplica Desorientação: −2 no próximo golpe ofensivo do alvo.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -1136,7 +1136,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico direto; +1 dano se agir antes do alvo.",
     "status": "Revisado V2.2",
     "pg": 4,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -1164,7 +1164,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico direto; causa +1 dano se o usuário agir antes do alvo.",
     "status": "Revisado V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 2,
@@ -1192,7 +1192,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Concede +2 RES por 2 turnos.",
     "status": "Revisado V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -1220,7 +1220,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Observa o campo de batalha e identifica vulnerabilidades e movimentações.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -1248,7 +1248,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico direto; se acertar, reduz ATQ do alvo em 2 por 2 turnos.",
     "status": "Revisado V2.2",
     "pg": 5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -1276,7 +1276,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico direto; se acertar, aplica −2 precisão ao próximo golpe ofensivo do alvo.",
     "status": "Revisado V2.2",
     "pg": 4,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -1304,7 +1304,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Fora de combate, alerta sobre ameaças próximas; em combate, concede +2 de precisão no próximo golpe ofensivo próprio.",
     "status": "Revisado V2.2",
     "pg": 3,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
@@ -1332,7 +1332,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Deslocamento explosivo para aproximar-se ou escapar.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -1360,7 +1360,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico de precisão; +1 dano se o alvo estiver sob efeito negativo.",
     "status": "Revisado V2.2",
     "pg": 3,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
@@ -1388,7 +1388,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Calcula o momento ideal para capturar alvo ou objeto em movimento.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -1416,7 +1416,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Transmite alertas e informações a aves próximas; não concede bônus automático em combate individual.",
     "status": "Revisado V2.2",
     "pg": 3,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
@@ -1444,7 +1444,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Reduz prejuízos causados por água e favorece a movimentação em áreas alagadas.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -1472,7 +1472,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico direto; +1 dano contra alvo com DEF reduzida.",
     "status": "Revisado V2.2",
     "pg": 4,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -1500,7 +1500,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa dano físico e aplica Desorientação: −2 no próximo golpe ofensivo do alvo.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -1528,7 +1528,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Fora de combate, imita sons para distrair, atrair ou confundir; em combate, aplica Desorientação.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -1556,7 +1556,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Transmite informações táticas aos aliados.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -1584,7 +1584,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa dano especial e aplica Envenenamento: 1 dano especial ao final do turno do alvo, por 2 turnos.",
     "status": "Revisado V2.2",
     "pg": 3,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
@@ -1612,7 +1612,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico; reduz AGI do alvo em 2 por 2 turnos.",
     "status": "Revisado V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 2,
@@ -1640,7 +1640,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Se o alvo já estiver envenenado, causa +2 de dano imediato e renova o Envenenamento por 2 turnos.",
     "status": "Revisado V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -1668,7 +1668,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Reduz a percepção da Nativa pelo adversário e prepara ação surpresa.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -1696,7 +1696,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Utiliza a cauda como distração para facilitar fuga ou reposicionamento.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -1724,7 +1724,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico direto; +1 dano se o alvo já tiver agido no turno.",
     "status": "Revisado V2.2",
     "pg": 5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -1752,7 +1752,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico direto; sem efeito adicional.",
     "status": "Revisado V2.2",
     "pg": 3,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
@@ -1780,7 +1780,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Aplica Desorientação: −2 no próximo golpe ofensivo do alvo.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -1808,7 +1808,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Recolhe partes vulneráveis do corpo e reduz exposição a ataques.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -1836,7 +1836,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico pesado; +1 dano se o usuário não tiver recebido dano neste turno.",
     "status": "Revisado V2.2",
     "pg": 7,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 2,
@@ -1864,7 +1864,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico direto; +1 dano contra alvo sob efeito negativo.",
     "status": "Revisado V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 2,
@@ -1892,7 +1892,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Reduz em 2 o próximo dano recebido, físico ou especial.",
     "status": "Revisado V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -1920,7 +1920,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico pesado; reduz DEF do alvo em 2 por 2 turnos.",
     "status": "Revisado V2.2",
     "pg": 7,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 2,
@@ -1948,7 +1948,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico; +1 dano se o usuário agir antes do alvo.",
     "status": "Revisado V2.2",
     "pg": 5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -1976,7 +1976,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Mantém mordida de alta pressão e restringe a movimentação do alvo.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -2004,7 +2004,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Assume postura defensiva que reduz o impacto de ataques recebidos.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -2032,7 +2032,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ativa por 2 turnos. Quando o usuário recebe golpe físico de contato, causa 2 de dano especial ao atacante.",
     "status": "Revisado V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -2060,7 +2060,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico; reduz AGI do alvo em 2 por 2 turnos.",
     "status": "Revisado V2.2",
     "pg": 5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -2088,7 +2088,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Reduz POT do adversário em 2 por 2 turnos.",
     "status": "Revisado V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -2116,7 +2116,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Mantém a superfície corporal protegida e favorece adaptação a ambientes úmidos.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -2144,7 +2144,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa dano especial e reduz POT do adversário em 2 por 2 turnos.",
     "status": "Revisado V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -2172,7 +2172,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa dano especial elevado e aplica −2 de precisão ao próximo golpe ofensivo do adversário.",
     "status": "Revisado V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -2200,7 +2200,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico; +1 dano em cenário aquático.",
     "status": "Revisado V2.2",
     "pg": 5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -2228,7 +2228,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Detecta sinais elétricos e identifica presença ou movimentação de criaturas próximas.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -2256,7 +2256,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa +1 dano quando o alvo estiver sob Sangramento.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -2284,7 +2284,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Executa dois impactos físicos de 2 de dano cada; cada impacto faz teste de precisão.",
     "status": "Revisado V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 2,
@@ -2312,7 +2312,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Coordena aproximação coletiva e pressão sobre um adversário.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -2340,7 +2340,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Aplica −2 de precisão ao próximo golpe ofensivo do adversário.",
     "status": "Revisado V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -2368,7 +2368,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico; se o adversário usar golpe físico de contato no turno seguinte, sofre 2 de dano.",
     "status": "Revisado V2.2",
     "pg": 4,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -2396,7 +2396,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico; reduz AGI do alvo em 2 por 2 turnos.",
     "status": "Revisado V2.2",
     "pg": 5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -2424,7 +2424,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Revela qual defesa do adversário é menor: DEF ou RES.",
     "status": "Revisado V2.2",
     "pg": 3,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
@@ -2452,7 +2452,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Reforça postura defensiva e reduz eficácia de ataques físicos.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -2480,7 +2480,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Concede +2 de precisão no próximo golpe ofensivo próprio.",
     "status": "Revisado V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -2508,7 +2508,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico; +1 dano em cenário aquático.",
     "status": "Revisado V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 2,
@@ -2536,7 +2536,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico; causa +1 dano imediato adicional após acertar.",
     "status": "Revisado V2.2",
     "pg": 5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -2564,7 +2564,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Utiliza a textura corporal para dificultar ataques de contato e agarrões.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -2592,7 +2592,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa dano especial e aplica Envenenamento: 1 dano especial ao final do turno do alvo, por 2 turnos.",
     "status": "Revisado V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -2620,7 +2620,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico; reduz ATQ do alvo em 2 por 2 turnos.",
     "status": "Revisado V2.2",
     "pg": 4,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -2648,7 +2648,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Prende o alvo com fios resistentes e restringe suas ações.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -2676,7 +2676,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Aplica −2 de precisão ao próximo golpe ofensivo do adversário.",
     "status": "Revisado V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -2704,7 +2704,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Prepara posição defensiva no ambiente.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -2732,7 +2732,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico direto; sem efeito adicional.",
     "status": "Revisado V2.2",
     "pg": 3,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
@@ -2760,7 +2760,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa dano especial e reduz ATQ do adversário em 2 por 2 turnos.",
     "status": "Revisado V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -2788,7 +2788,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Utiliza sinais químicos para transmitir informações e coordenar aliados.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -2816,7 +2816,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico; reduz AGI do alvo em 2 por 2 turnos.",
     "status": "Revisado V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 2,
@@ -2844,7 +2844,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico; +1 dano contra alvo com DEF reduzida.",
     "status": "Revisado V2.2",
     "pg": 5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -2872,7 +2872,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa dano especial e aplica Digestão: 2 de dano especial ao final do próximo turno do alvo.",
     "status": "Revisado V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -2900,7 +2900,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Intercepta adversário em deslocamento e pode impedir sua fuga.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -2928,7 +2928,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico; reduz AGI do alvo em 2 por 2 turnos.",
     "status": "Revisado V2.2",
     "pg": 7,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 2,
@@ -2956,7 +2956,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Executa deslocamento lateral rápido para escapar ou reposicionar-se.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -2984,7 +2984,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Aplica −2 de precisão ao próximo golpe ofensivo do adversário.",
     "status": "Revisado V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -3012,7 +3012,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Assume postura protetora e reduz o impacto de ataques recebidos.",
     "status": "Revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
+    "estadoCatalogo": "aprovado",
     "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
@@ -3040,8 +3040,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa +1 dano se agir antes do alvo.",
     "status": "Recuperado",
     "pg": 5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 2,
@@ -3068,8 +3068,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Reduz em 2 o próximo dano recebido.",
     "status": "Recuperado",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 3,
@@ -3096,8 +3096,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Concede +2 AGI até o final do próximo turno.",
     "status": "Recuperado",
     "pg": 3.5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 2,
@@ -3124,8 +3124,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Aplica Exposição: −2 DEF por 2 turnos.",
     "status": "Recuperado",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 1,
@@ -3152,8 +3152,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Reduz em 3 o próximo dano recebido.",
     "status": "Recuperado",
     "pg": 4,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 2,
@@ -3180,8 +3180,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Reduz AGI do alvo em 2 por 2 turnos.",
     "status": "Recuperado",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 1,
@@ -3208,8 +3208,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Concede +1 AGI durante este turno em ambiente aquático.",
     "status": "Recuperado",
     "pg": 5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 2,
@@ -3236,8 +3236,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Recebe +2 de precisão contra alvos com AGI reduzida.",
     "status": "Recuperado",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 1,
@@ -3264,8 +3264,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Avança antes do ataque; causa +1 dano se houver espaço para a arrancada.",
     "status": "Recuperado",
     "pg": 3.5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 2,
@@ -3292,8 +3292,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Reduz em 2 o próximo dano de Fogo recebido.",
     "status": "Recuperado",
     "pg": 3.5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 2,
@@ -3320,8 +3320,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa +1 dano se o usuário tiver preparado o impulso antes do ataque.",
     "status": "Recuperado",
     "pg": 5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 2,
@@ -3348,8 +3348,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Reduz em 2 o próximo dano físico recebido.",
     "status": "Recuperado",
     "pg": 3.5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 2,
@@ -3376,8 +3376,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa dano e reduz DEF do alvo em 2 por 2 turnos.",
     "status": "Recuperado",
     "pg": 7,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 2,
       "R": 2,
@@ -3404,8 +3404,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Reduz AGI do alvo em 2 por 2 turnos.",
     "status": "Recuperado",
     "pg": 5.5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 3,
@@ -3432,8 +3432,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Após atacar, prepara reposicionamento narrativo e reduz em 2 o próximo dano físico recebido.",
     "status": "Recuperado",
     "pg": 3,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 1,
@@ -3460,8 +3460,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Reduz em 2 o próximo dano especial recebido.",
     "status": "Recuperado",
     "pg": 3.5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 2,
@@ -3488,8 +3488,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Investida em terreno aberto; causa +1 dano se agir antes do alvo.",
     "status": "Novo — proposta V2.2",
     "pg": 5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 2,
@@ -3516,8 +3516,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Rajada de poeira e sementes: aplica −2 precisão ao próximo golpe ofensivo do alvo.",
     "status": "Novo — proposta V2.2",
     "pg": 5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 1,
@@ -3544,8 +3544,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Prepara abrigo baixo; reduz em 3 o próximo dano recebido.",
     "status": "Novo — proposta V2.2",
     "pg": 4,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 2,
@@ -3572,8 +3572,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Explora vento aberto; causa dano especial e concede +2 AGI até o final do próximo turno.",
     "status": "Novo — proposta V2.2",
     "pg": 7,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 2,
       "R": 2,
@@ -3600,8 +3600,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa +1 dano se o alvo estiver sem bônus defensivo.",
     "status": "Novo — proposta V2.2",
     "pg": 5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 2,
@@ -3628,8 +3628,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa dano especial e reduz ATQ do alvo em 2 por 2 turnos.",
     "status": "Novo — proposta V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 3,
@@ -3656,8 +3656,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Concede +2 de precisão no próximo golpe contra alvo abaixo da metade do HP.",
     "status": "Novo — proposta V2.2",
     "pg": 3.5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 2,
@@ -3684,8 +3684,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Dois impactos consecutivos; cada um causa 2 de dano e exige teste próprio.",
     "status": "Novo — proposta V2.2",
     "pg": 7,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 2,
       "R": 2,
@@ -3712,8 +3712,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Reduz em 3 o próximo dano recebido.",
     "status": "Novo — proposta V2.2",
     "pg": 4,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 2,
@@ -3740,8 +3740,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Concede +2 DEF por 2 turnos.",
     "status": "Novo — proposta V2.2",
     "pg": 3.5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 2,
@@ -3768,8 +3768,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa dano físico; se o usuário recebeu dano no turno anterior, causa +1 dano.",
     "status": "Novo — proposta V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 1,
@@ -3796,8 +3796,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Recupera 3 HP e reduz em 1 o próximo dano recebido.",
     "status": "Novo — proposta V2.2",
     "pg": 5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 4,
@@ -3824,8 +3824,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa +2 dano se o usuário agir antes do alvo.",
     "status": "Novo — proposta V2.2",
     "pg": 6.5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 2,
       "R": 2,
@@ -3852,8 +3852,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Aplica −2 precisão ao próximo golpe ofensivo do adversário.",
     "status": "Novo — proposta V2.2",
     "pg": 3.5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 2,
@@ -3880,8 +3880,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa dano especial e aplica Exposição: −2 RES por 2 turnos.",
     "status": "Novo — proposta V2.2",
     "pg": 5.5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 3,
@@ -3908,8 +3908,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Concede +2 AGI por 2 turnos.",
     "status": "Novo — proposta V2.2",
     "pg": 3.5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 2,
@@ -3936,8 +3936,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa dano especial e recebe +1 dano se o usuário tiver MP atual igual ou superior a 2.",
     "status": "Novo — proposta V2.2",
     "pg": 5.5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 2,
@@ -3964,8 +3964,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa dano especial elevado; usuário recebe −2 precisão no próximo golpe.",
     "status": "Novo — proposta V2.2",
     "pg": 8,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 2,
       "R": 3,
@@ -3992,8 +3992,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Recupera 2 MP.",
     "status": "Novo — proposta V2.2",
     "pg": 5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 4,
@@ -4020,8 +4020,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Concede +2 POT ao próximo golpe especial.",
     "status": "Novo — proposta V2.2",
     "pg": 3.5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 2,
@@ -4048,8 +4048,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa dano especial e reduz AGI do alvo em 2 por 2 turnos.",
     "status": "Novo — proposta V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 3,
@@ -4076,8 +4076,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Reduz ATQ e POT do alvo em 1 por 2 turnos.",
     "status": "Novo — proposta V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 3,
@@ -4104,8 +4104,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "O próximo efeito positivo aplicado ao alvo tem sua intensidade reduzida em 2.",
     "status": "Novo — proposta V2.2",
     "pg": 4,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 2,
@@ -4132,8 +4132,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa dano especial e impede bônus de AGI do alvo por 2 turnos.",
     "status": "Novo — proposta V2.2",
     "pg": 7,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 2,
       "R": 2,
@@ -4160,8 +4160,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico básico, sem efeito adicional.",
     "status": "Recuperado e revisado V2.2",
     "pg": 2,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 0,
@@ -4188,8 +4188,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa dano físico e aplica Queimadura: 1 dano ao final do turno do alvo por 2 turnos.",
     "status": "Recuperado e revisado V2.2",
     "pg": 5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 2,
@@ -4216,8 +4216,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque especial de fogo que não depende de contato corporal.",
     "status": "Recuperado e revisado V2.2",
     "pg": 5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 1,
@@ -4244,8 +4244,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa dano especial e aplica −2 precisão ao próximo golpe ofensivo do alvo.",
     "status": "Recuperado e revisado V2.2",
     "pg": 7.5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 2,
       "R": 3,
@@ -4272,8 +4272,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Concede +2 AGI por 2 turnos.",
     "status": "Recuperado e revisado V2.2",
     "pg": 3.5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 2,
@@ -4300,8 +4300,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Golpe especial de alto impacto, sem efeito adicional.",
     "status": "Recuperado e revisado V2.2",
     "pg": 7,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 2,
       "R": 2,
@@ -4328,8 +4328,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque especial básico à distância.",
     "status": "Recuperado e revisado V2.2",
     "pg": 2,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 0,
@@ -4356,8 +4356,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa dano físico e reduz ATQ do alvo em 2 por 2 turnos.",
     "status": "Recuperado e revisado V2.2",
     "pg": 5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 2,
@@ -4384,8 +4384,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa dano especial e reduz AGI do alvo em 2 por 2 turnos.",
     "status": "Recuperado e revisado V2.2",
     "pg": 5.5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 2,
@@ -4412,8 +4412,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa dano especial e impede bônus de AGI do alvo por 2 turnos.",
     "status": "Recuperado e revisado V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 3,
@@ -4440,8 +4440,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa +1 dano contra alvos com AGI reduzida.",
     "status": "Recuperado e revisado V2.2",
     "pg": 7,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 2,
       "R": 2,
@@ -4468,8 +4468,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Golpe especial de alto impacto.",
     "status": "Recuperado e revisado V2.2",
     "pg": 7,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 2,
       "R": 2,
@@ -4496,8 +4496,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico básico.",
     "status": "Recuperado e revisado V2.2",
     "pg": 2,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 0,
@@ -4524,8 +4524,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa dano físico e reduz AGI do alvo em 2 por 2 turnos.",
     "status": "Recuperado e revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 1,
@@ -4552,8 +4552,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Reduz em 3 o próximo dano recebido.",
     "status": "Recuperado e revisado V2.2",
     "pg": 4,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 2,
@@ -4580,8 +4580,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa dano especial e aplica −2 precisão ao próximo golpe ofensivo do alvo.",
     "status": "Recuperado e revisado V2.2",
     "pg": 5.5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 2,
@@ -4608,8 +4608,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico pesado.",
     "status": "Recuperado e revisado V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 3,
@@ -4636,8 +4636,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Golpe físico de alto impacto.",
     "status": "Recuperado e revisado V2.2",
     "pg": 7,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 2,
       "R": 2,
@@ -4664,8 +4664,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque físico básico.",
     "status": "Recuperado e revisado V2.2",
     "pg": 2,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 0,
@@ -4692,8 +4692,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Recebe +2 AGI para determinar a iniciativa deste turno.",
     "status": "Recuperado e revisado V2.2",
     "pg": 4,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 3,
@@ -4720,8 +4720,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa dano especial e aplica −2 precisão ao próximo golpe ofensivo do alvo.",
     "status": "Recuperado e revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 1,
@@ -4748,8 +4748,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Concede +2 AGI por 2 turnos.",
     "status": "Recuperado e revisado V2.2",
     "pg": 3.5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 2,
@@ -4776,8 +4776,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa dano especial e 1 dano adicional ao final do próximo turno do alvo.",
     "status": "Recuperado e revisado V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 3,
@@ -4804,8 +4804,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Golpe especial de alto impacto.",
     "status": "Recuperado e revisado V2.2",
     "pg": 7,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 2,
       "R": 2,
@@ -4832,8 +4832,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Ataque especial básico.",
     "status": "Recuperado e revisado V2.2",
     "pg": 2,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 0,
@@ -4860,8 +4860,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa dano especial e reduz POT do alvo em 2 por 2 turnos.",
     "status": "Recuperado e revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 1,
@@ -4888,8 +4888,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa dano especial elevado; usuário recebe −2 precisão no próximo golpe.",
     "status": "Recuperado e revisado V2.2",
     "pg": 6.5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 2,
       "R": 1,
@@ -4916,8 +4916,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Reduz em 1 turno a duração do primeiro efeito negativo recebido durante 2 turnos.",
     "status": "Recuperado e revisado V2.2",
     "pg": 4.5,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 3,
@@ -4944,8 +4944,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Causa +1 dano se o alvo já estiver afetado por condição negativa.",
     "status": "Recuperado e revisado V2.2",
     "pg": 6,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 3,
@@ -4972,8 +4972,8 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "efeito": "Golpe especial de alto impacto.",
     "status": "Recuperado e revisado V2.2",
     "pg": 7,
-    "estadoCatalogo": "em-revisao",
-    "parametrosTecnicosDisponiveis": false,
+    "estadoCatalogo": "aprovado",
+    "parametrosTecnicosDisponiveis": true,
     "parametrosBalanceamento": {
       "P": 2,
       "R": 2,
