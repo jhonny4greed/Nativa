@@ -79,15 +79,16 @@ test("IDs V1 arquivados continuam resolvíveis para fichas antigas sem integrar 
   assert.equal(TECNICAS.some(t => t.id === "linhagem-felinos-bote-predatorio"), false);
 });
 
-test("golpes V1 mantêm sinergia dependente dos Traços e V2.1 pendente não pode ser usado em combate", () => {
+test("golpes V1 mantêm sinergia arquivada e Bote Predatório V2.2.1 está liberado", () => {
   const archived = obterTecnicaPorId("linhagem-felinos-garras-perfurantes");
   assert.ok(archived.sinergias.some(x => obterTracoPorId(x.tracoId)));
-  const pending = TECNICAS_LINHAGEM_V2_1.find(t => t.nome === "Bote Predatório");
-  const attacker = criarCombatente({ id: "a", name: "A", attrs: { ATQ: 5, POT: 5, DEF: 2, RES: 2, AGI: 5, HP: 5, MP: 5 }, techniques: [pending.id] });
+  const current = TECNICAS.find(t => t.nome === "Bote Predatório");
+  const attacker = criarCombatente({ id: "a", name: "A", attrs: { ATQ: 5, POT: 5, DEF: 2, RES: 2, AGI: 5, HP: 5, MP: 5 }, techniques: [current.id] });
   const target = criarCombatente({ id: "b", name: "B", attrs: { ATQ: 1, POT: 1, DEF: 1, RES: 1, AGI: 1, HP: 5, MP: 5 }, techniques: [] });
-  const result = resolverTurnoCombate({ fighters: [attacker, target], choices: [{ tipo: "attack", tecnicaId: pending.id }, null], random: () => 0.9 });
-  assert.match(result.error.message, /não foi liberado para combate/);
-  assert.equal(result.fighters[0].mp, attacker.mp);
+  const result = resolverTurnoCombate({ fighters: [attacker, target], choices: [{ tipo: "attack", tecnicaId: current.id }, null], random: () => 0.9 });
+  assert.equal(result.error, null);
+  assert.ok(result.events.some(event => event.type === "hit"));
+  assert.ok(result.fighters[1].hp < target.hp);
 });
 
 test("o histórico não informa sinergia de precisão como ativa quando o golpe ainda erra", () => {
