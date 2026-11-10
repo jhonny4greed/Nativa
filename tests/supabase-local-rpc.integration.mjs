@@ -40,7 +40,7 @@ async function request(path, { method = "GET", token, body, prefer, baseUrl = AP
     signal: AbortSignal.timeout(12000)
   });
   const raw = await response.text();
-  let data = null;
+  let data;
   try { data = raw ? JSON.parse(raw) : null; } catch { data = raw; }
   return { response, data };
 }

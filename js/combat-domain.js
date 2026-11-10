@@ -1,4 +1,4 @@
-import { TECNICAS, obterTecnicaPorId } from "./techniques.js";
+import { obterTecnicaPorId } from "./techniques.js";
 import { nativaPossuiTraco, obterTracoPorId } from "./traits.js";
 import { obterModificadorTecnicaArena } from "./arena-technique-modifiers.js";
 import { podeUsarTecnicaEmCombate } from "./technique-learning.js";
@@ -250,12 +250,11 @@ function aplicarTecnicaV21(combatentes,indice,tecnica,random,eventos) {
     return;
   }
   const hasDamage=TECNICAS_DANO_DIRETO_V21.has(tecnica.id);
-  let dano=0;
   if(hasDamage) {
     const pgLiquido=tecnica.parametrosBalanceamento.pgLiquido;
-    dano=Math.max(0,atributoEfetivo(combatente,'POT')+pgLiquido-atributoEfetivo(adversario,'RES'));
+    const bruto=Math.max(0,atributoEfetivo(combatente,'POT')+pgLiquido-atributoEfetivo(adversario,'RES'));
     const reducao=obterReducaoDano(adversario,'Especial');
-    dano=Math.max(0,dano-reducao.valor);
+    const dano=Math.max(0,bruto-reducao.valor);
     if(reducao.efeito)consumirEfeito(adversario,'reducao-dano');
     adversario.hp=Math.max(0,adversario.hp-dano);
     adversario.animacao='hit';

@@ -5,7 +5,6 @@ import { readFileSync } from "node:fs";
 import { TECNICAS, TECNICAS_V1_ARQUIVO, TECNICAS_ARQUETIPO_LEGADO, obterTecnicaPorId } from "../js/techniques.js";
 import {
   criarCombatente,
-  obterTecnicasCombatente,
   modificadorAfinidade,
   danoNumerico,
   avancarCombatentesDeTurno,

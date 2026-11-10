@@ -29,7 +29,7 @@ test("Bote de Jararaca pode ser aprendido sem Peçonha, sem Presas ou sem ambos 
 test("Bote de Jararaca continua independente de Traços e fica liberado para teste controlado", () => {
   assert.equal(jararaca.estadoCatalogo, "em-revisao");
   assert.equal(jararaca.parametrosTecnicosDisponiveis,true);
-  for (const lista of [[], [tracos[0]], [tracos[1]], tracos]) {
+  for (const _lista of [[], [tracos[0]], [tracos[1]], tracos]) {
     assert.equal(podeAprenderTecnica(jararaca), true);
     assert.equal(podeUsarTecnicaEmCombate(jararaca), true);
     assert.deepEqual(jararaca.sinergias, []);

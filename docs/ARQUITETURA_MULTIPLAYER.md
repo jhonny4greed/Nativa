@@ -36,8 +36,10 @@ camada.
 
 O servidor valida a propriedade de cada ficha e a autorização para alterar
 estado da mesa. Segredos administrativos do Supabase nunca devem ser incluídos
-no cliente. O estado compartilhado da mesa e o combate online ainda pertencem
-a etapas futuras.
+no cliente. As salas compartilham membros, convites e snapshots independentes de
+campanha. O combate online da arena e o combate de campanha usam resolução
+autoritativa nas Edge Functions; cada ação é validada e o estado é gravado com
+controle de revisão no servidor.
 
 ## Companheiros e privacidade por sala
 
@@ -77,6 +79,27 @@ convites, aposenta companheiros e registra evento/estado, sem apagar as fichas
 originais ou o histórico da sala. Salas antigas mantêm suas relações legadas;
 um único vínculo antigo inequívoco é migrado como companheiro inicial, enquanto
 múltiplos vínculos não são escolhidos arbitrariamente.
+
+## Encontros jogáveis da campanha
+
+As migrations `20261109040000_room_gameplay.sql` e
+`20261109050000_room_game_recovery.sql` adicionam pedidos, limite diário,
+escolhas privadas por turno, estado persistente e cancelamento pelo mestre. A
+caçada gera um oponente do habitat e linhagem do companheiro selecionado. Cada
+jogador recebe três caçadas gratuitas por dia no fuso de São Paulo; pedidos
+extras ficam pendentes para o mestre. No PvP, o desafiado precisa aceitar antes
+da criação do encontro. Participantes veem a própria ação confirmada e aguardam
+a outra ação; os golpes e a rodada são resolvidos pelo motor compartilhado no
+servidor. O motor também concede XP e chance de Essência em vitória de caçada,
+atualizando somente `room_companions.campaign_data`. O mestre pode encerrar uma
+partida travada e liberar os companheiros. `supabase/functions/room-game`
+implementa o limite de ações, validação de sessão e resolução; a interface das
+salas atualiza os encontros automaticamente enquanto a sala está aberta.
+
+A arena em tela cheia usa uma composição de campo e painel de ações/histórico
+para caber no viewport. Em celulares, os comandos refluem para uma coluna e a
+orientação horizontal é solicitada quando o navegador oferece o bloqueio de
+orientação.
 
 ## Riscos e sequência sugerida
 

@@ -76,6 +76,13 @@
               <p id="online-room-nativas-status" class="muted" role="status" aria-live="polite"></p>
               <div id="online-room-nativas-list" class="room-nativas-list"></div>
             </section>
+            <section id="online-room-game" class="room-game-panel" aria-labelledby="online-room-game-title">
+              <div class="section-heading compact"><div><h4 id="online-room-game-title">Encontros da campanha</h4><p class="muted">Caçadas solo e desafios PvP usam apenas o progresso desta sala.</p></div><button id="online-room-game-refresh" class="small secondary" type="button">Atualizar encontros</button></div>
+              <p id="online-room-game-status" role="status" aria-live="polite"></p>
+              <div class="room-game-start"><label>Seu companheiro<select id="online-room-game-companion"><option value="">Escolha seu companheiro ativo</option></select></label><label>Desafiar jogador<select id="online-room-game-target"><option value="">Escolha participante</option></select></label><button id="online-room-start-hunt" type="button">Iniciar caçada <span id="online-room-hunts-left"></span></button><button id="online-room-request-pvp" class="secondary" type="button">Desafiar para PvP</button></div>
+              <div id="online-room-game-requests" class="room-game-requests"></div>
+              <div id="online-room-game-encounters" class="room-game-encounters"></div>
+            </section>
             <section id="online-room-admin" class="room-admin" hidden aria-labelledby="online-room-admin-title">
               <h4 id="online-room-admin-title">Gerenciar sala</h4>
               <p class="muted">Apenas o mestre pode administrar a sala. Encerrar preserva o histórico e as fichas originais.</p>

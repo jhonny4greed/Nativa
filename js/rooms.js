@@ -20,6 +20,13 @@ function mensagemErroSala(error) {
   if (/room player not found|room master cannot be removed/i.test(mensagem)) return "Esse participante não pode ser removido desta sala.";
   if (/room name confirmation mismatch/i.test(mensagem)) return "O nome digitado não corresponde ao nome atual da sala.";
   if (/invalid room name/i.test(mensagem)) return "Informe um nome de sala com até 80 caracteres.";
+  if (/active campaign companion required/i.test(mensagem)) return "Escolha um companheiro ativo desta campanha.";
+  if (/companion is busy|a companion is busy/i.test(mensagem)) return "Um dos companheiros já está em outro encontro desta sala.";
+  if (/only challenged player can respond/i.test(mensagem)) return "Somente o jogador desafiado pode responder a este PvP.";
+  if (/room master required/i.test(mensagem)) return "Somente o mestre pode aprovar caçadas extras.";
+  if (/request is no longer pending/i.test(mensagem)) return "Este pedido já foi respondido.";
+  if (/turn changed/i.test(mensagem)) return "A rodada mudou. Atualize os encontros e escolha novamente.";
+  if (/action already confirmed/i.test(mensagem)) return "Sua ação já foi confirmada nesta rodada.";
   return mensagem || "Não foi possível concluir a operação. Tente novamente.";
 }
 
@@ -154,7 +161,13 @@ export async function inicializarSalas() {
   const createdInviteHelp = document.querySelector("#online-created-invite-help");
   const copyInviteButton = document.querySelector("#online-copy-invite");
   const closeDetailsButton = document.querySelector("#online-close-room-details");
-  if (!panel || !hint || !content || !status || !createForm || !joinForm || !inviteInput || !refreshButton || !roomList || !details || !roomName || !roomMeta || !participants || !roomNativasStatus || !roomNativasList || !refreshRoomNativas || !chooseCompanionForm || !companionChoice || !roomAdmin || !renameRoomForm || !renameRoomName || !adminParticipants || !closeRoomButton || !deleteRoomButton || !invitePanel || !createInviteForm || !inviteList || !createdInvite || !createdInviteValue || !createdInviteHelp || !copyInviteButton || !closeDetailsButton) return;
+  const gameStatus = document.querySelector("#online-room-game-status");
+  const gameCompanion = document.querySelector("#online-room-game-companion");
+  const gameTarget = document.querySelector("#online-room-game-target");
+  const gameHuntsLeft = document.querySelector("#online-room-hunts-left");
+  const gameRequests = document.querySelector("#online-room-game-requests");
+  const gameEncounters = document.querySelector("#online-room-game-encounters");
+  if (!panel || !hint || !content || !status || !createForm || !joinForm || !inviteInput || !refreshButton || !roomList || !details || !roomName || !roomMeta || !participants || !roomNativasStatus || !roomNativasList || !refreshRoomNativas || !chooseCompanionForm || !companionChoice || !roomAdmin || !renameRoomForm || !renameRoomName || !adminParticipants || !closeRoomButton || !deleteRoomButton || !invitePanel || !createInviteForm || !inviteList || !createdInvite || !createdInviteValue || !createdInviteHelp || !copyInviteButton || !closeDetailsButton || !gameStatus || !gameCompanion || !gameTarget || !gameHuntsLeft || !gameRequests || !gameEncounters) return;
 
   let client;
   try {
@@ -168,6 +181,7 @@ export async function inicializarSalas() {
   let membrosDaSala = new Map();
   let participantesDaSala = [];
   let salaSelecionada = null;
+  let roomGamePoll = null;
   const roomPhotoUrls = new Set();
   let conviteDaUrl = new URL(window.location.href).searchParams.get("convite");
   let autoEntradaEmAndamento = false;
@@ -175,6 +189,73 @@ export async function inicializarSalas() {
 
   function setStatus(texto) {
     status.textContent = texto;
+  }
+
+  async function chamarJogo(action, payload = {}) {
+    const { data, error } = await client.functions.invoke("room-game", { body: { action, payload } });
+    if (error) throw new Error(data?.error || error.message || "Ação da mesa indisponível.");
+    return data;
+  }
+
+  function mostrarEstadoJogo(texto) { gameStatus.textContent = texto; }
+
+  async function carregarJogoDaSala(roomId) {
+    if (!salaSelecionada || salaSelecionada.id !== roomId) return;
+    try {
+      const snapshot = await chamarJogo("context", { roomId });
+      gameHuntsLeft.textContent = `· ${snapshot.free_hunts_remaining ?? 0} gratuitas hoje`;
+      gameRequests.replaceChildren(); gameEncounters.replaceChildren();
+      for (const request of snapshot.requests || []) {
+        const card = elemento("article", undefined, "room-game-request");
+        card.append(elemento("p", request.kind === "pvp" ? `${request.requester_name} desafiou você para PvP por turnos.` : `${request.requester_name} pediu uma caçada extra.`));
+        for (const [action, label] of [["accept", "Aceitar"], ["decline", "Recusar"]]) {
+          const button = elemento("button", label, action === "accept" ? "small" : "small secondary"); button.type = "button";
+          button.dataset.roomGameAction = action; button.dataset.requestId = request.id; card.append(button);
+        }
+        gameRequests.append(card);
+      }
+      if (!gameRequests.childElementCount) gameRequests.append(elemento("p", "Nenhum pedido aguardando resposta.", "muted"));
+      for (const encounter of snapshot.encounters || []) {
+        const card = elemento("article", undefined, `room-game-encounter${encounter.status === "active" ? " is-active" : ""}`);
+        const isHunt = encounter.kind === "hunt";
+        card.append(elemento("div", undefined, "room-game-encounter-heading"));
+        const heading = card.firstChild;
+        heading.append(elemento("strong", isHunt ? "Caçada selvagem" : "Duelo PvP"), elemento("span", encounter.status === "active" ? `Turno ${encounter.turn} · em andamento` : "Encontro concluído"));
+        const fighters = encounter.state?.fighters || [];
+        const party = [...(encounter.participants || [])].sort((a, b) => String(a.player_id).localeCompare(String(b.player_id)));
+        const names = isHunt ? [party[0]?.companion_name || "Seu companheiro", fighters[1]?.nativa?.name || "Nativa selvagem"] : party.map(item => item.companion_name || item.display_name);
+        card.append(elemento("p", names.join("  ×  "), "room-game-matchup"));
+        const log = encounter.state?.history || [];
+        if (log.length) card.append(elemento("p", log[log.length - 1], "room-game-last-event"));
+        if (encounter.status === "active") {
+          const playerIndex = party.findIndex(item => item.player_id === usuarioAtual.id);
+          const hasChoice = Boolean(encounter.own_choice);
+          const actionBox = elemento("div", undefined, "room-game-actions");
+          if (playerIndex >= 0 && !hasChoice) {
+            const defend = elemento("button", "🛡 Defender", "small secondary"); defend.type = "button"; defend.dataset.encounter = encounter.id; defend.dataset.turn = encounter.turn; defend.dataset.choice = JSON.stringify({ tipo: "defend" }); actionBox.append(defend);
+            const recover = elemento("button", "✦ Recuperar PM", "small secondary"); recover.type = "button"; recover.dataset.encounter = encounter.id; recover.dataset.turn = encounter.turn; recover.dataset.choice = JSON.stringify({ tipo: "recover" }); actionBox.append(recover);
+            const fighter = fighters[playerIndex];
+            for (const entry of fighter?.nativa?.techniques || []) {
+              const id = typeof entry === "string" ? entry : entry?.id; const technique = obterTecnicaPorId(id);
+              if (!technique) continue;
+              const button = elemento("button", `${technique.nome} · ${technique.mp} PM`, "small room-game-move"); button.type = "button";
+              button.dataset.encounter = encounter.id; button.dataset.turn = encounter.turn; button.dataset.choice = JSON.stringify({ tipo: "attack", tecnicaId: technique.id });
+              button.disabled = (fighter.cooldowns?.[technique.id] || 0) > 0 || fighter.mp < technique.mp;
+              actionBox.append(button);
+            }
+          } else actionBox.append(elemento("span", hasChoice ? "Ação confirmada · aguardando a rodada" : "Aguardando o outro jogador aceitar ou agir.", "muted"));
+          if (membrosDaSala.get(roomId) === "master") {
+            const cancel = elemento("button", "Encerrar encontro", "small secondary"); cancel.type = "button"; cancel.dataset.cancelEncounter = encounter.id; actionBox.append(cancel);
+          }
+          card.append(actionBox);
+        } else if (encounter.result?.xp) {
+          card.append(elemento("p", `Recompensa da campanha: ${encounter.result.xp} XP${encounter.result.essence ? " · Essência guardada" : ""}.`, "room-game-reward"));
+        }
+        gameEncounters.append(card);
+      }
+      if (!gameEncounters.childElementCount) gameEncounters.append(elemento("p", "Nenhum encontro nesta sala ainda.", "muted"));
+      mostrarEstadoJogo("");
+    } catch (error) { mostrarEstadoJogo(mensagemErroSala(error)); }
   }
 
   function liberarFotosDaSala() {
@@ -282,10 +363,23 @@ export async function inicializarSalas() {
       option.value = nativa.id;
       companionChoice.append(option);
     }
+    gameCompanion.replaceChildren(new Option("Escolha seu companheiro ativo…", ""));
+    for (const row of rows || []) {
+      if (row.player_id !== usuarioAtual.id || row.companion_state !== "active" || !row.campaign_data) continue;
+      gameCompanion.append(new Option(String(row.campaign_data.name || row.campaign_data.nome || "Nativa"), row.companion_id));
+    }
+    gameCompanion.disabled = !gameCompanion.options.length || gameCompanion.options.length < 2 || !salaAberta;
+    gameTarget.replaceChildren(new Option("Escolha participante…", ""));
+    for (const member of participantesDaSala) {
+      if (member.user_id === usuarioAtual.id) continue;
+      const hasCompanion = (rows || []).some(row => row.player_id === member.user_id && row.companion_state === "active");
+      if (hasCompanion) gameTarget.append(new Option(String(member.display_name || "Jogador"), member.user_id));
+    }
+    gameTarget.disabled = gameTarget.options.length < 2 || !salaAberta;
     companionChoice.disabled = !ownNativas?.length || !salaAberta;
     chooseCompanionForm.querySelector("button[type=submit]").disabled = companionChoice.disabled;
 
-    async function criarFichaVisual({ data, eyebrow, campaign = false, preview = false, row = null, ownerName = "" }) {
+    async function criarFichaVisual({ data, eyebrow, campaign = false, preview = false, row = null }) {
       const card = elemento("article", undefined, `room-companion-card${preview ? " is-preview" : ""}`);
       const hero = elemento("div", undefined, "room-companion-hero");
       const portrait = elemento("div", undefined, "room-companion-portrait");
@@ -456,7 +550,7 @@ export async function inicializarSalas() {
           };
           typeSelect.addEventListener("change", refreshEssenceChoices);
           affinitySelect.addEventListener("change", refreshEssenceChoices);
-          const form = submitForm(essenceSection, [
+          submitForm(essenceSection, [
             { label: "Essência", control: typeSelect }, { label: "Nova afinidade", control: affinitySelect },
             { label: "Técnica de afinidade", control: firstTech }, { label: "Técnica de linhagem/arquétipo (Primeira Essência)", control: secondTech }
           ], "Conceder essência", () => {
@@ -586,6 +680,7 @@ export async function inicializarSalas() {
     roomNativasStatus.textContent = rows?.length
       ? "A lista veio da RPC protegida da sala. Apenas o mestre e o proprietário recebem o JSON completo."
       : "Ainda não há participantes ou companheiros nesta sala.";
+    await carregarJogoDaSala(roomId);
   }
   async function abrirSala(roomId) {
     setStatus("Abrindo sala…");
@@ -606,6 +701,8 @@ export async function inicializarSalas() {
     participants.replaceChildren();
     adminParticipants.replaceChildren();
     const isMaster = membrosDaSala.get(roomId) === "master";
+    document.querySelector("#online-room-start-hunt").disabled = room.status !== "open";
+    document.querySelector("#online-room-request-pvp").disabled = room.status !== "open";
     for (const member of members || []) {
       const role = member.role === "master" ? "Mestre" : "Jogador";
       participants.append(elemento("li", `${member.display_name} · ${role}`));
@@ -684,12 +781,17 @@ export async function inicializarSalas() {
     hint.hidden = Boolean(usuarioAtual);
     content.hidden = !usuarioAtual;
     if (!usuarioAtual) {
+      if (roomGamePoll) clearInterval(roomGamePoll);
+      roomGamePoll = null;
       liberarFotosDaSala();
       setStatus("");
       roomList.replaceChildren();
       details.hidden = true;
       return;
     }
+    if (!roomGamePoll) roomGamePoll = setInterval(() => {
+      if (salaSelecionada && !details.hidden && document.visibilityState === "visible") void carregarJogoDaSala(salaSelecionada.id);
+    }, 5000);
     try {
       await carregarSalas();
       if (conviteDaUrl && !autoEntradaEmAndamento) {
@@ -778,6 +880,59 @@ export async function inicializarSalas() {
     } finally {
       refreshRoomNativas.disabled = false;
     }
+  });
+
+  document.querySelector("#online-room-game-refresh").addEventListener("click", () => {
+    if (salaSelecionada) void carregarJogoDaSala(salaSelecionada.id);
+  });
+
+  document.querySelector("#online-room-start-hunt").addEventListener("click", async event => {
+    if (!salaSelecionada || !gameCompanion.value) return;
+    const button = event.currentTarget; button.disabled = true;
+    try {
+      const result = await chamarJogo("start_hunt", { roomId: salaSelecionada.id, companionId: gameCompanion.value });
+      mostrarEstadoJogo(result?.status === "approval_required" ? "As três caçadas gratuitas de hoje foram usadas. O mestre recebeu seu pedido de caçada extra." : "Caçada iniciada. A criatura selvagem foi gerada pelo bioma e linhagem da campanha.");
+      await carregarNativasDaSala(salaSelecionada.id);
+    } catch (error) { mostrarEstadoJogo(mensagemErroSala(error)); }
+    finally { button.disabled = false; }
+  });
+
+  document.querySelector("#online-room-request-pvp").addEventListener("click", async event => {
+    if (!salaSelecionada || !gameCompanion.value || !gameTarget.value) { mostrarEstadoJogo("Escolha seu companheiro e um participante com companheiro ativo."); return; }
+    const button = event.currentTarget; button.disabled = true;
+    try {
+      await chamarJogo("request_pvp", { roomId: salaSelecionada.id, companionId: gameCompanion.value, targetId: gameTarget.value });
+      mostrarEstadoJogo("Desafio enviado. O PvP começa quando o outro jogador aceitar.");
+      await carregarJogoDaSala(salaSelecionada.id);
+    } catch (error) { mostrarEstadoJogo(mensagemErroSala(error)); }
+    finally { button.disabled = false; }
+  });
+
+  gameRequests.addEventListener("click", async event => {
+    const button = event.target.closest("[data-room-game-action]"); if (!button || !salaSelecionada) return;
+    button.disabled = true;
+    try {
+      const result = await chamarJogo(button.dataset.roomGameAction, { roomId: salaSelecionada.id, requestId: button.dataset.requestId });
+      mostrarEstadoJogo(button.dataset.roomGameAction === "accept" ? "Pedido aceito. O encontro está pronto para jogar." : "Pedido recusado.");
+      if (result?.encounter_id) await carregarNativasDaSala(salaSelecionada.id); else await carregarJogoDaSala(salaSelecionada.id);
+    } catch (error) { mostrarEstadoJogo(mensagemErroSala(error)); }
+    finally { button.disabled = false; }
+  });
+
+  gameEncounters.addEventListener("click", async event => {
+    const cancel = event.target.closest("[data-cancel-encounter]");
+    if (cancel && salaSelecionada) {
+      cancel.disabled = true;
+      try { await chamarJogo("cancel", { roomId: salaSelecionada.id, encounterId: cancel.dataset.cancelEncounter }); await carregarNativasDaSala(salaSelecionada.id); }
+      catch (error) { mostrarEstadoJogo(mensagemErroSala(error)); cancel.disabled = false; }
+      return;
+    }
+    const button = event.target.closest("[data-encounter]"); if (!button || !salaSelecionada) return;
+    button.disabled = true;
+    try {
+      await chamarJogo("submit", { roomId: salaSelecionada.id, encounterId: button.dataset.encounter, turn: Number(button.dataset.turn), choice: JSON.parse(button.dataset.choice) });
+      await carregarNativasDaSala(salaSelecionada.id);
+    } catch (error) { mostrarEstadoJogo(mensagemErroSala(error)); button.disabled = false; }
   });
 
   renameRoomForm.addEventListener("submit", async event => {

@@ -11,4 +11,5 @@ function copy(path) {
   writeFileSync(resolve(target,basename(path)),source);
 }
 copy(resolve(root,"js/combat-domain.js"));
+copy(resolve(root,"js/progression.js"));
 console.log(`Motor compartilhado: ${seen.size} módulos sincronizados.`);

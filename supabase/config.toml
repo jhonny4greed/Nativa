@@ -406,6 +406,9 @@ verify_jwt = false
 [functions.arena-online]
 verify_jwt = false
 
+[functions.room-game]
+verify_jwt = true
+
 [functions.epidemic-sound]
 verify_jwt = false
 
