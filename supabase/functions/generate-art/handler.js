@@ -47,7 +47,7 @@ async function signature(value, secret) {
 }
 
 async function createTaskToken(taskId, userId, secret, now) {
-  const payload = b64url(new TextEncoder().encode(JSON.stringify({ taskId, userId, exp: now + TASK_TOKEN_TTL })));
+  const payload = b64url(new TextEncoder().encode(JSON.stringify({ taskId, userId, resultExp: now + RESULT_TTL, exp: now + TASK_TOKEN_TTL })));
   return `${payload}.${await signature(payload, secret)}`;
 }
 
@@ -64,8 +64,9 @@ async function readTaskToken(token, userId, secret, now) {
     if (mismatch !== 0) return null;
     const claims = JSON.parse(new TextDecoder().decode(fromB64url(payload)));
     if (claims?.userId !== userId || typeof claims.taskId !== "string" || !TASK_ID_PATTERN.test(claims.taskId)
-      || !Number.isSafeInteger(claims.exp) || claims.exp <= now || claims.exp > now + TASK_TOKEN_TTL + 60_000) return null;
-    return claims.taskId;
+      || !Number.isSafeInteger(claims.resultExp) || !Number.isSafeInteger(claims.exp)
+      || claims.resultExp <= 0 || claims.resultExp > claims.exp || claims.exp <= now || claims.exp > now + TASK_TOKEN_TTL + 60_000) return null;
+    return { taskId: claims.taskId, resultExp: claims.resultExp };
   } catch { return null; }
 }
 
@@ -301,8 +302,13 @@ export function createGenerateArtHandler({ env = () => undefined, fetchImpl = fe
     }
 
     if (body.action !== "status" && body.action !== "download") return json({ error: "Ação desconhecida." }, 400);
-    const taskId = await readTaskToken(body.taskToken, user.id, signingKey, now());
-    if (!taskId) return json({ error: "Tarefa inválida, expirada ou pertencente a outra conta." }, 403);
+    const task = await readTaskToken(body.taskToken, user.id, signingKey, now());
+    if (!task) return json({ error: "Tarefa inválida, expirada ou pertencente a outra conta." }, 403);
+    if (task.resultExp <= now()) {
+      await removeImage(user.id, task.taskId);
+      return json({ error: "O resultado desta geração expirou. Inicie uma nova geração." }, 410);
+    }
+    const taskId = task.taskId;
     const objectUrl = storageObjectUrl(user.id, taskId);
     const headers = storageHeaders();
     if (body.action === "status") {
