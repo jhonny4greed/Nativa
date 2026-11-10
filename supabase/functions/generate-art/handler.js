@@ -250,6 +250,9 @@ export function createGenerateArtHandler({ env = () => undefined, fetchImpl = fe
     catch { return json({ error: "Não foi possível validar a sessão." }, 401); }
     if (!user) return json({ error: "Entre na conta para gerar imagens." }, 401);
 
+    const allowedUsers = (env("IMAGE_GENERATION_ALLOWED_USER_IDS") || "").split(",").map(value => value.trim()).filter(Boolean);
+    if (!allowedUsers.includes(user.id)) return json({ error: "Esta conta não está autorizada a gerar imagens." }, 403);
+
     let body;
     try {
       const contentType = request.headers.get("content-type") || "";
