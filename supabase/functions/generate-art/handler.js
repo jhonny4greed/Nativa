@@ -6,10 +6,11 @@ const CORS_HEADERS = {
 };
 
 const BODY_LIMIT = 12_000;
-const JSON_RESPONSE_LIMIT = 1_000_000;
+// FLUX returns a base64 image inside JSON; allow the 15 MB artifact plus encoding overhead.
+const JSON_RESPONSE_LIMIT = 22_000_000;
 const RESULT_LIMIT = 15_000_000;
 const RESULT_TTL = 15 * 60 * 1000;
-const TASK_TOKEN_TTL = 30 * 60 * 1000;
+const TASK_TOKEN_TTL = RESULT_TTL;
 const TASK_ID_PATTERN = /^[A-Za-z0-9_-]{1,128}$/;
 const DEFAULT_MODEL = "black-forest-labs/flux.1-dev";
 const DEFAULT_BASE_URL = "https://ai.api.nvidia.com";
@@ -168,13 +169,53 @@ async function readJsonResponse(response, limit = JSON_RESPONSE_LIMIT) {
 }
 
 export function createGenerateArtHandler({ env = () => undefined, fetchImpl = fetch, now = () => Date.now(), randomUUID = () => crypto.randomUUID() } = {}) {
-  // Resultados gerados ficam em memória no isolate por até RESULT_TTL.
-  // O provedor NVIDIA responde de forma síncrona; o download é único.
-  const results = new Map();
+  const bucket = "nativa-image-task-results";
 
-  function sweepResults() {
-    const current = now();
-    for (const [id, entry] of results) if (entry.expiresAt <= current) results.delete(id);
+  function storageConfig() {
+    const key = env("SUPABASE_SERVICE_ROLE_KEY") || env("SUPABASE_SECRET_KEY");
+    const url = (env("SUPABASE_URL") || "").replace(/\/$/, "");
+    if (!key || !url) throw new Error("image_storage_unavailable");
+    return { key, url };
+  }
+
+  function storageObjectUrl(userId, taskId) {
+    const { url } = storageConfig();
+    return `${url}/storage/v1/object/${bucket}/${encodeURIComponent(userId)}/${encodeURIComponent(taskId)}`;
+  }
+
+  function storageHeaders(contentType) {
+    const { key } = storageConfig();
+    return { apikey: key, Authorization: `Bearer ${key}`, ...(contentType ? { "Content-Type": contentType } : {}) };
+  }
+
+  async function storeImage(userId, taskId, image) {
+    const response = await fetchImpl(storageObjectUrl(userId, taskId), {
+      method: "POST", headers: { ...storageHeaders(image.contentType), "x-upsert": "false", "Cache-Control": "no-store" },
+      body: image.bytes, signal: AbortSignal.timeout(20_000)
+    });
+    if (!response.ok) throw new Error("image_storage_write_failed");
+  }
+
+  async function removeImage(userId, taskId) {
+    try { await fetchImpl(storageObjectUrl(userId, taskId), { method: "DELETE", headers: storageHeaders(), signal: AbortSignal.timeout(10_000) }); }
+    catch { /* A remoção é oportunista; a tarefa já expirou ou foi entregue. */ }
+  }
+
+  async function removeExpiredImages(userId) {
+    const { url } = storageConfig();
+    try {
+      const response = await fetchImpl(`${url}/storage/v1/object/list/${bucket}`, {
+        method: "POST", headers: { ...storageHeaders("application/json"), "Cache-Control": "no-store" },
+        body: JSON.stringify({ prefix: `${userId}/`, limit: 100, offset: 0, sortBy: { column: "created_at", order: "asc" } }),
+        signal: AbortSignal.timeout(10_000)
+      });
+      if (!response.ok) return;
+      const objects = await readJsonResponse(response, 200_000);
+      for (const object of Array.isArray(objects) ? objects : []) {
+        const createdAt = Date.parse(object.created_at || object.updated_at || "");
+        if (object.name && Number.isFinite(createdAt) && createdAt < now() - RESULT_TTL) await removeImage(userId, object.name);
+      }
+    } catch { /* A limpeza não bloqueia uma geração válida. */ }
   }
 
   async function generateImage(prompt) {
@@ -240,16 +281,17 @@ export function createGenerateArtHandler({ env = () => undefined, fetchImpl = fe
         const quota=await fetchImpl(`${supabaseUrl}/rest/v1/rpc/reserve_image_generation`,{method:"POST",headers:{apikey:serviceKey,Authorization:`Bearer ${serviceKey}`,"Content-Type":"application/json"},body:JSON.stringify({p_user_id:user.id}),signal:AbortSignal.timeout(10_000)});
         if(!quota.ok)return json({error:"Não foi possível reservar uma geração."},503);
         if(await readJsonResponse(quota)===false)return json({error:"Limite diário atingido: até 20 imagens por conta a cada 24 horas UTC."},429);
-        sweepResults();
+        await removeExpiredImages(user.id);
         const image = await generateImage(makePrompt(kind, title, prompt));
         const taskId = randomUUID();
-        results.set(taskId, { ...image, expiresAt: now() + RESULT_TTL });
+        await storeImage(user.id, taskId, image);
         return json({ taskToken: await createTaskToken(taskId, user.id, signingKey, now()) });
       } catch (error) {
         const status = error?.status === 413 ? 413 : 502;
         const message = error?.name === "TimeoutError" ? "O provedor demorou demais para gerar a imagem."
           : error?.message === "invalid_image_size" ? "A imagem gerada excede o limite de 15 MB."
           : error?.message === "invalid_image_content" ? "O provedor retornou um conteúdo que não é uma imagem válida."
+          : error?.message === "image_storage_unavailable" || error?.message === "image_storage_write_failed" ? "O armazenamento temporário de imagens está indisponível."
           : `O provedor recusou a geração (HTTP ${error?.status || "desconhecido"}).`;
         return json({ error: status === 413 ? "A imagem excede o limite de 15 MB." : message }, status);
       }
@@ -258,19 +300,27 @@ export function createGenerateArtHandler({ env = () => undefined, fetchImpl = fe
     if (body.action !== "status" && body.action !== "download") return json({ error: "Ação desconhecida." }, 400);
     const taskId = await readTaskToken(body.taskToken, user.id, signingKey, now());
     if (!taskId) return json({ error: "Tarefa inválida, expirada ou pertencente a outra conta." }, 403);
-    sweepResults();
-    const entry = results.get(taskId);
-    if (!entry) return json({ error: "O resultado desta geração expirou. Inicie uma nova geração." }, 410);
+    const objectUrl = storageObjectUrl(user.id, taskId);
+    const headers = storageHeaders();
+    if (body.action === "status") {
+      const response = await fetchImpl(objectUrl, { method: "HEAD", headers, signal: AbortSignal.timeout(10_000) });
+      if (response.ok) return json({ status: "succeeded" });
+      if (response.status === 404) return json({ error: "O resultado desta geração expirou. Inicie uma nova geração." }, 410);
+      return json({ error: "Não foi possível consultar a imagem gerada." }, 503);
+    }
 
-    if (body.action === "status") return json({ status: "succeeded" });
-
-    const bytes = entry.bytes;
-    results.delete(taskId);
+    const response = await fetchImpl(objectUrl, { headers, signal: AbortSignal.timeout(20_000) });
+    if (response.status === 404) return json({ error: "O resultado desta geração expirou. Inicie uma nova geração." }, 410);
+    if (!response.ok) return json({ error: "Não foi possível baixar a imagem gerada." }, 503);
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    const contentType = detectImageType(bytes);
+    if (!contentType || bytes.byteLength === 0 || bytes.byteLength > RESULT_LIMIT) return json({ error: "A imagem gerada não passou na validação." }, 502);
+    await removeImage(user.id, taskId);
     return new Response(bytes, {
       headers: {
         ...CORS_HEADERS,
         "Content-Type": "application/octet-stream",
-        "X-Image-Content-Type": entry.contentType,
+        "X-Image-Content-Type": contentType,
         "Content-Length": String(bytes.byteLength),
         "Cache-Control": "no-store",
         "X-Content-Type-Options": "nosniff"

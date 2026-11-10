@@ -906,6 +906,7 @@ function selecionarAcao(indice,tipo,tecnicaId=null){
     batalha.aguardandoProximoTurno
   )return;
   if(batalha.modo==="online"&&(batalha.onlineSubmitted||indice!==batalha.onlineSelfIndex))return;
+  if(batalha.modo==="room"&&(batalha.roomSubmitted||indice!==batalha.roomSelfIndex))return;
 
   const c=batalha.fighters[indice];
 
@@ -1055,6 +1056,15 @@ async function executarTurno(){
     renderizarArena();
   }
 }
+
+async function executarTurnoSala(){
+  const current=batalha;
+  if(!current||current.modo!=="room"||current.encerrada||current.roomSubmitted||current.processando)return;
+  const choice=current.escolhas[current.roomSelfIndex];if(!choice)return;
+  current.processando=true;renderizarArena();
+  try{await current.roomSubmit(choice,current.turno);}
+  catch(error){if(batalha===current){current.processando=false;current.log.push(error.message);renderizarArena();}}
+}
 // Cria os cartões grandes das técnicas.
 function rotuloOrigemTecnica(origem){
   return ({afinidade:"Afinidade",bioma:"Bioma",linhagem:"Linhagem",arquetipo:"Arquétipo"})[origem]||origem||"";
@@ -1083,30 +1093,22 @@ function cartoesTecnicas(c,indice){
     else if(cd>0)motivo=`Recarga: ${cd} turno(s)`;
     else if(semMP)motivo="MP insuficiente";
 
-    const detalhesId=`battle-technique-detail-${indice}-${t.id}`;
     const origem=rotuloOrigemTecnica(t.origem);
     const classificacao=origem&&t.grupo?`${origem} · ${t.grupo}`:origem;
     const observacao=t.status&&t.status!=="MANTIDA"?`<p class="technique-observation">${escapar(t.status)}</p>`:"";
     return `
       <article class="battle-technique-card ${selecionada?"selected":""} ${bloqueada?"unavailable":""}">
         <button type="button" class="battle-technique" data-battle-technique="${escapar(t.id)}" data-fighter="${indice}" ${bloqueada?"disabled":""}>
-          <span class="technique-card-name">${escapar(t.nome)}</span>
+          <span class="technique-card-top"><span class="technique-card-name">${escapar(t.nome)}</span><span class="technique-cost">${t.mp??"—"} PM</span></span>
           <span class="technique-card-badges">
             ${t.categoria?`<span class="technique-badge category-badge" data-category="${escapar(t.categoria)}">${escapar(t.categoria)}</span>`:""}
             ${classificacao?`<span class="technique-badge source-badge" data-origin="${escapar(t.origem||"")}">${escapar(classificacao)}</span>`:""}
           </span>
+          <span class="technique-card-description">${escapar(t.efeito||"Sem descrição cadastrada.")}</span>
+          <span class="technique-card-stats"><span>Dano <b>${t.dano??"—"}</b></span><span>Precisão <b>${escapar(textoPrecisao(t))}</b></span><span>Recarga <b>${t.recarga??"—"}</b></span></span>
           ${bloqueada?`<span class="technique-lock-status">${escapar(motivo)}</span>`:""}
+          ${observacao}${htmlSinergiasAtivasBatalha(t,c.nativa)}
         </button>
-        <button type="button" class="technique-detail-toggle" data-technique-details aria-controls="${escapar(detalhesId)}" aria-expanded="false" aria-label="Mostrar detalhes de ${escapar(t.nome)}">i</button>
-        <div class="technique-detail-panel" id="${escapar(detalhesId)}">
-          <div class="technique-detail-stats">
-            <span>MP <b>${t.mp??"—"}</b></span><span>Dano <b>${t.dano??"—"}</b></span><span>Recarga <b>${t.recarga??"—"}</b></span>
-          </div>
-          <p class="technique-detail-description">${escapar(t.efeito||"Sem descrição cadastrada.")}</p>
-          <p class="technique-detail-precision">Precisão: ${escapar(textoPrecisao(t))}</p>
-          ${observacao}
-          ${htmlSinergiasAtivasBatalha(t,c.nativa)}
-        </div>
       </article>
     `;
   }).join("");
@@ -1188,11 +1190,11 @@ function renderizarPainelAcao(c,indice){
     <section class="action-panel">
       <div class="action-panel-heading">
         <div>
-          <span class="eyebrow">JOGADOR ${indice+1}</span>
+          <span class="eyebrow">${batalha.modo==="room"?`CAMPANHA · ${escapar(c.nativa.player||"SUA NATIVA")}`:`JOGADOR ${indice+1}`}</span>
           <h3>${escapar(c.nativa.name)}</h3>
         </div>
         <span class="action-selected">
-          ${batalha.modo==="online"&&batalha.onlineSubmitted?"Ação confirmada":escolha
+          ${(batalha.modo==="online"&&batalha.onlineSubmitted)||(batalha.modo==="room"&&batalha.roomSubmitted)?"Ação confirmada · aguardando rodada":escolha
             ?escolha.tipo==="attack"?escapar(obterTecnicaPorId(escolha.tecnicaId)?.nome||"Ataque escolhido")
               :escolha.tipo==="defend"?"Defender escolhido"
               :"Recuperação escolhida"
@@ -1228,12 +1230,12 @@ function renderizarPainelAcao(c,indice){
         </button>
       </div>
 
-      <details class="battle-moves" data-moves-fighter="${indice}" ${batalha.paineisGolpesAbertos?.includes(indice)?"open":""}>
-        <summary><span data-icon="swords"></span><span><strong>Golpes</strong><small>${tecnicasCombatente(c).filter(t=>podeUsarTecnicaEmCombate(t)).length} liberados · ${tecnicasCombatente(c).length} na ficha</small></span><span class="moves-chevron" aria-hidden="true">⌄</span></summary>
+      <section class="battle-moves" aria-label="Golpes de ${escapar(c.nativa.name)}">
+        <header class="battle-moves-heading"><span class="moves-emblem" aria-hidden="true">✦</span><span><strong>Golpes</strong><small>${tecnicasCombatente(c).filter(t=>podeUsarTecnicaEmCombate(t)).length} disponíveis · escolha sua ação</small></span><span class="moves-count">${tecnicasCombatente(c).length}</span></header>
         <div class="battle-technique-grid">
           ${cartoesTecnicas(c,indice)}
         </div>
-      </details>
+      </section>
     </section>
   `;
 }
@@ -1260,9 +1262,9 @@ function renderizarArena(){
         id="execute-turn"
         class="execute-battle-button"
         type="button"
-        ${Object.keys(batalha.escolhas).length<(batalha.modo===MODOS_BATALHA.CPU||batalha.modo==="online"?1:2)||batalha.processando||batalha.aguardandoProximoTurno||batalha.onlineSubmitted?"disabled":""}
+        ${Object.keys(batalha.escolhas).length<(batalha.modo===MODOS_BATALHA.CPU||batalha.modo==="online"||batalha.modo==="room"?1:2)||batalha.processando||batalha.aguardandoProximoTurno||batalha.onlineSubmitted||batalha.roomSubmitted?"disabled":""}
       >
-        ${batalha.modo==="online"?(batalha.onlineSubmitted?"AÇÃO CONFIRMADA · AGUARDANDO":"CONFIRMAR AÇÃO ONLINE"):batalha.aguardandoProximoTurno?"Aguarde o próximo turno...":"REALIZAR AÇÃO"}
+        ${batalha.modo==="online"?(batalha.onlineSubmitted?"AÇÃO CONFIRMADA · AGUARDANDO":"CONFIRMAR AÇÃO ONLINE"):batalha.modo==="room"?(batalha.roomSubmitted?"AÇÃO CONFIRMADA · AGUARDANDO":"CONFIRMAR AÇÃO DA CAMPANHA"):batalha.aguardandoProximoTurno?"Aguarde o próximo turno...":"REALIZAR AÇÃO"}
       </button>
     `;
 
@@ -1271,12 +1273,12 @@ function renderizarArena(){
       <div class="battle-result">
         <span>🏆</span>
         <div>
-          <strong>${batalha.onlineCancelled?"Duelo cancelado":"Combate encerrado"}</strong>
-          <p>${batalha.onlineCancelled?"Sem resultado · fichas preservadas":`Vitória: ${escapar(batalha.modo==="online"?(f[batalha.onlineWinnerIndex]?.nativa.name||"Sem vencedor"):f.find(c=>c.hp>0)?.nativa.name||"Sem vencedor")}`}</p>
+          <strong>${batalha.onlineCancelled?"Duelo cancelado":batalha.roomCancelled?"Encontro encerrado pelo mestre":"Combate encerrado"}</strong>
+          <p>${batalha.onlineCancelled?"Sem resultado · fichas preservadas":batalha.roomCancelled?"Progresso da campanha preservado":`Vitória: ${escapar(batalha.modo==="online"?(f[batalha.onlineWinnerIndex]?.nativa.name||"Sem vencedor"):batalha.modo==="room"?(f[batalha.roomWinnerIndex]?.nativa.name||"Sem vencedor"):f.find(c=>c.hp>0)?.nativa.name||"Sem vencedor")}`}</p>
         </div>
       </div>
 
-      <button id="new-battle" class="secondary" type="button" ${batalha.modo==="online"?"hidden":""}>
+      <button id="new-battle" class="secondary" type="button" ${["online","room"].includes(batalha.modo)?"hidden":""}>
         Novo combate
       </button>
     `
@@ -1305,9 +1307,10 @@ function renderizarArena(){
       </div>
       <div class="battle-commands">
         <div class="battle-commands-grid">
-          ${!batalha.encerrada&&(batalha.modo!=="online"||batalha.onlineSelfIndex===0)?renderizarPainelAcao(f[0],0):""}
+          ${!batalha.encerrada&&((batalha.modo!=="online"&&batalha.modo!=="room")||(batalha.modo==="online"&&batalha.onlineSelfIndex===0)||(batalha.modo==="room"&&batalha.roomSelfIndex===0))?renderizarPainelAcao(f[0],0):""}
           ${!batalha.encerrada&&batalha.modo===MODOS_BATALHA.LOCAL?renderizarPainelAcao(f[1],1):""}
           ${!batalha.encerrada&&batalha.modo==="online"&&batalha.onlineSelfIndex===1?renderizarPainelAcao(f[1],1):""}
+          ${!batalha.encerrada&&batalha.modo==="room"&&batalha.roomSelfIndex===1?renderizarPainelAcao(f[1],1):""}
         </div>
         ${botaoExecutar}
         ${resultado}
@@ -1316,17 +1319,8 @@ function renderizarArena(){
     </section>
   `;
 
-  $("#battle-arena").querySelectorAll("[data-moves-fighter]").forEach(details=>{
-    details.addEventListener("toggle",()=>{
-      if(!details.isConnected||!batalha)return;
-      const indice=Number(details.dataset.movesFighter);
-      const abertos=new Set(batalha.paineisGolpesAbertos||[]);
-      if(details.open)abertos.add(indice);else abertos.delete(indice);
-      batalha.paineisGolpesAbertos=[...abertos];
-    });
-  });
-
   $("#execute-turn")?.addEventListener("click",()=>{
+    if(batalha?.modo==="room"){void executarTurnoSala();return;}
     if(batalha?.modo!=="online"){void executarTurno();return;}
     const current=batalha;
     const choice=current.escolhas[current.onlineSelfIndex];if(!choice)return;
@@ -1354,15 +1348,6 @@ function renderizarArena(){
         Number(btn.dataset.fighter),
         btn.dataset.specialAction
       );
-    });
-  });
-
-  $("#battle-arena").querySelectorAll("[data-technique-details]").forEach(btn=>{
-    btn.addEventListener("click",event=>{
-      event.stopPropagation();
-      const open=btn.getAttribute("aria-expanded")!=="true";
-      btn.setAttribute("aria-expanded",String(open));
-      btn.closest(".battle-technique-card")?.classList.toggle("details-open",open);
     });
   });
 
@@ -1427,5 +1412,39 @@ onlineArena=initializeOnlineArena({
       paineisGolpesAbertos:previous?.paineisGolpesAbertos||[],encerrada:match.status!=="active",processando:false,aguardandoProximoTurno:false};
     renderizarArena();
   }
+});
+
+function atualizarArenaDaSala(detail){
+  const {encounter,roomId,userId,roomSubmit}=detail||{};
+  if(!encounter?.state?.fighters?.length)return;
+  const participants=[...(encounter.participants||[])].sort((a,b)=>String(a.player_id).localeCompare(String(b.player_id)));
+  const selfIndex=participants.findIndex(p=>p.player_id===userId);
+  if(selfIndex<0)return;
+  const same=batalha?.modo==="room"&&batalha.roomEncounterId===encounter.id?batalha:null;
+  if(batalha&&!same)urlsFotosArena.liberarTodasDepoisDe(()=>{});
+  const fighters=encounter.state.fighters.map((fighter,index)=>{
+    const wild=encounter.kind==="hunt"&&index===1;
+    const nativa={...fighter.nativa,player:wild?"Selvagem":participants[index]?.display_name||"Jogador"};
+    const portrait=arenaPortrait(nativa)||defaultPortrait(nativa);
+    return {...fighter,nativa,fotoUrl:portrait,arenaCutout:Boolean(arenaPortrait(nativa))};
+  });
+  const winnerIndex=encounter.winner_id?participants.findIndex(p=>p.player_id===encounter.winner_id):-1;
+  const sameTurn=same?.turno===encounter.turn;
+  batalha={modo:"room",roomId,roomEncounterId:encounter.id,roomSelfIndex:selfIndex,
+    roomSubmitted:Boolean(encounter.own_choice)&&encounter.status==="active",
+    roomCancelled:encounter.status==="cancelled",roomWinnerIndex:winnerIndex,
+    roomSubmit,fighters,turno:encounter.turn,horario:"Encontro da campanha",
+    bioma:fighters[0]?.nativa?.bioma||"Habitat da campanha",ordem:encounter.state.order||[],
+    log:[...(encounter.state.history||[])],escolhas:encounter.own_choice?{[selfIndex]:encounter.own_choice}:sameTurn?same.escolhas:{},
+    encerrada:encounter.status!=="active",processando:false,aguardandoProximoTurno:false};
+  renderizarArena();
+}
+
+document.addEventListener("nativa:room-arena-open",event=>{
+  mostrarTela("battle");
+  atualizarArenaDaSala(event.detail);
+});
+document.addEventListener("nativa:room-arena-update",event=>{
+  if(batalha?.modo==="room"&&batalha.roomEncounterId===event.detail?.encounter?.id)atualizarArenaDaSala(event.detail);
 });
 

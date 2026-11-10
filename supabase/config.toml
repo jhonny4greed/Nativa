@@ -393,7 +393,7 @@ deno_version = 2
 # A função valida a sessão com Auth /user e aplica allowlist própria. Esta
 # validação no handler também é compatível com os tokens assimétricos atuais.
 [functions.generate-art]
-verify_jwt = false
+verify_jwt = true
 
 # O painel valida a sessão no handler com Auth /user e confirma o papel
 # admin em profiles antes de qualquer ação.

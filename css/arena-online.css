@@ -87,7 +87,6 @@ body.arena-fullscreen-open { overflow:hidden; }
 #battle:fullscreen:has(.battlefield) .action-panel-heading,#battle.arena-expanded:has(.battlefield) .action-panel-heading { margin-bottom:6px; }
 #battle:fullscreen:has(.battlefield) .special-actions,#battle.arena-expanded:has(.battlefield) .special-actions { grid-template-columns:repeat(2,minmax(0,1fr)); gap:5px; margin-bottom:6px; }
 #battle:fullscreen:has(.battlefield) .special-action,#battle.arena-expanded:has(.battlefield) .special-action { min-height:36px; padding:5px 8px; }
-#battle:fullscreen:has(.battlefield) .battle-moves>summary,#battle.arena-expanded:has(.battlefield) .battle-moves>summary { min-height:37px; padding:6px 9px; }
 #battle:fullscreen:has(.battlefield) .battle-moves>.battle-technique-grid,#battle.arena-expanded:has(.battlefield) .battle-moves>.battle-technique-grid { grid-template-columns:repeat(3,minmax(0,1fr)); padding:6px; gap:5px!important; }
 #battle:fullscreen:has(.battlefield) .battle-technique-card,#battle.arena-expanded:has(.battlefield) .battle-technique-card { min-height:48px; }
 #battle:fullscreen:has(.battlefield) .battle-technique,#battle.arena-expanded:has(.battlefield) .battle-technique { min-height:48px; padding:7px 27px 7px 8px; }

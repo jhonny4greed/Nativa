@@ -54,17 +54,6 @@ html body.dashboard:has(#battle.active) main { max-width:1700px; padding:22px 26
 .battle-layout .special-action small { font-size:8px; color:#9db38e; }
 .battle-layout .special-action.selected { outline:2px solid #d2c28c; outline-offset:1px; }
 .battle-moves { border:1px solid #d0c38b4d; border-radius:9px; background:linear-gradient(110deg,#35453155,#192c21); overflow:visible; }
-.battle-moves>summary { display:flex; align-items:center; gap:10px; min-height:49px; padding:10px 13px; cursor:pointer; list-style:none; color:#e5d5a5; border-radius:9px; transition:background .2s; }
-.battle-moves>summary::-webkit-details-marker { display:none; }
-.battle-moves>summary:hover { background:#d1d8a30a; }
-.battle-moves>summary:focus-visible { outline:2px solid #e8d099; outline-offset:2px; }
-.battle-moves>summary strong,.battle-moves>summary small { display:block; }
-.battle-moves>summary strong { font:600 12px var(--font-body); }
-.battle-moves>summary small { font-size:8px; margin-top:3px; color:#a0b28e; }
-.moves-chevron { margin-left:auto; font-size:19px; transition:transform .2s; }
-.battle-moves[open] .moves-chevron { transform:rotate(180deg); }
-.battle-layout .battle-moves>.battle-technique-grid { padding:9px; border-top:1px solid #afc18c20; gap:7px; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); }
-.battle-moves:not([open])>.battle-technique-grid { display:none!important; }
 .battle-layout .battle-technique-card { border-radius:7px; min-height:55px; }
 .dashboard .battle-layout .battle-technique { background:transparent!important; color:#e0e4c7!important; border:0!important; min-height:55px; padding:10px 26px 10px 11px; }
 .battle-layout .technique-card-name { font-size:11px; }
@@ -100,3 +89,33 @@ html body.dashboard:has(#battle.active) main { max-width:1700px; padding:22px 26
 }
 @media(prefers-reduced-motion:reduce) { .battle-layout .arena-creature,.battle-layout .combatant-photo { animation:none!important; } .battle-layout .bar>span,.moves-chevron { transition:none; } }
 @media(prefers-reduced-transparency:reduce) { .battle-layout .battle-hud { background:#10231a; backdrop-filter:none; } }
+
+/* Golpes permanecem visíveis como escolhas de combate, sem acordeão. */
+.battle-layout .battle-moves { padding:12px; border-color:#cdbd8152; border-radius:13px; background:linear-gradient(135deg,#263b2b,#14271d 72%); box-shadow:inset 0 1px #f8edc412,0 8px 22px #06110c33; }
+.battle-layout .battle-moves-heading { display:flex; align-items:center; gap:10px; padding:2px 2px 11px; color:#e6d59c; }
+.battle-layout .battle-moves-heading>span:nth-child(2) { flex:1; }
+.battle-layout .battle-moves-heading strong,.battle-layout .battle-moves-heading small { display:block; }
+.battle-layout .battle-moves-heading strong { font:650 13px var(--font-body); letter-spacing:.02em; }
+.battle-layout .battle-moves-heading small { margin-top:3px; color:#aabd9b; font-size:9px; }
+.battle-layout .moves-emblem { display:grid; place-items:center; width:30px; height:30px; border:1px solid #d9c58d66; border-radius:9px; background:#c8aa5a19; font-size:17px; }
+.battle-layout .moves-count { display:grid; place-items:center; min-width:25px; height:25px; border:1px solid #d9c58d55; border-radius:50%; color:#f1dfae; font-size:10px; }
+.battle-layout .battle-technique-grid { display:grid!important; grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr)); gap:9px; padding:0!important; border:0!important; }
+.battle-layout .battle-technique-card { min-width:0; overflow:hidden; border:1px solid #b4c59038; border-radius:10px; background:linear-gradient(145deg,#29462e,#1a3324 70%,#172a20); box-shadow:0 5px 14px #07140d38; transition:transform .18s,border-color .18s,box-shadow .18s; }
+.battle-layout .battle-technique-card:hover { transform:translateY(-2px); border-color:#d7c27a9c; box-shadow:0 9px 21px #07140d66; }
+.battle-layout .battle-technique-card.selected { border-color:#e1c36d; box-shadow:0 0 0 1px #e1c36d70,0 0 19px #e1c36d24; }
+.battle-layout .battle-technique-card.unavailable { filter:saturate(.55); opacity:.7; }
+.dashboard .battle-layout .battle-technique { display:flex; width:100%; flex-direction:column; align-items:stretch; gap:7px; min-height:0; padding:11px!important; text-align:left; white-space:normal; }
+.battle-layout .technique-card-top { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+.battle-layout .technique-card-name { color:#f1ebd5; font-size:12px; font-weight:700; line-height:1.2; }
+.battle-layout .technique-cost { flex:none; border:1px solid #9bc1c166; border-radius:999px; padding:3px 7px; color:#b8d9df; background:#5b99a020; font-size:8px; font-weight:700; }
+.battle-layout .technique-card-badges { display:flex; flex-wrap:wrap; gap:4px; }
+.battle-layout .technique-badge { border:1px solid #c4d39a2b; border-radius:999px; padding:3px 6px; color:#c7d5ad; background:#a8c77b12; font-size:8px; }
+.battle-layout .technique-card-description { display:-webkit-box; overflow:hidden; color:#bdc8ae; font-size:9px; line-height:1.45; -webkit-box-orient:vertical; -webkit-line-clamp:2; }
+.battle-layout .technique-card-stats { display:flex; flex-wrap:wrap; gap:5px; }
+.battle-layout .technique-card-stats>span { padding:4px 6px; border-radius:5px; color:#9daf91; background:#09191052; font-size:8px; }
+.battle-layout .technique-card-stats b { margin-left:2px; color:#e5d59d; font-weight:700; }
+.battle-layout .technique-lock-status { color:#e6ac91; font-size:8px; }
+.battle-layout .technique-observation { margin:0; color:#e7ca83; font-size:8px; }
+.battle-layout .html-sinergia,.battle-layout [class*="sinergia"] { color:#d9d59c; }
+@media(max-width:760px) { .battle-layout .battle-technique-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; } .battle-layout .battle-moves { padding:9px; } .dashboard .battle-layout .battle-technique { padding:9px!important; } .battle-layout .technique-card-stats { gap:3px; } }
+@media(max-width:420px) { .battle-layout .battle-technique-grid { grid-template-columns:1fr; } }

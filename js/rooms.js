@@ -181,6 +181,7 @@ export async function inicializarSalas() {
   let membrosDaSala = new Map();
   let participantesDaSala = [];
   let salaSelecionada = null;
+  let roomArenaEncounterId = null;
   let roomGamePoll = null;
   const roomPhotoUrls = new Set();
   let conviteDaUrl = new URL(window.location.href).searchParams.get("convite");
@@ -227,31 +228,36 @@ export async function inicializarSalas() {
         card.append(elemento("p", names.join("  ×  "), "room-game-matchup"));
         const log = encounter.state?.history || [];
         if (log.length) card.append(elemento("p", log[log.length - 1], "room-game-last-event"));
+        const playerIndex = party.findIndex(item => item.player_id === usuarioAtual.id);
         if (encounter.status === "active") {
-          const playerIndex = party.findIndex(item => item.player_id === usuarioAtual.id);
           const hasChoice = Boolean(encounter.own_choice);
           const actionBox = elemento("div", undefined, "room-game-actions");
-          if (playerIndex >= 0 && !hasChoice) {
-            const defend = elemento("button", "🛡 Defender", "small secondary"); defend.type = "button"; defend.dataset.encounter = encounter.id; defend.dataset.turn = encounter.turn; defend.dataset.choice = JSON.stringify({ tipo: "defend" }); actionBox.append(defend);
-            const recover = elemento("button", "✦ Recuperar PM", "small secondary"); recover.type = "button"; recover.dataset.encounter = encounter.id; recover.dataset.turn = encounter.turn; recover.dataset.choice = JSON.stringify({ tipo: "recover" }); actionBox.append(recover);
-            const fighter = fighters[playerIndex];
-            for (const entry of fighter?.nativa?.techniques || []) {
-              const id = typeof entry === "string" ? entry : entry?.id; const technique = obterTecnicaPorId(id);
-              if (!technique) continue;
-              const button = elemento("button", `${technique.nome} · ${technique.mp} PM`, "small room-game-move"); button.type = "button";
-              button.dataset.encounter = encounter.id; button.dataset.turn = encounter.turn; button.dataset.choice = JSON.stringify({ tipo: "attack", tecnicaId: technique.id });
-              button.disabled = (fighter.cooldowns?.[technique.id] || 0) > 0 || fighter.mp < technique.mp;
-              actionBox.append(button);
-            }
-          } else actionBox.append(elemento("span", hasChoice ? "Ação confirmada · aguardando a rodada" : "Aguardando o outro jogador aceitar ou agir.", "muted"));
+          if (playerIndex >= 0 && encounter.state) {
+            const openArena = elemento("button", hasChoice ? "Ver encontro na Arena · ação confirmada" : "Jogar encontro na Arena", "small room-game-open-arena");
+            openArena.type = "button"; openArena.dataset.openRoomArena = encounter.id;
+            actionBox.append(openArena);
+          } else actionBox.append(elemento("span", "Aguardando o outro jogador aceitar ou agir.", "muted"));
           if (membrosDaSala.get(roomId) === "master") {
             const cancel = elemento("button", "Encerrar encontro", "small secondary"); cancel.type = "button"; cancel.dataset.cancelEncounter = encounter.id; actionBox.append(cancel);
           }
           card.append(actionBox);
-        } else if (encounter.result?.xp) {
-          card.append(elemento("p", `Recompensa da campanha: ${encounter.result.xp} XP${encounter.result.essence ? " · Essência guardada" : ""}.`, "room-game-reward"));
+        } else {
+          if (encounter.result?.xp) card.append(elemento("p", `Recompensa da campanha: ${encounter.result.xp} XP${encounter.result.essence ? " · Essência guardada" : ""}.`, "room-game-reward"));
+          if (encounter.state && playerIndex >= 0) {
+            const replay = elemento("button", "Rever batalha na Arena", "small secondary room-game-open-arena");
+            replay.type = "button"; replay.dataset.openRoomArena = encounter.id; card.append(replay);
+          }
         }
         gameEncounters.append(card);
+        if (roomArenaEncounterId === encounter.id && encounter.state) {
+          document.dispatchEvent(new CustomEvent("nativa:room-arena-update", { detail: {
+            encounter, roomId, userId: usuarioAtual.id,
+            roomSubmit: async (choice, turn) => {
+              await chamarJogo("submit", { roomId, encounterId: encounter.id, turn, choice });
+              await carregarNativasDaSala(roomId);
+            }
+          } }));
+        }
       }
       if (!gameEncounters.childElementCount) gameEncounters.append(elemento("p", "Nenhum encontro nesta sala ainda.", "muted"));
       mostrarEstadoJogo("");
@@ -927,12 +933,21 @@ export async function inicializarSalas() {
       catch (error) { mostrarEstadoJogo(mensagemErroSala(error)); cancel.disabled = false; }
       return;
     }
-    const button = event.target.closest("[data-encounter]"); if (!button || !salaSelecionada) return;
-    button.disabled = true;
+    const button = event.target.closest("[data-open-room-arena]"); if (!button || !salaSelecionada) return;
+    const encounterId = button.dataset.openRoomArena;
     try {
-      await chamarJogo("submit", { roomId: salaSelecionada.id, encounterId: button.dataset.encounter, turn: Number(button.dataset.turn), choice: JSON.parse(button.dataset.choice) });
-      await carregarNativasDaSala(salaSelecionada.id);
-    } catch (error) { mostrarEstadoJogo(mensagemErroSala(error)); button.disabled = false; }
+      const snapshot = await chamarJogo("context", { roomId: salaSelecionada.id });
+      const encounter = (snapshot.encounters || []).find(item => item.id === encounterId);
+      if (!encounter?.state) throw new Error("Este encontro não está disponível para sua conta.");
+      roomArenaEncounterId = encounterId;
+      document.dispatchEvent(new CustomEvent("nativa:room-arena-open", { detail: {
+        encounter, roomId: salaSelecionada.id, userId: usuarioAtual.id,
+        roomSubmit: async (choice, turn) => {
+          await chamarJogo("submit", { roomId: salaSelecionada.id, encounterId, turn, choice });
+          await carregarNativasDaSala(salaSelecionada.id);
+        }
+      } }));
+    } catch (error) { mostrarEstadoJogo(mensagemErroSala(error)); }
   });
 
   renameRoomForm.addEventListener("submit", async event => {
