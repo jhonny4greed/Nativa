@@ -28,13 +28,13 @@ test("41 Traços e oito sinergias validadas preservam IDs; sinergia não é requ
   assert.ok(TECNICAS.every(item => item.sinergiasCandidatas.length === 0));
   const clawMove = TECNICAS.find(item => item.id === "linhagem-v2-1-felinos-bote-predatorio");
   assert.equal(podeAprenderTecnica(clawMove), true);
-  assert.equal(podeUsarTecnicaEmCombate(clawMove), false);
+  assert.equal(podeUsarTecnicaEmCombate(clawMove), true);
 });
 
-test("estados em revisão e propostas não liberam combate; parâmetros não alteram aprovação", () => {
-  assert.ok(TECNICAS.every(item => item.estadoCatalogo === "em-revisao"));
+test("os 178 golpes V2.2.1 estão aprovados e liberados; parâmetros legados seguem sinalizados", () => {
+  assert.ok(TECNICAS.every(item => item.estadoCatalogo === "aprovado"));
   assert.ok(TECNICAS.every(item => podeAprenderTecnica(item)));
-  assert.ok(TECNICAS.every(item => !podeUsarTecnicaEmCombate(item)));
+  assert.ok(TECNICAS.every(item => podeUsarTecnicaEmCombate(item)));
   assert.ok(TECNICAS.filter(item => item.parametrosTecnicosDisponiveis).length > 0);
   assert.ok(TECNICAS.filter(item => item.status === "Novo — proposta V2.2").every(item => !item.parametrosTecnicosDisponiveis));
 });
