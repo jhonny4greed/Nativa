@@ -20,7 +20,6 @@ body.arena-fullscreen-open { overflow:hidden; }
 .battle-layout .technique-card-name { font-size:12px; line-height:1.3; color:#f1edcf; }
 .battle-layout .technique-card-badges { gap:5px; }
 .battle-layout .technique-badge { padding:2px 5px; border:1px solid #bad09b22; border-radius:5px; font-size:8px; background:#10271c66; }
-.battle-layout .technique-detail-toggle { width:24px; height:24px; top:7px; right:6px; border-radius:50%; font-size:11px; }
 .battle-layout .battle-technique-grid { gap:10px!important; }
 .battle-layout[data-mode="online"] .battle-commands-grid { grid-template-columns:1fr; width:100%; max-width:1050px; margin:auto; }
 .battle-layout[data-mode="online"] .action-panel-heading .eyebrow { color:#d6c58c; }
@@ -79,7 +78,8 @@ body.arena-fullscreen-open { overflow:hidden; }
 #battle:fullscreen:has(.battlefield)>.section-heading p,#battle.arena-expanded:has(.battlefield)>.section-heading p { margin:2px 0 0; font-size:11px; }
 #battle:fullscreen:has(.battlefield)>.arena-mode-tabs,#battle:fullscreen:has(.battlefield)>#online-arena-lobby,#battle:fullscreen:has(.battlefield)>.battle-setup,#battle.arena-expanded:has(.battlefield)>.arena-mode-tabs,#battle.arena-expanded:has(.battlefield)>#online-arena-lobby,#battle.arena-expanded:has(.battlefield)>.battle-setup { display:none!important; }
 #battle:fullscreen:has(.battlefield) #battle-arena,#battle.arena-expanded:has(.battlefield) #battle-arena { min-height:0; height:100%; margin:0; overflow:hidden; }
-#battle:fullscreen:has(.battlefield) .battlefield,#battle.arena-expanded:has(.battlefield) .battlefield { display:grid; height:100%; min-height:0; grid-template-rows:32px minmax(230px,1fr) minmax(250px,.78fr); overflow:hidden; border:1px solid #b9cd8c42; border-radius:20px; box-shadow:0 20px 60px #0007,inset 0 1px #e8ecc91c; }
+#battle:fullscreen:has(.battlefield) .battlefield,#battle.arena-expanded:has(.battlefield) .battlefield { display:grid; height:100%; min-height:0; grid-template-rows:32px minmax(230px,1fr) auto minmax(250px,.78fr); overflow:hidden; border:1px solid #b9cd8c42; border-radius:20px; box-shadow:0 20px 60px #0007,inset 0 1px #e8ecc91c; }
+#battle:fullscreen:has(.battlefield) .arena-action-trigger,#battle.arena-expanded:has(.battlefield) .arena-action-trigger { padding:4px 12px 0; }
 #battle:fullscreen:has(.battlefield) .arena-stage,#battle.arena-expanded:has(.battlefield) .arena-stage { height:100%; min-height:230px; }
 #battle:fullscreen:has(.battlefield) .battle-commands,#battle.arena-expanded:has(.battlefield) .battle-commands { min-height:0; overflow:hidden; display:grid; grid-template-columns:minmax(0,1.6fr) minmax(250px,.8fr); grid-template-rows:minmax(0,1fr) auto auto; gap:8px 14px; padding:11px 15px; }
 #battle:fullscreen:has(.battlefield) .battle-commands-grid,#battle.arena-expanded:has(.battlefield) .battle-commands-grid { grid-column:1; grid-row:1; min-height:0; overflow:auto; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
@@ -90,7 +90,6 @@ body.arena-fullscreen-open { overflow:hidden; }
 #battle:fullscreen:has(.battlefield) .battle-moves>.battle-technique-grid,#battle.arena-expanded:has(.battlefield) .battle-moves>.battle-technique-grid { grid-template-columns:repeat(3,minmax(0,1fr)); padding:6px; gap:5px!important; }
 #battle:fullscreen:has(.battlefield) .battle-technique-card,#battle.arena-expanded:has(.battlefield) .battle-technique-card { min-height:48px; }
 #battle:fullscreen:has(.battlefield) .battle-technique,#battle.arena-expanded:has(.battlefield) .battle-technique { min-height:48px; padding:7px 27px 7px 8px; }
-#battle:fullscreen:has(.battlefield) .execute-battle-button,#battle.arena-expanded:has(.battlefield) .execute-battle-button { grid-column:1; grid-row:2; width:min(100%,330px); min-height:38px; }
 #battle:fullscreen:has(.battlefield) .battle-result,#battle.arena-expanded:has(.battlefield) .battle-result { grid-column:1; grid-row:3; margin:0; }
 #battle:fullscreen:has(.battlefield) .battle-log,#battle.arena-expanded:has(.battlefield) .battle-log { grid-column:2; grid-row:1/4; min-height:0; overflow:hidden; padding:9px; }
 #battle:fullscreen:has(.battlefield) .battle-log-list,#battle.arena-expanded:has(.battlefield) .battle-log-list { max-height:calc(100% - 45px); overflow:auto; }
@@ -101,20 +100,19 @@ body.arena-fullscreen-open { overflow:hidden; }
   .room-game-start button { width:100%; white-space:normal; }
   #battle:fullscreen:has(.battlefield),#battle.arena-expanded:has(.battlefield) { padding:8px; }
   #battle:fullscreen:has(.battlefield)::after,#battle.arena-expanded:has(.battlefield)::after { content:"⟳  Gire o celular para jogar na horizontal"; position:fixed; z-index:1100; top:8px; left:50%; transform:translateX(-50%); width:max-content; max-width:calc(100% - 24px); padding:8px 13px; border:1px solid #d5c58d88; border-radius:99px; color:#f0e7c9; background:#11251beF; box-shadow:0 8px 25px #0006; font-size:11px; pointer-events:none; }
-  #battle:fullscreen:has(.battlefield) .battlefield,#battle.arena-expanded:has(.battlefield) .battlefield { grid-template-rows:28px minmax(190px,.9fr) minmax(260px,1fr); }
+  #battle:fullscreen:has(.battlefield) .battlefield,#battle.arena-expanded:has(.battlefield) .battlefield { grid-template-rows:28px minmax(190px,.9fr) auto minmax(260px,1fr); }
+  #battle:fullscreen:has(.battlefield) .arena-action-trigger,#battle.arena-expanded:has(.battlefield) .arena-action-trigger { padding:3px 8px 0; }
   #battle:fullscreen:has(.battlefield) .battle-commands,#battle.arena-expanded:has(.battlefield) .battle-commands { grid-template-columns:minmax(0,1fr); grid-template-rows:minmax(0,1fr) auto auto auto; padding:8px; }
   #battle:fullscreen:has(.battlefield) .battle-commands-grid,#battle.arena-expanded:has(.battlefield) .battle-commands-grid { grid-column:1; grid-row:1; grid-template-columns:1fr; }
-  #battle:fullscreen:has(.battlefield) .execute-battle-button,#battle.arena-expanded:has(.battlefield) .execute-battle-button { grid-column:1; grid-row:2; }
   #battle:fullscreen:has(.battlefield) .battle-result,#battle.arena-expanded:has(.battlefield) .battle-result { grid-column:1; grid-row:3; }
   #battle:fullscreen:has(.battlefield) .battle-log,#battle.arena-expanded:has(.battlefield) .battle-log { grid-column:1; grid-row:4; max-height:110px; }
   #battle:fullscreen:has(.battlefield) .battle-log-list,#battle.arena-expanded:has(.battlefield) .battle-log-list { max-height:65px; }
 }
 @media(max-width:760px) and (orientation:landscape) {
   #battle:fullscreen:has(.battlefield)::after,#battle.arena-expanded:has(.battlefield)::after { display:none; }
-  #battle:fullscreen:has(.battlefield) .battlefield,#battle.arena-expanded:has(.battlefield) .battlefield { grid-template-rows:25px minmax(135px,.8fr) minmax(170px,1fr); }
+  #battle:fullscreen:has(.battlefield) .battlefield,#battle.arena-expanded:has(.battlefield) .battlefield { grid-template-rows:25px minmax(135px,.8fr) auto minmax(170px,1fr); }
   #battle:fullscreen:has(.battlefield) .battle-commands,#battle.arena-expanded:has(.battlefield) .battle-commands { grid-template-columns:minmax(0,1.5fr) minmax(180px,.75fr); grid-template-rows:minmax(0,1fr) auto auto; }
   #battle:fullscreen:has(.battlefield) .battle-commands-grid,#battle.arena-expanded:has(.battlefield) .battle-commands-grid { grid-column:1; grid-row:1; grid-template-columns:repeat(2,minmax(0,1fr)); }
-  #battle:fullscreen:has(.battlefield) .execute-battle-button,#battle.arena-expanded:has(.battlefield) .execute-battle-button { grid-column:1; grid-row:2; }
   #battle:fullscreen:has(.battlefield) .battle-result,#battle.arena-expanded:has(.battlefield) .battle-result { grid-column:1; grid-row:3; }
   #battle:fullscreen:has(.battlefield) .battle-log,#battle.arena-expanded:has(.battlefield) .battle-log { grid-column:2; grid-row:1/4; max-height:none; }
 }

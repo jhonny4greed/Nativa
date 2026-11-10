@@ -330,10 +330,6 @@ function htmlSinergiasFicha(tecnica,nativa){
     return `<p class="muted"><b>${ativa?"Sinergia ativa":"Traço opcional"} · ${escapar(traco?.nome||sinergia.tracoId)}:</b> ${escapar(sinergia.descricao)} (${escapar(tipo)}).</p>`;
   }).join("");
 }
-function htmlSinergiasAtivasBatalha(tecnica,nativa){
-  const ativas=(tecnica.sinergias||[]).filter(s=>nativaPossuiTraco(nativa,s.tracoId));
-  return ativas.length?`<span class="battle-synergy">Sinergia: ${ativas.map(s=>escapar(s.descricao)).join(" ")}</span>`:"";
-}
 function custoCriacao(v){return v*(v+1)/2-1;}
 function xpUsado(){return Object.values(atributos).reduce((s,v)=>s+custoCriacao(v),0);}
 function preencherSelect(seletor,itens,placeholder){const el=$(seletor);if(!el)return;const atual=el.value;el.innerHTML=`<option value="">${placeholder}</option>`+itens.map(x=>`<option value="${escapar(x.nome)}">${escapar(x.nome)}</option>`).join("");if(itens.some(x=>x.nome===atual))el.value=atual;}
@@ -970,6 +966,33 @@ function apresentarEventosCombate(eventos){
   }
 }
 
+function aplicarAnimacoesTecnicas(resultado){
+  for(const evento of resultado.events||[]){
+    if(!evento.technique||!evento.attacker)continue;
+    const combatente=resultado.fighters.find(item=>item.nativa.name===evento.attacker);
+    if(!combatente)continue;
+    const tecnica=tecnicasCombatente(combatente).find(item=>item.nome===evento.technique);
+    if(!tecnica)continue;
+    if(evento.type==="support"||tecnica.categoria==="Suporte")combatente.animacao="support";
+    else if(evento.type==="miss")combatente.animacao="miss";
+    else combatente.animacao=tecnica.categoria==="Especial"?"attack-special":"attack-physical";
+  }
+}
+
+function aplicarAnimacoesDoHistorico(combatentes,historico){
+  const lines=historico||[];
+  let roundStart=lines.findLastIndex?.(line=>/^Turno \d+$/i.test(line))??-1;
+  if(roundStart<0)roundStart=lines.map(line=>/^Turno \d+$/i.test(line)).lastIndexOf(true);
+  for(const line of lines.slice(roundStart+1)){
+    const match=String(line).match(/^(.+?) (usa|erra) (.+?)(?::| e causa | \(D10:|\.$)/);
+    if(!match)continue;
+    const fighter=combatentes.find(item=>item.nativa.name===match[1]);
+    const technique= fighter&&tecnicasCombatente(fighter).find(item=>item.nome===match[3]);
+    if(!fighter||!technique)continue;
+    fighter.animacao=match[2]==="erra"?"miss":technique.categoria==="Especial"?"attack-special":technique.categoria==="Suporte"?"support":"attack-physical";
+  }
+}
+
 // Executa escolhas e apresenta o resultado produzido pelo domínio.
 async function concederRecompensasVitoria(batalhaAtual){
   if(batalhaAtual.recompensaAplicada)return;
@@ -1027,6 +1050,7 @@ async function executarTurno(){
     batalha.ordem=resultado.order;
     batalha.rolls=resultado.rolls;
     apresentarEventosCombate(resultado.events);
+    aplicarAnimacoesTecnicas(resultado);
     if(resultado.error)throw resultado.error;
 
     if(resultado.ended){
@@ -1065,9 +1089,8 @@ async function executarTurnoSala(){
   try{await current.roomSubmit(choice,current.turno);}
   catch(error){if(batalha===current){current.processando=false;current.log.push(error.message);renderizarArena();}}
 }
-// Cria os cartões grandes das técnicas.
-function rotuloOrigemTecnica(origem){
-  return ({afinidade:"Afinidade",bioma:"Bioma",linhagem:"Linhagem",arquetipo:"Arquétipo"})[origem]||origem||"";
+function slugVisualTecnica(value){
+  return String(value||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 }
 
 function cartoesTecnicas(c,indice){
@@ -1093,21 +1116,19 @@ function cartoesTecnicas(c,indice){
     else if(cd>0)motivo=`Recarga: ${cd} turno(s)`;
     else if(semMP)motivo="MP insuficiente";
 
-    const origem=rotuloOrigemTecnica(t.origem);
-    const classificacao=origem&&t.grupo?`${origem} · ${t.grupo}`:origem;
-    const observacao=t.status&&t.status!=="MANTIDA"?`<p class="technique-observation">${escapar(t.status)}</p>`:"";
+    const afinidade=t.origem==="afinidade"?t.grupo:(t.afinidade||"");
+    const categoria=t.categoria||"Suporte";
+    const categoriaIcone=categoria==="Físico"?"⚔":categoria==="Especial"?"✦":"✿";
     return `
-      <article class="battle-technique-card ${selecionada?"selected":""} ${bloqueada?"unavailable":""}">
-        <button type="button" class="battle-technique" data-battle-technique="${escapar(t.id)}" data-fighter="${indice}" ${bloqueada?"disabled":""}>
+      <article class="battle-technique-card ${selecionada?"selected":""} ${bloqueada?"unavailable":""}" data-source="${escapar(slugVisualTecnica(t.origem))}" data-family="${escapar(t.origem==="linhagem"?slugVisualTecnica(t.grupo):"")}" data-biome="${escapar(t.origem==="bioma"?slugVisualTecnica(t.grupo):"")}" data-element="${escapar(t.origem==="afinidade"?slugVisualTecnica(t.grupo):"")}" data-category="${escapar(slugVisualTecnica(categoria))}">
+        <button type="button" class="battle-technique" data-battle-technique="${escapar(t.id)}" data-fighter="${indice}" aria-label="${escapar(`${t.nome}. ${afinidade?`Afinidade ${afinidade}. `:""}${categoria}. Custo ${t.mp??"não definido"} PM. Dano ${t.dano??"não definido"}. Efeito: ${t.efeito||"sem efeito descrito"}`)}" ${bloqueada?"disabled":""}>
           <span class="technique-card-top"><span class="technique-card-name">${escapar(t.nome)}</span><span class="technique-cost">${t.mp??"—"} PM</span></span>
           <span class="technique-card-badges">
-            ${t.categoria?`<span class="technique-badge category-badge" data-category="${escapar(t.categoria)}">${escapar(t.categoria)}</span>`:""}
-            ${classificacao?`<span class="technique-badge source-badge" data-origin="${escapar(t.origem||"")}">${escapar(classificacao)}</span>`:""}
+            ${afinidade?`<span class="technique-badge affinity-badge">Afinidade · ${escapar(afinidade)}</span>`:""}
+            <span class="technique-badge category-badge" data-category="${escapar(categoria)}">${categoriaIcone} ${escapar(categoria)}</span>
           </span>
-          <span class="technique-card-description">${escapar(t.efeito||"Sem descrição cadastrada.")}</span>
-          <span class="technique-card-stats"><span>Dano <b>${t.dano??"—"}</b></span><span>Precisão <b>${escapar(textoPrecisao(t))}</b></span><span>Recarga <b>${t.recarga??"—"}</b></span></span>
-          ${bloqueada?`<span class="technique-lock-status">${escapar(motivo)}</span>`:""}
-          ${observacao}${htmlSinergiasAtivasBatalha(t,c.nativa)}
+          <span class="technique-card-stats"><span>Dano <b>${t.dano??"—"}</b></span></span>
+          <span class="technique-hover-effect"><strong>Efeito</strong>${escapar(t.efeito||"Sem efeito descrito.")}${bloqueada?`<small>${escapar(motivo)}</small>`:""}</span>
         </button>
       </article>
     `;
@@ -1305,6 +1326,7 @@ function renderizarArena(){
         <div class="arena-stage-mark" aria-hidden="true"><span></span><b>VS</b><span></span></div>
         <div class="arena-fighter arena-fighter-two">${renderizarCombatente(f[1],1)}</div>
       </div>
+      <div class="arena-action-trigger">${botaoExecutar}</div>
       <div class="battle-commands">
         <div class="battle-commands-grid">
           ${!batalha.encerrada&&((batalha.modo!=="online"&&batalha.modo!=="room")||(batalha.modo==="online"&&batalha.onlineSelfIndex===0)||(batalha.modo==="room"&&batalha.roomSelfIndex===0))?renderizarPainelAcao(f[0],0):""}
@@ -1312,7 +1334,6 @@ function renderizarArena(){
           ${!batalha.encerrada&&batalha.modo==="online"&&batalha.onlineSelfIndex===1?renderizarPainelAcao(f[1],1):""}
           ${!batalha.encerrada&&batalha.modo==="room"&&batalha.roomSelfIndex===1?renderizarPainelAcao(f[1],1):""}
         </div>
-        ${botaoExecutar}
         ${resultado}
         ${renderizarHistorico()}
       </div>
@@ -1405,6 +1426,7 @@ onlineArena=initializeOnlineArena({
       ...fighter,nativa:{...fighter.nativa,player:index===0?match.hostName:match.guestName},
       fotoUrl:arenaPortrait(fighter.nativa),arenaCutout:Boolean(arenaPortrait(fighter.nativa))
     }));
+    if(previous&&previous.log?.at(-1)!==match.state.history?.at(-1))aplicarAnimacoesDoHistorico(fighters,match.state.history);
     batalha={modo:"online",onlineMatchId:match.id,onlineSelfIndex:match.selfIndex,onlineSubmitted:match.ownConfirmed,
       onlineWinnerIndex:match.winnerIndex,onlineCancelled:match.status==="cancelled",fighters,turno:match.turn,
       horario:"Duelo online",bioma:match.biome,ordem:match.state.order||[],log:[...match.state.history],
@@ -1428,6 +1450,8 @@ function atualizarArenaDaSala(detail){
     const portrait=arenaPortrait(nativa)||defaultPortrait(nativa);
     return {...fighter,nativa,fotoUrl:portrait,arenaCutout:Boolean(arenaPortrait(nativa))};
   });
+  const history=encounter.state.history||[];
+  if(same&&same.log?.at(-1)!==history.at(-1))aplicarAnimacoesDoHistorico(fighters,history);
   const winnerIndex=encounter.winner_id?participants.findIndex(p=>p.player_id===encounter.winner_id):-1;
   const sameTurn=same?.turno===encounter.turn;
   batalha={modo:"room",roomId,roomEncounterId:encounter.id,roomSelfIndex:selfIndex,
@@ -1435,7 +1459,7 @@ function atualizarArenaDaSala(detail){
     roomCancelled:encounter.status==="cancelled",roomWinnerIndex:winnerIndex,
     roomSubmit,fighters,turno:encounter.turn,horario:"Encontro da campanha",
     bioma:fighters[0]?.nativa?.bioma||"Habitat da campanha",ordem:encounter.state.order||[],
-    log:[...(encounter.state.history||[])],escolhas:encounter.own_choice?{[selfIndex]:encounter.own_choice}:sameTurn?same.escolhas:{},
+    log:[...history],escolhas:encounter.own_choice?{[selfIndex]:encounter.own_choice}:sameTurn?same.escolhas:{},
     encerrada:encounter.status!=="active",processando:false,aguardandoProximoTurno:false};
   renderizarArena();
 }

@@ -1,6 +1,6 @@
 /* A habitat fills the field. Opponents share the same scene at different depths. */
 html body.dashboard:has(#battle.active) main { max-width:1700px; padding:22px 26px 40px; }
-.dashboard .battlefield.battle-layout { grid-template-columns:minmax(0,1fr); grid-template-areas:"top" "stage" "commands"; gap:0; padding:0; border-radius:18px; border-color:#bdb78544; background:#0e1e15; overflow:hidden; }
+.dashboard .battlefield.battle-layout { grid-template-columns:minmax(0,1fr); grid-template-areas:"top" "stage" "action" "commands"; gap:0; padding:0; border-radius:18px; border-color:#bdb78544; background:#0e1e15; overflow:hidden; }
 .battle-layout .battlefield-topline { position:relative; inset:auto; grid-area:top; display:flex; justify-content:space-between; align-items:center; padding:11px 17px; background:#14251c; z-index:4; gap:10px; }
 .battle-layout .battlefield-topline .arena-location,.battle-layout .battlefield-topline .battle-state { background:none; border:0; font-size:10px; color:#d5dcc0; padding:0; }
 .battle-layout .battlefield-topline .battle-state { color:#aebc98; font-size:9px; }
@@ -41,6 +41,10 @@ html body.dashboard:has(#battle.active) main { max-width:1700px; padding:22px 26
 .battle-layout .arena-fighter-two .contestant-right .combatant-photo { transform:none; }
 .battle-layout .arena-stage-mark { top:53%; left:50%; width:42px; opacity:.45; }
 .battle-layout .arena-stage-mark b { font:600 11px var(--font-body); letter-spacing:2px; }
+.battle-layout .arena-action-trigger { grid-area:action; display:flex; justify-content:center; padding:10px 14px 2px; background:linear-gradient(180deg,#182d21,#17291e); }
+.battle-layout .arena-action-trigger:empty { display:none; }
+.battle-layout .arena-action-trigger .execute-battle-button { width:min(100%,460px); min-height:48px; margin:0; border:1px solid #e2d09a; border-radius:10px 18px 10px 18px; background:linear-gradient(105deg,#a9c77a,#e0cb90 54%,#c2d98e); box-shadow:inset 0 1px #fff9,0 6px 18px #030b0780; color:#17251a; font-size:12px; font-weight:850; letter-spacing:1.1px; }
+.battle-layout .arena-action-trigger .execute-battle-button:disabled { filter:saturate(.5); opacity:.58; }
 .battle-layout .battle-commands { padding:17px; gap:13px; background:linear-gradient(150deg,#192e21,#101f18); border-top:1px solid #bfcb9a40; }
 .battle-layout .battle-commands-grid { gap:14px; }
 .battle-layout .action-panel { padding:13px; border-radius:12px; border-color:#b9c49b33; background:#0d1e17b3; box-shadow:inset 0 1px #ffffe00a; }
@@ -81,6 +85,8 @@ html body.dashboard:has(#battle.active) main { max-width:1700px; padding:22px 26
   .battle-layout .arena-fighter-one { width:69%; height:61%; left:-10%; bottom:12%; }
   .battle-layout .arena-fighter-two { width:60%; height:52%; right:-4%; top:19%; }
   .battle-layout .arena-stage-mark { top:54%; width:24px; }
+  .battle-layout .arena-action-trigger { padding:9px 10px 0; }
+  .battle-layout .arena-action-trigger .execute-battle-button { min-height:44px; font-size:10px; }
   .battle-layout .battle-commands { padding:10px; gap:11px; }
   .battle-layout .battle-commands-grid { grid-template-columns:1fr; gap:10px; }
   .battle-layout .action-panel { padding:11px; }
@@ -100,22 +106,61 @@ html body.dashboard:has(#battle.active) main { max-width:1700px; padding:22px 26
 .battle-layout .moves-emblem { display:grid; place-items:center; width:30px; height:30px; border:1px solid #d9c58d66; border-radius:9px; background:#c8aa5a19; font-size:17px; }
 .battle-layout .moves-count { display:grid; place-items:center; min-width:25px; height:25px; border:1px solid #d9c58d55; border-radius:50%; color:#f1dfae; font-size:10px; }
 .battle-layout .battle-technique-grid { display:grid!important; grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr)); gap:9px; padding:0!important; border:0!important; }
-.battle-layout .battle-technique-card { min-width:0; overflow:hidden; border:1px solid #b4c59038; border-radius:10px; background:linear-gradient(145deg,#29462e,#1a3324 70%,#172a20); box-shadow:0 5px 14px #07140d38; transition:transform .18s,border-color .18s,box-shadow .18s; }
+.battle-layout .battle-technique-card { --technique-accent:#b8cf82; position:relative; isolation:isolate; min-width:0; overflow:visible; border:1px solid #b4c59055; border-radius:8px 15px 8px 15px; background:linear-gradient(145deg,#29462e,#1a3324 70%,#172a20); box-shadow:0 5px 14px #07140d38; transition:transform .18s,border-color .18s,box-shadow .18s; }
+.battle-layout .battle-technique-card::before { position:absolute; z-index:0; inset:0; border-radius:inherit; background:radial-gradient(ellipse at 100% 0%,color-mix(in srgb,var(--technique-accent) 18%,transparent),transparent 54%); content:""; opacity:.75; pointer-events:none; }
 .battle-layout .battle-technique-card:hover { transform:translateY(-2px); border-color:#d7c27a9c; box-shadow:0 9px 21px #07140d66; }
 .battle-layout .battle-technique-card.selected { border-color:#e1c36d; box-shadow:0 0 0 1px #e1c36d70,0 0 19px #e1c36d24; }
 .battle-layout .battle-technique-card.unavailable { filter:saturate(.55); opacity:.7; }
-.dashboard .battle-layout .battle-technique { display:flex; width:100%; flex-direction:column; align-items:stretch; gap:7px; min-height:0; padding:11px!important; text-align:left; white-space:normal; }
+.dashboard .battle-layout .battle-technique { position:relative; z-index:1; display:flex; width:100%; flex-direction:column; align-items:stretch; gap:7px; min-height:0; padding:11px!important; text-align:left; white-space:normal; }
 .battle-layout .technique-card-top { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
 .battle-layout .technique-card-name { color:#f1ebd5; font-size:12px; font-weight:700; line-height:1.2; }
 .battle-layout .technique-cost { flex:none; border:1px solid #9bc1c166; border-radius:999px; padding:3px 7px; color:#b8d9df; background:#5b99a020; font-size:8px; font-weight:700; }
 .battle-layout .technique-card-badges { display:flex; flex-wrap:wrap; gap:4px; }
 .battle-layout .technique-badge { border:1px solid #c4d39a2b; border-radius:999px; padding:3px 6px; color:#c7d5ad; background:#a8c77b12; font-size:8px; }
-.battle-layout .technique-card-description { display:-webkit-box; overflow:hidden; color:#bdc8ae; font-size:9px; line-height:1.45; -webkit-box-orient:vertical; -webkit-line-clamp:2; }
-.battle-layout .technique-card-stats { display:flex; flex-wrap:wrap; gap:5px; }
-.battle-layout .technique-card-stats>span { padding:4px 6px; border-radius:5px; color:#9daf91; background:#09191052; font-size:8px; }
-.battle-layout .technique-card-stats b { margin-left:2px; color:#e5d59d; font-weight:700; }
-.battle-layout .technique-lock-status { color:#e6ac91; font-size:8px; }
-.battle-layout .technique-observation { margin:0; color:#e7ca83; font-size:8px; }
-.battle-layout .html-sinergia,.battle-layout [class*="sinergia"] { color:#d9d59c; }
-@media(max-width:760px) { .battle-layout .battle-technique-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; } .battle-layout .battle-moves { padding:9px; } .dashboard .battle-layout .battle-technique { padding:9px!important; } .battle-layout .technique-card-stats { gap:3px; } }
+.battle-layout .technique-card-stats { display:flex; align-items:center; justify-content:flex-end; }
+.battle-layout .technique-card-stats>span { padding:3px 7px; border:1px solid #d6dcad24; border-radius:6px; color:#c2cda9; background:#09191058; font-size:9px; }
+.battle-layout .technique-card-stats b { margin-left:3px; color:#f0dfa5; font-size:11px; font-weight:800; }
+.battle-layout .affinity-badge { border-color:#e4d28c52; color:#f0d68e; background:#bc9d4220; }
+.battle-layout .category-badge[data-category="Físico"] { border-color:#dba97555; color:#efc697; background:#9c613322; }
+.battle-layout .category-badge[data-category="Especial"] { border-color:#9ec7e855; color:#bce4f0; background:#4385a322; }
+.battle-layout .category-badge[data-category="Suporte"] { border-color:#9bcfba55; color:#bce3c6; background:#41806b22; }
+.battle-layout .technique-hover-effect { position:absolute; z-index:10; inset:0; display:grid; align-content:center; gap:5px; width:auto; padding:11px 13px; border:1px solid #e0ce8c99; border-radius:inherit; color:#e4e9d4; background:linear-gradient(145deg,#1c3025f5,#0b1912f7); box-shadow:inset 0 1px #f7edc01b; font-size:10px; line-height:1.45; text-align:left; white-space:normal; opacity:0; visibility:hidden; transform:scale(.98); transition:opacity .16s,transform .16s,visibility .16s; pointer-events:none; }
+.battle-layout .technique-hover-effect strong { color:#e8d69c; font-size:9px; letter-spacing:.08em; text-transform:uppercase; }
+.battle-layout .technique-hover-effect small { color:#e8ac91; font-size:9px; }
+.battle-layout .battle-technique-card:hover .technique-hover-effect,.battle-layout .battle-technique-card:focus-within .technique-hover-effect { opacity:1; visibility:visible; transform:translateY(0); }
+/* Subtle game-card textures vary by technique origin and creature lineage. */
+.battle-layout .battle-technique-card[data-source="linhagem"]::before { background:repeating-linear-gradient(135deg,transparent 0 16px,#b9d58710 17px 18px,transparent 19px 30px),radial-gradient(ellipse at 100% 0%,#bddb9130,transparent 60%); }
+.battle-layout .battle-technique-card[data-family="felinos"]::before { background:radial-gradient(ellipse at 85% 20%,transparent 0 4px,#d6b87830 5px 7px,transparent 8px),radial-gradient(ellipse at 98% 48%,transparent 0 5px,#d6b87825 6px 8px,transparent 9px),repeating-linear-gradient(135deg,transparent 0 24px,#e5c88110 25px 26px,transparent 27px 38px); background-size:38px 34px,45px 40px,auto; }
+.battle-layout .battle-technique-card[data-family="canideos"]::before,.battle-layout .battle-technique-card[data-family="mustelideos"]::before { background:repeating-linear-gradient(155deg,transparent 0 10px,#d4c79b12 11px 12px,transparent 13px 25px),radial-gradient(ellipse at 100% 0%,#b5d68d28,transparent 65%); }
+.battle-layout .battle-technique-card[data-family="siluriformes"]::before,.battle-layout .battle-technique-card[data-family="peixes"]::before { background:radial-gradient(circle at 90% 20%,#8dd3c12b 0 3px,transparent 3.5px),radial-gradient(circle at 100% 45%,#8dd3c121 0 4px,transparent 4.5px),repeating-radial-gradient(ellipse at 100% 100%,transparent 0 9px,#91d9c10c 10px 11px,transparent 12px 20px); background-size:22px 20px,28px 24px,100% 100%; }
+.battle-layout .battle-technique-card[data-source="bioma"]::before { background:linear-gradient(0deg,#29493645,transparent 54%),repeating-linear-gradient(165deg,transparent 0 18px,#b3d09b10 19px 20px,transparent 21px 34px),radial-gradient(ellipse at 100% 0%,#a3bf7925,transparent 65%); }
+.battle-layout .battle-technique-card[data-biome*="pampa"]::before,.battle-layout .battle-technique-card[data-biome*="campos"]::before { background:repeating-linear-gradient(165deg,transparent 0 15px,#dbca7f20 16px 17px,transparent 18px 27px),linear-gradient(160deg,transparent 35%,#9dac6540); }
+.battle-layout .battle-technique-card[data-biome*="floresta"]::before,.battle-layout .battle-technique-card[data-biome*="mata"]::before { background:radial-gradient(ellipse at 85% 20%,#6cb78430,transparent 45%),repeating-linear-gradient(125deg,transparent 0 20px,#9dcd8b14 21px 22px,transparent 23px 38px); }
+.battle-layout .battle-technique-card[data-element="fogo"] { --technique-accent:#ff9861; }
+.battle-layout .battle-technique-card[data-element="fogo"]::before { background:radial-gradient(ellipse at 0% 100%,#eb633f35,transparent 42%),radial-gradient(ellipse at 100% 0%,#ffbf6340,transparent 48%); }
+.battle-layout .battle-technique-card[data-element="agua"] { --technique-accent:#78d9eb; }
+.battle-layout .battle-technique-card[data-element="agua"]::before { background:repeating-radial-gradient(ellipse at 100% 100%,transparent 0 9px,#74cfe51e 10px 11px,transparent 12px 19px),linear-gradient(135deg,transparent 25%,#5cc4d225); }
+.battle-layout .battle-technique-card[data-element="vento"] { --technique-accent:#d3e9ae; }
+.battle-layout .battle-technique-card[data-element="vento"]::before { background:repeating-linear-gradient(160deg,transparent 0 12px,#deecbe22 13px 14px,transparent 15px 26px),radial-gradient(ellipse at 100% 0%,#b8d8a52e,transparent 62%); }
+.battle-layout .battle-technique-card[data-element="terra"] { --technique-accent:#d7b56f; }
+.battle-layout .battle-technique-card[data-element="terra"]::before { background:linear-gradient(145deg,transparent 45%,#b9955233 46% 49%,transparent 50%),radial-gradient(ellipse at 100% 100%,#a8753c30,transparent 60%); }
+.battle-layout .battle-technique-card[data-element="energia"] { --technique-accent:#c6b7ff; }
+.battle-layout .battle-technique-card[data-element="energia"]::before { background:repeating-radial-gradient(ellipse at 100% 0%,transparent 0 10px,#c4b0ff20 11px 12px,transparent 13px 23px),radial-gradient(ellipse at 100% 0%,#a495eb30,transparent 55%); }
+@media(max-width:760px) { .battle-layout .battle-technique-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; } .battle-layout .battle-moves { padding:9px; } .dashboard .battle-layout .battle-technique { padding:9px!important; } .battle-layout .technique-card-stats { gap:3px; } .battle-layout .technique-hover-effect { display:none; } }
 @media(max-width:420px) { .battle-layout .battle-technique-grid { grid-template-columns:1fr; } }
+
+@keyframes nativa-physical-lunge { 0%,100% { transform:translateX(0) scale(1); } 18% { transform:translateX(2%) scale(1.025); } 48% { transform:translateX(12%) scale(1.07); } 72% { transform:translateX(-2%) scale(.99); } }
+@keyframes nativa-physical-lunge-left { 0%,100% { transform:translateX(0) scale(1); } 18% { transform:translateX(-2%) scale(1.025); } 48% { transform:translateX(-12%) scale(1.07); } 72% { transform:translateX(2%) scale(.99); } }
+@keyframes nativa-special-cast { 0%,100% { transform:translateY(0) scale(1); filter:brightness(1); } 24% { transform:translateY(-3%) scale(1.04); filter:brightness(1.28) saturate(1.2); } 56% { transform:translateY(1%) scale(1.02); filter:brightness(1.1); } }
+@keyframes nativa-support-pulse { 0%,100% { transform:scale(1); filter:brightness(1); } 35%,70% { transform:scale(1.025); filter:brightness(1.28) drop-shadow(0 0 20px #95e4ba99); } }
+@keyframes nativa-slash-flash { 0% { opacity:0; transform:translate(25%,25%) rotate(-25deg) scaleX(.1); } 35% { opacity:.9; } 100% { opacity:0; transform:translate(-20%,-15%) rotate(-25deg) scaleX(1); } }
+@keyframes nativa-spell-ring { 0% { opacity:0; transform:scale(.35) rotate(0); } 35% { opacity:.8; } 100% { opacity:0; transform:scale(1.15) rotate(140deg); } }
+@keyframes nativa-heal-aura { 0%,100% { opacity:0; transform:scale(.6); } 45% { opacity:.75; transform:scale(1.03); } }
+.battle-layout .arena-creature.anim-attack-physical { animation:nativa-physical-lunge .68s cubic-bezier(.2,.72,.22,1); }
+.battle-layout .arena-creature.contestant-right.anim-attack-physical { animation-name:nativa-physical-lunge-left; }
+.battle-layout .arena-creature.anim-attack-special { animation:nativa-special-cast .82s cubic-bezier(.2,.72,.22,1); }
+.battle-layout .arena-creature.anim-support { animation:nativa-support-pulse .95s ease-out; }
+.battle-layout .arena-creature.anim-attack-physical .combatant-art::after { position:absolute; z-index:3; top:17%; left:8%; width:86%; height:62%; border-radius:50%; background:linear-gradient(135deg,transparent 43%,#fff7c7b8 48%,#f5b96b80 50%,transparent 56%); content:""; filter:blur(2px); animation:nativa-slash-flash .54s ease-out both; pointer-events:none; }
+.battle-layout .arena-creature.anim-attack-special .combatant-art::after { position:absolute; z-index:3; inset:17% 13% 15%; border:2px solid #a8e9f2b8; border-radius:50%; box-shadow:0 0 24px #87d9ff88,inset 0 0 18px #87d9ff55; content:""; animation:nativa-spell-ring .72s ease-out both; pointer-events:none; }
+.battle-layout .arena-creature.anim-support .combatant-art::before { position:absolute; z-index:3; inset:9% 17%; border:2px solid #b3edcba0; border-radius:48%; background:radial-gradient(ellipse,#a5efbf30,transparent 68%); box-shadow:0 0 26px #86daa477,inset 0 0 20px #a2edbd44; content:""; animation:nativa-heal-aura .9s ease-out both; pointer-events:none; }
+@media(prefers-reduced-motion:reduce) { .battle-layout .arena-creature.anim-attack-physical,.battle-layout .arena-creature.anim-attack-special,.battle-layout .arena-creature.anim-support { animation:none!important; } .battle-layout .arena-creature.anim-attack-physical .combatant-art::after,.battle-layout .arena-creature.anim-attack-special .combatant-art::after,.battle-layout .arena-creature.anim-support .combatant-art::before { animation:none!important; opacity:.3; } }

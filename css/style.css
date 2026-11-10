@@ -1318,9 +1318,6 @@ body:has(#battle.active) main { max-width:none; padding:16px clamp(12px,2vw,30px
 .battle-commands .technique-card-name { font-size:10px; }
 .battle-commands .technique-card-badges { gap:3px; }
 .battle-commands .technique-badge { padding:1px 3px; border-radius:2px; font-size:7px; background:transparent; }
-.battle-commands .category-badge[data-category="Físico"]:before { content:"⚔ "; }
-.battle-commands .category-badge[data-category="Especial"]:before { content:"✦ "; }
-.battle-commands .category-badge[data-category="Suporte"]:before { content:"✿ "; }
 .battle-commands .source-badge { border-left:1px solid currentColor; padding-left:5px; }
 .battle-commands .technique-lock-status { font-size:7px; }
 .battle-commands .technique-detail-toggle { width:16px; height:16px; min-width:16px; top:3px; right:3px; font-size:9px; }
