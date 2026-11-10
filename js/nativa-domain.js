@@ -48,7 +48,7 @@ export function criarNativa(dados) {
     techniques: [...techniques],
     nivel: 1,
     xp: 0,
-    xpa: 1,
+    xpa: 42,
     estagio: 1,
     essencias: [],
     afinidadesEssencia: [],

@@ -1,36 +1,42 @@
-/**
- * Regra de aprendizagem compartilhada pelos seletores e pela Essência.
- * Parâmetros V2.1 pendentes não bloqueiam aprendizagem; apenas registros
- * arquivados fora do catálogo atual ficam indisponíveis para novas escolhas.
- * Não recebe a ficha da Nativa: Traços nunca autorizam nem bloqueiam
- * aprendizagem. Os requisitos de origem continuam nos filtros chamadores.
- */
+/** Regras de aprendizagem e liberação de golpes do catálogo. */
 export function podeAprenderTecnica(tecnica) {
-  return Boolean(tecnica && tecnica.estadoCatalogo !== "arquivado");
+  return Boolean(tecnica && tecnica.estadoCatalogo !== "arquivado" && tecnica.estadoCatalogo !== "reservado");
 }
 
-/** Em revisão bloqueia o combate, exceto parâmetros liberados para teste controlado. */
+/**
+ * Golpes aprovados são liberados. Registros em revisão continuam bloqueados,
+ * mesmo quando seus valores numéricos estão preenchidos. Arquivados permanecem
+ * utilizáveis apenas pelas fichas que já os possuem.
+ */
 export function podeUsarTecnicaEmCombate(tecnica) {
-  // V1 arquivada ainda pode ser usada em fichas existentes; só a revisão
-  // técnica V2.1 bloqueia o combate.
-  return Boolean(tecnica && (tecnica.estadoCatalogo !== "em-revisao" || tecnica.parametrosTecnicosDisponiveis === true));
+  if (!tecnica) return false;
+  if (tecnica.estadoCatalogo === "aprovado") return true;
+  if (tecnica.estadoCatalogo === "arquivado") return tecnica.compatibilidadeCombate === true;
+  return false;
 }
 
-/** Estado de apresentação do cartão no seletor, compartilhado com os testes do fluxo de UI. */
+/** Estado de apresentação compartilhado com o seletor de golpes. */
 export function obterEstadoSeletorTecnica(tecnica, selecionada, limiteAtingido) {
   const podeAprender = podeAprenderTecnica(tecnica);
-  const pendenteCombate = !podeUsarTecnicaEmCombate(tecnica);
+  const podeUsar = podeUsarTecnicaEmCombate(tecnica);
+  let aviso = "";
+
+  if (!podeAprender) aviso = "Golpe arquivado; não pode ser aprendido novamente.";
+  else if (!podeUsar) {
+    aviso = "Golpe em revisão ou pendente; pode ser aprendido, mas está bloqueado em combate. Parâmetros preenchidos não equivalem à aprovação.";
+  }
+
   return {
     podeAprender,
-    pendenteCombate,
+    podeUsar,
+    pendenteCombate: !podeUsar,
     botaoDesabilitado: !podeAprender || selecionada || limiteAtingido,
-    textoBotao: selecionada ? "Adicionada" : !podeAprender ? "Indisponível" : limiteAtingido ? "Limite de técnicas atingido" : "Adicionar à ficha",
-    aviso: pendenteCombate ? "Pode ser aprendida; parâmetros técnicos pendentes impedem apenas o uso em combate."
-      : tecnica?.parametrosTecnicosDisponiveis ? "Disponível para teste controlado; revisão de equilíbrio em aberto." : ""
+    textoBotao: selecionada ? "Adicionada" : !podeAprender ? "Indisponível" : limiteAtingido ? "Limite de golpes atingido" : "Adicionar à ficha",
+    aviso
   };
 }
 
-/** Função usada pelo seletor; não consulta nem recebe Traços da ficha. */
+/** Traços não autorizam nem bloqueiam a aprendizagem. */
 export function adicionarTecnicaSelecionada(selecionadas, tecnica, limite) {
   if (!(selecionadas instanceof Set) || !podeAprenderTecnica(tecnica) || selecionadas.has(tecnica.id) || selecionadas.size >= limite) return false;
   selecionadas.add(tecnica.id);

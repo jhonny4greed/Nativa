@@ -45,7 +45,7 @@ test("arena organiza HUDs compactos, combatentes no campo e comandos antes do hi
   assert.match(app, /arena-hud-row[\s\S]*?renderizarHudCombatente\(f\[0\],0\)[\s\S]*?renderizarHudCombatente\(f\[1\],1\)/);
   assert.match(app, /arena-stage[\s\S]*?renderizarCombatente\(f\[0\],0\)[\s\S]*?renderizarCombatente\(f\[1\],1\)/);
   assert.match(app, /battle-commands-grid[\s\S]*?renderizarPainelAcao\(f\[0\],0\)[\s\S]*?renderizarPainelAcao\(f\[1\],1\)/);
-  assert.match(app, /battle-commands-grid[\s\S]*?\$\{botaoExecutar\}[\s\S]*?renderizarHistorico\(\)/);
+  assert.match(app, /arena-stage[\s\S]*?<div class="arena-action-trigger">\$\{botaoExecutar\}<\/div>[\s\S]*?<div class="battle-commands">[\s\S]*?renderizarHistorico\(\)/);
   assert.match(css, /grid-template-areas:"top" "hud" "stage" "commands"/);
   assert.match(css, /body:has\(#battle\.active\) main \{ max-width:none;/);
   assert.match(css, /\.arena-stage \{[\s\S]*?height:clamp\(190px,29vh,330px\)/);
@@ -63,16 +63,16 @@ test("campo mantém camadas visíveis e fotos reais com fallback legível", () =
   assert.match(css, /\.arena-creature \.combatant-photo \{[\s\S]*?object-fit:contain;/);
 });
 
-test("cartões mostram classificações reais e detalhes por hover, foco e toque separado da seleção", () => {
-  assert.match(app, /rotuloOrigemTecnica\(t\.origem\)/);
-  assert.match(app, /data-category="\$\{escapar\(t\.categoria\)\}"/);
-  assert.match(app, /data-origin="\$\{escapar\(t\.origem\|\|""\)\}"/);
+test("cartões mostram identidade de grupo, dados de combate e efeito por hover, foco e toque", () => {
+  assert.match(app, /iconeOrigemTecnica\(t\)/);
+  assert.match(app, /data-source="\$\{escapar\(slugVisualTecnica\(t\.origem\)\)\}"/);
+  assert.match(app, /data-category="\$\{escapar\(slugVisualTecnica\(categoria\)\)\}"/);
   assert.match(app, /data-battle-technique=/);
-  assert.match(app, /data-technique-details/);
-  assert.match(app, /data-technique-details[\s\S]*?aria-expanded/);
-  assert.match(css, /\.battle-technique-card:hover \.technique-detail-panel/);
-  assert.match(css, /\.battle-technique-card:focus-within \.technique-detail-panel/);
-  assert.match(css, /\.battle-technique-card\.details-open \.technique-detail-panel/);
+  assert.match(app, /technique-hover-effect/);
+  assert.match(app, /data-battle-technique=[\s\S]*?aria-expanded=/);
+  assert.match(css, /\.battle-technique-card:hover[\s\S]*?\.technique-hover-effect/);
+  assert.match(css, /\.battle-technique-card:focus-within[\s\S]*?\.technique-hover-effect/);
+  assert.match(css, /\.battle-technique-card\.details-open[\s\S]*?\.technique-hover-effect/);
 });
 
 test("acabamento translúcido usa apenas identidade visual do bioma e respeita preferências", () => {

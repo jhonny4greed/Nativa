@@ -18,7 +18,7 @@ export function xpPorVitoria(nivelVencedor, nivelDerrotado) {
 export function inicializarProgressao(nativa) {
   nativa.nivel ??= 1;
   nativa.xp ??= 0;
-  nativa.xpa ??= 1;
+  if (nativa.xpa == null) nativa.xpa = nativa.nivel === 1 ? 42 : 0;
   // Compatibilidade legada: XP total é derivável do nível e do saldo atual.
   nativa.xpTotal ??= xpTotalParaNivel(nativa.nivel) + nativa.xp;
   nativa.estagio ??= 1;

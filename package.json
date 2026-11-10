@@ -32,6 +32,7 @@
     "assets": "node scripts/generate-assets.mjs",
     "assets:optimize": "node scripts/optimize-portraits.mjs",
     "assets:arena": "node scripts/optimize-arena-art.mjs",
+    "catalog:inventory": "node scripts/export-catalog-inventory.mjs",
     "test:online:local": "node tests/online-arena.local.integration.mjs",
     "combat:sync": "node scripts/sync-combat-server.mjs"
   },

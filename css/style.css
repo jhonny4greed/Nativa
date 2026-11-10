@@ -1319,6 +1319,40 @@ body:has(#battle.active) main { max-width:none; padding:16px clamp(12px,2vw,30px
 .battle-commands .technique-card-badges { gap:3px; }
 .battle-commands .technique-badge { padding:1px 3px; border-radius:2px; font-size:7px; background:transparent; }
 .battle-commands .source-badge { border-left:1px solid currentColor; padding-left:5px; }
+.battle-commands .technique-hover-effect {
+  position:absolute;
+  top:calc(100% + 5px);
+  left:0;
+  z-index:30;
+  display:grid;
+  gap:4px;
+  width:min(300px,calc(100vw - 30px));
+  max-height:min(180px,35vh);
+  overflow:auto;
+  padding:9px 11px;
+  border:1px solid rgba(var(--arena-accent-rgb,177,199,135),.75);
+  border-radius:4px 11px;
+  background:linear-gradient(145deg,rgba(13,27,18,.98),rgba(17,34,22,.97));
+  box-shadow:inset 0 1px 0 #ffffff20,0 12px 28px #000a;
+  color:#e8efdc;
+  font-size:10px;
+  line-height:1.4;
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transform:translateY(-4px);
+  transition:opacity .15s ease,visibility .15s ease,transform .15s ease;
+}
+.battle-commands .technique-hover-effect strong { color:#e5d09a; font-size:8px; letter-spacing:1px; text-transform:uppercase; }
+.battle-commands .technique-hover-effect small { color:#f1b7a4; font-size:8px; }
+.battle-commands .battle-technique-card:hover .technique-hover-effect,
+.battle-commands .battle-technique-card:focus-within .technique-hover-effect,
+.battle-commands .battle-technique-card.details-open .technique-hover-effect {
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+  transform:translateY(0);
+}
 .battle-commands .technique-lock-status { font-size:7px; }
 .battle-commands .technique-detail-toggle { width:16px; height:16px; min-width:16px; top:3px; right:3px; font-size:9px; }
 .battle-commands .technique-detail-panel { width:min(300px,calc(100vw - 30px)); }
@@ -1381,7 +1415,7 @@ body:has(#battle.active) main { max-width:none; padding:16px clamp(12px,2vw,30px
   .battlefield .battle-hud,.arena-hud-row .turn-order,.battle-commands .action-panel,.battle-commands .battle-log { backdrop-filter:none; background:rgba(14,27,19,.96); }
 }
 @media(prefers-reduced-motion:reduce) {
-  .arena-creature .combatant-photo,.battle-commands .battle-technique-card,.battle-commands .execute-battle-button { animation:none; transition:none; }
+  .arena-creature .combatant-photo,.battle-commands .battle-technique-card,.battle-commands .execute-battle-button,.battle-commands .technique-hover-effect { animation:none; transition:none; }
 }
 
 /* Fichas visuais de companheiros na mesa */

@@ -20,15 +20,16 @@ test("normalização troca somente o rótulo legado Veloz por Infiltrador", () =
   assert.deepEqual(nativa.techniques, ["arquetipo-veloz-ataque-relampago"]);
 });
 
-test("golpes antigos de Veloz ficam fora das opções atuais, mas seus IDs arquivados seguem resolvíveis", () => {
+test("golpes atuais usam os cinco arquétipos; Veloz e os 12 golpes substituídos seguem arquivados", () => {
   assert.equal(TECNICAS.some(t => t.grupo === "Veloz"), false);
-  assert.equal(TECNICAS.some(t => t.grupo === "Infiltrador"), false);
-  assert.equal(TECNICAS.some(t => t.grupo === "Controlador"), false);
+  assert.equal(TECNICAS.some(t => t.grupo === "Infiltrador"), true);
+  assert.equal(TECNICAS.some(t => t.grupo === "Controlador"), true);
   assert.equal(TECNICAS_ARQUETIPO_LEGADO.length, 4);
   for (const t of TECNICAS_ARQUETIPO_LEGADO) {
     assert.equal(t.grupo, "Veloz");
     assert.equal(t.estadoCatalogo, "arquivado");
-    assert.equal(obterTecnicaPorId(t.id), t);
+    assert.equal(obterTecnicaPorId(t.id).id, t.id);
+    assert.equal(obterTecnicaPorId(t.id).compatibilidadeCombate, true);
   }
   const source = readFileSync(new URL("../js/app.js", import.meta.url), "utf8");
   assert.match(source, /n\.archetype = normalizarArquetipoLegado\(n\.archetype\)/);

@@ -5,7 +5,7 @@ import { ESSENCIAS, verificarEssencia } from "../js/essences.js";
 import { criarRepositorioLocal } from "../js/repository.js";
 
 const fichaBase = () => ({
-  id: "progression-test", name: "Aruã", nivel: 1, xp: 0, xpa: 1, estagio: 1,
+  id: "progression-test", name: "Aruã", nivel: 1, xp: 0, xpa: 42, estagio: 1,
   attrs: { ATQ: 1, POT: 1, DEF: 1, RES: 1, AGI: 1, HP: 1, MP: 1 },
   essencias: [], afinidadesEssencia: [], historicoProgressao: []
 });
@@ -37,7 +37,7 @@ test("simulações até níveis 5, 10, 12 e 17 concedem XPA igual à soma dos n�
     assert.equal(ficha.nivel, level);
     assert.equal(ficha.xp, 0);
     assert.equal(ficha.xpTotal, total);
-    assert.equal(ficha.xpa - 1, total, "XPA ganha por nível, excluindo o XPA inicial");
+    assert.equal(ficha.xpa - 42, total, "XPA ganha por nível, excluindo o orçamento inicial");
     assert.equal(result.niveisConquistados.length, level - 1);
     assert.equal(new Set(result.niveisConquistados.map(x => x.nivelNovo)).size, level - 1);
   }
@@ -115,7 +115,7 @@ test("persistência local conserva XP, XP acumulado, XPA e histórico após salv
   assert.equal(carregada.nivel, 5);
   assert.equal(carregada.xp, 0);
   assert.equal(carregada.xpTotal, 14);
-  assert.equal(carregada.xpa, 13);
+  assert.equal(carregada.xpa, 54);
   assert.equal(carregada.attrs.ATQ, 2);
   assert.equal(carregada.historicoProgressao.length, 5);
 });

@@ -47,14 +47,14 @@ test('efeito desconhecido não recebe custo e auditoria não valida técnica sem
   assert.equal(resultado.estado,'pendente de validação individual');
 });
 
-test('108 técnicas têm fórmula de referência; só os 28 especiais parametrizados liberam teste controlado', () => {
+test('108 técnicas têm fórmula de referência; parâmetros preenchidos não liberam golpes em revisão', () => {
   assert.equal(TECNICAS_LINHAGEM_V2_1.length,108);
   let testaveis=0;
   for (const tecnica of TECNICAS_LINHAGEM_V2_1) {
     assert.equal(tecnica.auditoriaBalanceamento.pgBruto,tecnica.parametrosBalanceamento?.pgBruto ?? 2,tecnica.id);
     assert.equal(tecnica.auditoriaBalanceamento.pgLiquidoFinal,null,tecnica.id);
     if (tecnica.categoria==='Suporte') assert.equal(tecnica.auditoriaBalanceamento.danoAutomatico,false);
-    assert.equal(podeUsarTecnicaEmCombate(tecnica),tecnica.parametrosTecnicosDisponiveis===true,tecnica.id);
+    assert.equal(podeUsarTecnicaEmCombate(tecnica),false,tecnica.id);
     if(tecnica.parametrosTecnicosDisponiveis)testaveis+=1;
   }
   assert.equal(testaveis,28);

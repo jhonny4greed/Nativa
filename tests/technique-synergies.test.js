@@ -73,7 +73,8 @@ test("IDs V1 arquivados continuam resolvíveis para fichas antigas sem integrar 
   assert.equal(TECNICAS_V1_ARQUIVO.length, 105);
   for (const t of TECNICAS_V1_ARQUIVO) {
     assert.equal(t.estadoCatalogo, "arquivado");
-    assert.equal(obterTecnicaPorId(t.id), t);
+    assert.equal(obterTecnicaPorId(t.id).id, t.id);
+    assert.equal(obterTecnicaPorId(t.id).compatibilidadeCombate, true);
   }
   assert.equal(TECNICAS.some(t => t.id === "linhagem-felinos-bote-predatorio"), false);
 });
@@ -85,7 +86,7 @@ test("golpes V1 mantêm sinergia dependente dos Traços e V2.1 pendente não pod
   const attacker = criarCombatente({ id: "a", name: "A", attrs: { ATQ: 5, POT: 5, DEF: 2, RES: 2, AGI: 5, HP: 5, MP: 5 }, techniques: [pending.id] });
   const target = criarCombatente({ id: "b", name: "B", attrs: { ATQ: 1, POT: 1, DEF: 1, RES: 1, AGI: 1, HP: 5, MP: 5 }, techniques: [] });
   const result = resolverTurnoCombate({ fighters: [attacker, target], choices: [{ tipo: "attack", tecnicaId: pending.id }, null], random: () => 0.9 });
-  assert.match(result.error.message, /parâmetros técnicos validados para uso em combate/);
+  assert.match(result.error.message, /não foi liberado para combate/);
   assert.equal(result.fighters[0].mp, attacker.mp);
 });
 
