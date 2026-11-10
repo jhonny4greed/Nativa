@@ -10,19 +10,19 @@ import { criarRepositorioLocal } from "../js/repository.js";
 
 const jararaca = TECNICAS.find(item => item.nome === "Bote de Jararaca");
 
-test("golpe V2.2.1 em revisão pode ser aprendido sem Traços, mas não pode entrar em combate", () => {
+test("golpes V2.2.1 aprovados podem ser aprendidos e usados sem exigir Traços", () => {
   const ficha = criarNativa({ id: "teste", name: "Serpente", lineage: "Serpentes", archetype: "Predador", attrs: {}, techniques: [jararaca.id], tracos: [] });
   assert.equal(podeAprenderTecnica(jararaca), true);
-  assert.equal(podeUsarTecnicaEmCombate(jararaca), false);
+  assert.equal(podeUsarTecnicaEmCombate(jararaca), true);
   assert.deepEqual(ficha.techniques, [jararaca.id]);
   assert.equal(nativaPossuiTraco(ficha, "fisiologia-1"), false);
   const state = obterEstadoSeletorTecnica(jararaca, false, false);
   assert.equal(state.botaoDesabilitado, false);
-  assert.equal(state.pendenteCombate, true);
-  assert.match(state.aviso, /bloqueado em combate/);
+  assert.equal(state.pendenteCombate, false);
+  assert.equal(state.aviso, "");
 });
 
-test("seleção respeita limite, não duplica golpe e não habilita combate", () => {
+test("seleção respeita limite, não duplica golpe e mantém liberação de combate", () => {
   const escolhidos = new Set();
   for (const item of TECNICAS.filter(move => move.grupo === "Felinos")) {
     assert.equal(adicionarTecnicaSelecionada(escolhidos, item, 4), true);
@@ -30,7 +30,7 @@ test("seleção respeita limite, não duplica golpe e não habilita combate", ()
   assert.equal(adicionarTecnicaSelecionada(escolhidos, jararaca, 4), false);
   assert.equal(adicionarTecnicaSelecionada(escolhidos, jararaca, 5), true);
   assert.equal(adicionarTecnicaSelecionada(escolhidos, jararaca, 5), false);
-  assert.equal(podeUsarTecnicaEmCombate(jararaca), false);
+  assert.equal(podeUsarTecnicaEmCombate(jararaca), true);
 });
 
 test("ficha guarda IDs V2.2.1 e os recupera após persistência local", async () => {
@@ -64,7 +64,7 @@ test("golpes arquivados não entram no catálogo de aprendizagem, mas fichas ant
   assert.ok(result.fighters[1].hp < target.hp);
 });
 
-test("interface consulta o mesmo gate em criação e Essências e informa bloqueio de combate", () => {
+test("interface consulta o mesmo gate em criação e Essências sem aviso de revisão", () => {
   const app = readFileSync(new URL("../js/app.js", import.meta.url), "utf8");
   assert.match(app, /const estado=obterEstadoSeletorTecnica\(t,selected,locked\)/);
   assert.match(app, /adicionarTecnicaSelecionada\(tecnicasSelecionadas,tecnica,LIMITE_TECNICAS\)/);
