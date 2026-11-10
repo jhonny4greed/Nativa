@@ -29,7 +29,7 @@ O arquivo integral anterior de Linhagem tinha 105 golpes; a implementação V2.1
 
 O catálogo contém 41 Traços. Oito sinergias têm correspondência exata de golpe, grupo e ID de Traço; as dez associações históricas sem correspondência exata não foram ativadas. Traços sem associação confirmada continuam opcionais.
 
-Os quatro estados de fonte são preservados como vieram. Os 178 registros foram liberados para combate na revisão de lançamento V2.2.1. Todos possuem custo de MP e recarga numéricos; golpes ofensivos possuem precisão e dano numéricos, enquanto Suporte usa dano nulo por definição. O estado interno dos 178 registros é `aprovado`. O marcador legado `parametrosTecnicosDisponiveis` permanece fiel à fonte anterior: 108 registros estão `true` e 70 permanecem `false` para auditoria técnica detalhada; ele não bloqueia mais a arena. Portanto, aprovação aqui significa desbloqueio operacional do catálogo, não certificação final de balanceamento. Golpes arquivados continuam utilizáveis apenas por fichas antigas que já os possuíam.
+Os quatro estados de fonte são preservados como vieram. Todos os registros ficam com estado interno `em-revisao` até haver aprovação explícita; parâmetros existentes não liberam combate. A função de combate aceita apenas registros aprovados e golpes arquivados já aprendidos, para compatibilidade com fichas antigas.
 
 As colunas P/R/M, PG bruto e PG líquido reproduzem os valores da fonte. Suporte não recebe dano automático; PG líquido de suporte permanece como declarado na fonte (nulo quando não se aplica). Valores não fornecidos permanecem pendentes. PG é dado interno e não aparece na interface do jogador.
 
