@@ -25,6 +25,7 @@ function createServer({
 } = {}) {
   let currentNow = nowValue;
   const calls = [];
+  const storedImages = new Map();
   const envValues = {
     SUPABASE_URL: "http://127.0.0.1:54321",
     SUPABASE_ANON_KEY: "public-anon-test-key",
@@ -45,9 +46,11 @@ function createServer({
     if (url.endsWith("/rest/v1/rpc/reserve_image_generation")) return jsonResponse(true);
     if (url.includes("/storage/v1/object/list/")) return jsonResponse([]);
     if (url.includes("/storage/v1/object/")) {
-      if (init.method === "HEAD") return new Response(null, { status: 200 });
-      if (init.method === "DELETE" || init.method === "POST") return new Response(null, { status: 200 });
-      return new Response(PNG_BYTES, { status: 200, headers: { "content-type": "image/png" } });
+      if (init.method === "HEAD") return new Response(null, { status: storedImages.has(url) ? 200 : 404 });
+      if (init.method === "DELETE") { storedImages.delete(url); return new Response(null, { status: 200 }); }
+      if (init.method === "POST") { storedImages.set(url, new Uint8Array(init.body)); return new Response(null, { status: 200 }); }
+      const bytes = storedImages.get(url);
+      return bytes ? new Response(bytes, { status: 200, headers: { "content-type": "image/png" } }) : new Response(null, { status: 404 });
     }
     if (url === NVIDIA_URL) return jsonResponse(nvidiaResponse, nvidiaStatus);
     if (fetchOverride) return fetchOverride({ url, init, calls });
