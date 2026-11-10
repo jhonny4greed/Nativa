@@ -3041,7 +3041,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado",
     "pg": 5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 2,
@@ -3069,7 +3069,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado",
     "pg": 4.5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 3,
@@ -3097,7 +3097,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado",
     "pg": 3.5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 2,
@@ -3125,7 +3125,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado",
     "pg": 4.5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 1,
@@ -3153,7 +3153,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado",
     "pg": 4,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 2,
@@ -3181,7 +3181,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado",
     "pg": 4.5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 1,
@@ -3209,7 +3209,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado",
     "pg": 5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 2,
@@ -3237,7 +3237,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado",
     "pg": 4.5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 1,
@@ -3265,7 +3265,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado",
     "pg": 3.5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 2,
@@ -3293,7 +3293,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado",
     "pg": 3.5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 2,
@@ -3321,7 +3321,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado",
     "pg": 5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 2,
@@ -3349,7 +3349,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado",
     "pg": 3.5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 2,
@@ -3377,7 +3377,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado",
     "pg": 7,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 2,
       "R": 2,
@@ -3405,7 +3405,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado",
     "pg": 5.5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 3,
@@ -3433,7 +3433,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado",
     "pg": 3,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 1,
@@ -3461,7 +3461,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado",
     "pg": 3.5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 2,
@@ -3489,7 +3489,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Novo — proposta V2.2",
     "pg": 5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 2,
@@ -3517,7 +3517,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Novo — proposta V2.2",
     "pg": 5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 1,
@@ -3545,7 +3545,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Novo — proposta V2.2",
     "pg": 4,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 2,
@@ -3573,7 +3573,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Novo — proposta V2.2",
     "pg": 7,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 2,
       "R": 2,
@@ -3601,7 +3601,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Novo — proposta V2.2",
     "pg": 5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 2,
@@ -3629,7 +3629,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Novo — proposta V2.2",
     "pg": 6,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 3,
@@ -3657,7 +3657,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Novo — proposta V2.2",
     "pg": 3.5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 2,
@@ -3685,7 +3685,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Novo — proposta V2.2",
     "pg": 7,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 2,
       "R": 2,
@@ -3713,7 +3713,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Novo — proposta V2.2",
     "pg": 4,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 2,
@@ -3741,7 +3741,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Novo — proposta V2.2",
     "pg": 3.5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 2,
@@ -3769,7 +3769,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Novo — proposta V2.2",
     "pg": 4.5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 1,
@@ -3797,7 +3797,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Novo — proposta V2.2",
     "pg": 5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 4,
@@ -3825,7 +3825,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Novo — proposta V2.2",
     "pg": 6.5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 2,
       "R": 2,
@@ -3853,7 +3853,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Novo — proposta V2.2",
     "pg": 3.5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 2,
@@ -3881,7 +3881,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Novo — proposta V2.2",
     "pg": 5.5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 3,
@@ -3909,7 +3909,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Novo — proposta V2.2",
     "pg": 3.5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 2,
@@ -3937,7 +3937,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Novo — proposta V2.2",
     "pg": 5.5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 2,
@@ -3965,7 +3965,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Novo — proposta V2.2",
     "pg": 8,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 2,
       "R": 3,
@@ -3993,7 +3993,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Novo — proposta V2.2",
     "pg": 5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 4,
@@ -4021,7 +4021,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Novo — proposta V2.2",
     "pg": 3.5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 2,
@@ -4049,7 +4049,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Novo — proposta V2.2",
     "pg": 6,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 3,
@@ -4077,7 +4077,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Novo — proposta V2.2",
     "pg": 6,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 3,
@@ -4105,7 +4105,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Novo — proposta V2.2",
     "pg": 4,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 2,
@@ -4133,7 +4133,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Novo — proposta V2.2",
     "pg": 7,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 2,
       "R": 2,
@@ -4161,7 +4161,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado e revisado V2.2",
     "pg": 2,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 0,
@@ -4189,7 +4189,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado e revisado V2.2",
     "pg": 5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 2,
@@ -4217,7 +4217,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado e revisado V2.2",
     "pg": 5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 1,
@@ -4245,7 +4245,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado e revisado V2.2",
     "pg": 7.5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 2,
       "R": 3,
@@ -4273,7 +4273,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado e revisado V2.2",
     "pg": 3.5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 2,
@@ -4301,7 +4301,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado e revisado V2.2",
     "pg": 7,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 2,
       "R": 2,
@@ -4329,7 +4329,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado e revisado V2.2",
     "pg": 2,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 0,
@@ -4357,7 +4357,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado e revisado V2.2",
     "pg": 5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 2,
@@ -4385,7 +4385,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado e revisado V2.2",
     "pg": 5.5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 2,
@@ -4413,7 +4413,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado e revisado V2.2",
     "pg": 6,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 3,
@@ -4441,7 +4441,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado e revisado V2.2",
     "pg": 7,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 2,
       "R": 2,
@@ -4469,7 +4469,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado e revisado V2.2",
     "pg": 7,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 2,
       "R": 2,
@@ -4497,7 +4497,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado e revisado V2.2",
     "pg": 2,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 0,
@@ -4525,7 +4525,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado e revisado V2.2",
     "pg": 4.5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 1,
@@ -4553,7 +4553,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado e revisado V2.2",
     "pg": 4,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 2,
@@ -4581,7 +4581,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado e revisado V2.2",
     "pg": 5.5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 2,
@@ -4609,7 +4609,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado e revisado V2.2",
     "pg": 6,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 3,
@@ -4637,7 +4637,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado e revisado V2.2",
     "pg": 7,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 2,
       "R": 2,
@@ -4665,7 +4665,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado e revisado V2.2",
     "pg": 2,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 0,
@@ -4693,7 +4693,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado e revisado V2.2",
     "pg": 4,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 3,
@@ -4721,7 +4721,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado e revisado V2.2",
     "pg": 4.5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 1,
@@ -4749,7 +4749,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado e revisado V2.2",
     "pg": 3.5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 2,
@@ -4777,7 +4777,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado e revisado V2.2",
     "pg": 6,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 3,
@@ -4805,7 +4805,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado e revisado V2.2",
     "pg": 7,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 2,
       "R": 2,
@@ -4833,7 +4833,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado e revisado V2.2",
     "pg": 2,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 0,
@@ -4861,7 +4861,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado e revisado V2.2",
     "pg": 4.5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 1,
@@ -4889,7 +4889,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado e revisado V2.2",
     "pg": 6.5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 2,
       "R": 1,
@@ -4917,7 +4917,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado e revisado V2.2",
     "pg": 4.5,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 0,
       "R": 3,
@@ -4945,7 +4945,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado e revisado V2.2",
     "pg": 6,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 1,
       "R": 3,
@@ -4973,7 +4973,7 @@ export const TECNICAS_V2_2_1 = Object.freeze([
     "status": "Recuperado e revisado V2.2",
     "pg": 7,
     "estadoCatalogo": "aprovado",
-    "parametrosTecnicosDisponiveis": true,
+    "parametrosTecnicosDisponiveis": false,
     "parametrosBalanceamento": {
       "P": 2,
       "R": 2,
