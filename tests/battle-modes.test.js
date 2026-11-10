@@ -64,12 +64,12 @@ test("escolha da CPU passa pelo resolvedor normal e mantém o encerramento por P
   assert.ok(resultado.events.some(event => event.type === "defeat"));
 });
 
-test("CPU usa golpe legado já aprendido e ignora golpe V2.2.1 ainda em revisão",()=>{
+test("CPU prioriza golpes V2.2.1 aprovados e mantém golpes legados aprendidos disponíveis",()=>{
   const aviso=TECNICAS_ARQUIVADAS.find(t=>t.id==='arquetipo-veloz-ataque-relampago');
   const peconha=TECNICAS.find(t=>t.nome==='Peçonha Concentrada');
   const cpu=combatente([aviso,peconha],{mp:8,maxMP:8});
   const alvo=combatente([]);
-  assert.equal(escolherAcaoCpu(cpu,()=>0,alvo).tecnicaId,aviso.id);
+  assert.equal(escolherAcaoCpu(cpu,()=>0,alvo).tecnicaId,peconha.id);
   alvo.efeitosV21=[{tipo:'envenenamento',danoPorTurno:1,turnosRestantes:2,intensificado:false}];
-  assert.equal(escolherAcaoCpu(cpu,()=>0.99,alvo).tecnicaId,aviso.id);
+  assert.equal(escolherAcaoCpu(cpu,()=>0.99,alvo).tecnicaId,peconha.id);
 });
