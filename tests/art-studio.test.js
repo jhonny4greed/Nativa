@@ -30,18 +30,27 @@ function createServer({
     SUPABASE_ANON_KEY: "public-anon-test-key",
     NVIDIA_API_KEY: API_KEY,
     IMAGE_TASK_SIGNING_KEY: SIGNING_KEY,
+    SUPABASE_SERVICE_ROLE_KEY: "service-role-test-key",
     IMAGE_GENERATION_ALLOWED_USER_IDS: allowedUsers.join(",")
   };
   const fetchImpl = async (input, init = {}) => {
     const url = String(input);
     calls.push({ url, init });
-    if (fetchOverride) return fetchOverride({ url, init, calls });
+    if (fetchOverride && (url.endsWith("/auth/v1/user") || url === NVIDIA_URL)) return fetchOverride({ url, init, calls });
     if (url.endsWith("/auth/v1/user")) {
       const bearer = new Headers(init.headers).get("authorization")?.replace(/^Bearer\s+/i, "");
       const id = userByBearer[bearer];
       return id ? jsonResponse({ id }) : jsonResponse({ message: "unauthorized" }, 401);
     }
+    if (url.endsWith("/rest/v1/rpc/reserve_image_generation")) return jsonResponse(true);
+    if (url.includes("/storage/v1/object/list/")) return jsonResponse([]);
+    if (url.includes("/storage/v1/object/")) {
+      if (init.method === "HEAD") return new Response(null, { status: 200 });
+      if (init.method === "DELETE" || init.method === "POST") return new Response(null, { status: 200 });
+      return new Response(PNG_BYTES, { status: 200, headers: { "content-type": "image/png" } });
+    }
     if (url === NVIDIA_URL) return jsonResponse(nvidiaResponse, nvidiaStatus);
+    if (fetchOverride) return fetchOverride({ url, init, calls });
     throw new Error(`Unexpected request: ${url}`);
   };
   const handler = createGenerateArtHandler({ env: name => envValues[name], fetchImpl, now: () => currentNow });
