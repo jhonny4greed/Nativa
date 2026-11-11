@@ -164,3 +164,100 @@ html body.dashboard:has(#battle.active) main { max-width:1700px; padding:22px 26
 .battle-layout .arena-creature.anim-attack-special .combatant-art::after { position:absolute; z-index:3; inset:17% 13% 15%; border:2px solid #a8e9f2b8; border-radius:50%; box-shadow:0 0 24px #87d9ff88,inset 0 0 18px #87d9ff55; content:""; animation:nativa-spell-ring .72s ease-out both; pointer-events:none; }
 .battle-layout .arena-creature.anim-support .combatant-art::before { position:absolute; z-index:3; inset:9% 17%; border:2px solid #b3edcba0; border-radius:48%; background:radial-gradient(ellipse,#a5efbf30,transparent 68%); box-shadow:0 0 26px #86daa477,inset 0 0 20px #a2edbd44; content:""; animation:nativa-heal-aura .9s ease-out both; pointer-events:none; }
 @media(prefers-reduced-motion:reduce) { .battle-layout .arena-creature.anim-attack-physical,.battle-layout .arena-creature.anim-attack-special,.battle-layout .arena-creature.anim-support { animation:none!important; } .battle-layout .arena-creature.anim-attack-physical .combatant-art::after,.battle-layout .arena-creature.anim-attack-special .combatant-art::after,.battle-layout .arena-creature.anim-support .combatant-art::before { animation:none!important; opacity:.3; } }
+
+/* Keep combat HUD anchored to the illustrated field, never to the full page. */
+.dashboard .battlefield.battle-layout { grid-template-areas:"top" "stage" "action" "forfeit" "commands"; gap:0; overflow:hidden; }
+.battle-layout .arena-stage { position:relative; height:clamp(400px,58vh,650px); min-height:400px; }
+.battle-layout .arena-hud-row { position:absolute; inset:0; display:block; grid-area:auto; z-index:5; pointer-events:none; }
+.battle-layout .battle-hud { z-index:2; width:clamp(250px,25%,360px); padding:12px 15px; pointer-events:auto; }
+.battle-layout .hud-player { top:16px; bottom:auto; left:18px; }
+.battle-layout .hud-opponent { top:16px; right:18px; }
+.battle-layout .arena-hud-row .turn-order { top:16px; left:50%; max-width:min(260px,28%); transform:translateX(-50%); text-align:center; justify-items:center; }
+.battle-layout .arena-hud-row .turn-order span { max-width:100%; }
+.battle-layout .arena-fighter-one { left:1%; bottom:2%; width:48%; height:70%; }
+.battle-layout .arena-fighter-two { top:23%; right:3%; width:43%; height:63%; }
+.battle-layout .arena-action-trigger { position:relative; z-index:1; padding:13px 18px 3px; }
+.battle-layout .arena-action-trigger .execute-battle-button { min-height:52px; border-radius:9px 20px; font-size:13px; }
+.battle-layout .battle-commands { padding:18px clamp(14px,3vw,42px); }
+.battle-layout .action-panel { padding:17px; }
+.battle-layout .action-panel-heading { margin-bottom:13px; padding-bottom:10px; }
+.battle-layout .action-panel-heading h3 { font-size:18px; }
+.battle-layout .action-panel-heading .eyebrow { font-size:9px; }
+.battle-layout .action-selected { font-size:11px; }
+.battle-layout .special-actions { gap:10px; margin-bottom:13px; }
+.dashboard .battle-layout .special-action { min-height:56px; padding:10px 13px; border-radius:9px 16px; }
+.battle-layout .special-action strong { font-size:12px; }
+.battle-layout .special-action small { font-size:10px; }
+.battle-layout .battle-moves { padding:15px; }
+.battle-layout .battle-moves-heading { padding-bottom:13px; }
+.battle-layout .battle-moves-heading strong { font-size:15px; }
+.battle-layout .battle-moves-heading small { font-size:10px; }
+.battle-layout .battle-technique-grid { grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr)); gap:10px; }
+.battle-layout .battle-technique-card { min-height:88px; border-radius:10px 18px; }
+.dashboard .battle-layout .battle-technique { min-height:88px; padding:14px!important; gap:9px; }
+.battle-layout .technique-card-name { font-size:14px; }
+.battle-layout .technique-cost,.battle-layout .technique-badge { font-size:10px; }
+.battle-layout .technique-card-stats>span { font-size:10px; }
+.battle-layout .technique-card-stats b { font-size:13px; }
+.battle-layout .battle-log-list { max-height:240px; }
+
+/* Portrait phones use a natural scroll layout, with controls outside the scene. */
+@media(max-width:760px) {
+  html body.dashboard:has(#battle.active) main { padding:12px 8px 30px; }
+  .dashboard .battlefield.battle-layout { border-radius:14px; }
+  .battle-layout .battlefield-topline { padding:9px 11px; }
+  .battle-layout .battlefield-topline .arena-location { max-width:58%; font-size:9px; }
+  .battle-layout .battlefield-topline .battle-state { max-width:42%; font-size:8px; }
+  .battle-layout .arena-stage { height:clamp(310px,46svh,440px); min-height:310px; }
+  .battle-layout .battle-hud { width:calc(50% - 15px); padding:8px; gap:5px; border-left-width:3px; border-radius:4px 12px; }
+  .battle-layout .hud-player { top:9px; left:8px; }
+  .battle-layout .hud-opponent { top:9px; right:8px; }
+  .battle-layout .combatant-info { padding-right:0; }
+  .battle-layout .combatant-info h3 { font-size:14px; }
+  .battle-layout .combatant-info .identity { font-size:8px; }
+  .battle-layout .combatant-player { display:none; }
+  .battle-layout .combatant-vitals { grid-template-columns:1fr 1fr; gap:4px 6px; }
+  .battle-layout .bar-label,.battle-layout .bar-label b { font-size:8px; }
+  .battle-layout .bar { height:6px; }
+  .battle-layout .condition-state { font-size:7px; }
+  .battle-layout .arena-hud-row .turn-order { top:91px; max-width:47%; padding:5px 8px; border-radius:999px; text-align:center; justify-items:center; }
+  .battle-layout .turn-order strong { font-size:7px; }
+  .battle-layout .turn-order span { font-size:8px; }
+  .battle-layout .turn-order small { display:none; }
+  .battle-layout .arena-fighter-one { left:-1%; bottom:1%; width:58%; height:62%; }
+  .battle-layout .arena-fighter-two { top:28%; right:-1%; width:53%; height:57%; }
+  .battle-layout .arena-action-trigger { padding:11px 12px 2px; }
+  .battle-layout .arena-action-trigger .execute-battle-button { width:100%; min-height:48px; font-size:12px; }
+  .battle-layout .battle-commands { padding:12px 9px; }
+  .battle-layout .action-panel { padding:12px 10px; }
+  .battle-layout .action-panel-heading h3 { font-size:15px; }
+  .battle-layout .action-selected { font-size:9px; }
+  .dashboard .battle-layout .special-action { min-height:48px; padding:8px; }
+  .battle-layout .special-action strong { font-size:10px; }
+  .battle-layout .special-action small { display:block; font-size:8px; }
+  .battle-layout .battle-moves { padding:9px; }
+  .battle-layout .battle-technique-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; }
+  .battle-layout .battle-technique-card,.dashboard .battle-layout .battle-technique { min-height:82px; }
+  .dashboard .battle-layout .battle-technique { padding:9px!important; }
+  .battle-layout .technique-card-name { font-size:12px; }
+  .battle-layout .technique-cost,.battle-layout .technique-badge { font-size:8px; }
+  .battle-layout .battle-log-list { max-height:200px; }
+}
+@media(max-width:390px) {
+  .battle-layout .battle-hud { width:calc(50% - 11px); padding:6px; }
+  .battle-layout .combatant-info h3 { font-size:12px; }
+  .battle-layout .combatant-info .identity { font-size:7px; }
+  .battle-layout .arena-stage { height:310px; }
+  .battle-layout .battle-technique-grid { grid-template-columns:1fr; }
+  .battle-layout .battle-technique-card,.dashboard .battle-layout .battle-technique { min-height:64px; }
+  .battle-layout .battle-technique { flex-direction:row!important; align-items:center!important; justify-content:space-between!important; }
+}
+/* Full-screen remains scrollable; nothing sticks over the fight controls. */
+#battle:fullscreen,#battle.arena-expanded { overflow-y:auto; }
+#battle:fullscreen .battlefield,#battle.arena-expanded .battlefield { grid-template-areas:"top" "stage" "action" "forfeit" "commands"; min-height:0; overflow:visible; }
+#battle:fullscreen .arena-action-trigger,#battle.arena-expanded .arena-action-trigger { position:relative; bottom:auto; }
+html.arena-playing-fullscreen body { overflow:auto; }
+@media(max-width:760px) {
+  #battle:fullscreen .arena-stage,#battle.arena-expanded .arena-stage { height:clamp(310px,46svh,440px); min-height:310px; }
+  #battle:fullscreen .battle-commands-grid,#battle.arena-expanded .battle-commands-grid { grid-template-columns:1fr; }
+}

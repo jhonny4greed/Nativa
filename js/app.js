@@ -1534,18 +1534,17 @@ function renderizarArena(){
   $("#battle-arena").innerHTML=`
     <section class="battlefield battle-layout" data-mode="${escapar(batalha.modo)}" data-biome="${escapar(batalha.bioma||"")}" aria-label="Arena: ${escapar(batalha.bioma||"Bioma não definido")}">
       <header class="battlefield-topline"><span class="arena-location">${escapar(batalha.bioma||"Arena")} · ${escapar(batalha.horario||"")}</span><span class="battle-state">${batalha.encerrada?"Combate encerrado":`Turno ${batalha.turno} · ${batalha.processando?"Resolvendo ações":"Combate em andamento"}`}</span></header>
-      <div class="arena-hud-row">
-        ${renderizarHudCombatente(f[0],0)}
-        <div class="turn-order ${batalha.ordem.length?"initiative-revealed":""}">
-          <strong>${batalha.ordem.length?"Iniciativa":"Estado do turno"}</strong>
-          <span>${escapar(order)}</span>
-          <small>${batalha.ordem.length?"1D10 + AGI":"Aguardando as escolhas"}</small>
-        </div>
-        ${renderizarHudCombatente(f[1],1)}
-      </div>
-
       <div class="arena-stage" aria-label="Campo de batalha">
         <div class="scene-backdrop" aria-hidden="true"><span class="scene-canopy"></span><span class="scene-ridge"></span><span class="scene-water"></span><span class="scene-ground"></span><span class="scene-rocks"></span><span class="scene-plants"></span><span class="scene-light"></span></div>
+        <div class="arena-hud-row">
+          ${renderizarHudCombatente(f[0],0)}
+          <div class="turn-order ${batalha.ordem.length?"initiative-revealed":""}">
+            <strong>${batalha.ordem.length?"Iniciativa":"Estado do turno"}</strong>
+            <span>${escapar(order)}</span>
+            <small>${batalha.ordem.length?"1D10 + AGI":"Aguardando as escolhas"}</small>
+          </div>
+          ${renderizarHudCombatente(f[1],1)}
+        </div>
         <div class="arena-fighter arena-fighter-one">${renderizarCombatente(f[0],0)}</div>
         <div class="arena-stage-mark" aria-hidden="true"><span></span><b>VS</b><span></span></div>
         <div class="arena-fighter arena-fighter-two">${renderizarCombatente(f[1],1)}</div>
