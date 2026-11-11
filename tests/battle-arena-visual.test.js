@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { BIOMAS } from "../js/data.js";
 
 const app = readFileSync(new URL("../js/app.js", import.meta.url), "utf8");
+const html = readFileSync(new URL("../app.html", import.meta.url), "utf8");
 const css = readFileSync(new URL("../css/style.css", import.meta.url), "utf8");
 const fourHabitats = [
   "Floresta e Mata",
@@ -40,11 +41,13 @@ test("HUD conserva imagens reais, fallback, barras e controles das ações", () 
   assert.match(app, /renderizarHistorico\(\)/);
 });
 
-test("arena oferece o sorteio de uma Nativa adversária como primeiro modo de CPU", () => {
+test("arena oferece apenas PvP online e CPU e sorteia uma adversária diferente da ficha escolhida", () => {
+  assert.match(html, /data-arena-lane="local"[^>]*>Contra CPU/);
+  assert.match(html, /data-arena-lane="online"[^>]*>.*?PvP online/);
+  assert.doesNotMatch(html, /Multiplayer local/);
   assert.match(app, /value="random">🎲 Enfrentar Nativa aleatória · CPU/);
   assert.match(app, /const candidatos=nativas\.filter\(n=>n\.id!==a\?\.id\)/);
-  assert.match(app, /adversarioAleatorio\|\|\$\("#battle-mode"\)\?\.value===MODOS_BATALHA\.CPU/);
-  assert.match(app, /if\(\$\("#fighter-b"\)\.value==="random"\)\$\("#battle-mode"\)\.value=MODOS_BATALHA\.CPU/);
+  assert.match(app, /const modo=MODOS_BATALHA\.CPU/);
 });
 
 test("arena organiza HUDs compactos, combatentes no campo e comandos antes do histórico", () => {

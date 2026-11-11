@@ -138,12 +138,12 @@
           <div id="lineage-profile" class="lineage-profile empty"><span class="eyebrow">GUIA BIOLÓGICO</span><p>Selecione uma linhagem para consultar exemplos, biologia e especialidades.</p></div>
         </section>
 
-        <section class="form-panel"><div class="panel-heading"><span class="step-number">02</span><div><h3>Atributos</h3><p>Distribua os 42 XPA iniciais. Todos começam em 1.</p></div></div>
+        <section class="form-panel"><div class="panel-heading"><span class="step-number">02</span><div><h3>Atributos</h3><p>Distribua de 37 a 42 XPA iniciais entre os atributos. Todos começam em 1; até 5 pontos podem ficar guardados.</p></div></div>
           <div id="attrs" class="attrs"></div><div id="budget" class="budget-line">42 XPA restantes</div>
         </section>
 
-        <section id="technique-picker" class="form-panel"><div class="panel-heading"><span class="step-number">03</span><div><h3>Técnicas iniciais</h3><p>Escolha até seis técnicas entre as opções liberadas pelas características.</p></div></div>
-          <div id="technique-groups"></div><div class="selected-area"><div class="section-heading compact"><h3>Minha ficha de técnicas</h3><span id="technique-count">0 de 6 selecionadas</span></div><div id="selected-techniques"></div></div>
+        <section id="technique-picker" class="form-panel"><div class="panel-heading"><span class="step-number">03</span><div><h3>Golpes iniciais</h3><p>Escolha até quatro: no máximo um de linhagem, bioma, afinidade e arquétipo.</p></div></div>
+          <div id="technique-groups"></div><div class="selected-area"><div class="section-heading compact"><h3>Minha ficha de golpes</h3><span id="technique-count">0 de 4 golpes · um por grupo</span></div><div id="selected-techniques"></div></div>
         </section>
         <section class="form-panel"><div class="panel-heading"><span class="step-number">04</span><div><h3>Vocalização e sons</h3><p>Busque gravações naturais e efeitos que combinem com a criatura. O catálogo fornece efeitos de áudio, não síntese de voz.</p></div></div><div class="grid"><label>Descreva o som<input id="native-sound-query" maxlength="240" placeholder="Ex.: vocalização rouca de lobo ao entardecer"></label><button id="native-sound-search" class="secondary" type="button">Recomendar efeitos</button><label>Efeito escolhido<select id="native-sound-choice"><option value="">Sem efeito</option></select></label><audio id="native-sound-preview" controls preload="none" hidden></audio></div><div id="native-sound-status" role="status"></div></section>
         <label class="checkbox-row"><input id="generate-art-on-create" type="checkbox"> Gerar também uma ilustração desta Nativa após salvar (usa créditos de imagem)</label>
@@ -188,7 +188,7 @@
 
     <section id="battle" class="view">
       <div class="section-heading"><div><span class="eyebrow">ESTRATÉGIA E VÍNCULO</span><h2>Arena de batalha</h2><p>Escolha seu companheiro e encontre seu próximo desafio.</p></div><button id="arena-fullscreen" class="secondary" aria-pressed="false" type="button">⛶ Tela cheia</button></div>
-      <nav class="arena-mode-tabs" aria-label="Tipo de arena"><button type="button" data-arena-lane="local" aria-pressed="true">Local e CPU</button><button type="button" data-arena-lane="online" aria-pressed="false"><span data-icon="globe"></span> Multiplayer online</button></nav>
+      <nav class="arena-mode-tabs" aria-label="Tipo de arena"><button type="button" data-arena-lane="local" aria-pressed="true">Contra CPU</button><button type="button" data-arena-lane="online" aria-pressed="false"><span data-icon="globe"></span> PvP online</button></nav>
       <section id="online-arena-lobby" class="form-panel" hidden aria-label="Lobby da arena online">
         <div class="section-heading compact"><div><span class="eyebrow">ENCONTRE SEU ADVERSÁRIO</span><h3>Duelos online</h3><p>Uma ação por turno, com resolução no servidor. As fichas originais são preservadas.</p></div><button id="online-connect" type="button">Ficar disponível online</button></div>
         <p id="online-arena-status" role="status" aria-live="polite">Escolha uma ficha sincronizada para começar.</p>
@@ -198,17 +198,17 @@
         <div id="online-arena-incoming" class="online-incoming" aria-live="polite"></div>
         <section id="online-match-controls" class="online-match-controls" hidden><h4 id="online-match-title"></h4><p id="online-match-message" role="status" aria-live="polite"></p><label>Código do convite<input id="online-private-code" readonly></label><div class="form-actions"><button id="online-copy-invite" class="secondary" type="button">Copiar link do convite</button><button id="online-match-cancel" class="secondary" type="button">Cancelar</button></div></section>
       </section>
-      <div class="form-panel battle-setup"><div class="grid"><label>Modo de batalha<select id="battle-mode"><option value="local">Multiplayer local</option><option value="cpu">Contra CPU</option></select></label><label id="fighter-a-label">Nativa do Jogador 1<select id="fighter-a"><option value="">Selecione a primeira Nativa</option></select></label><label id="fighter-b-label">Nativa do Jogador 2<select id="fighter-b"><option value="">Selecione a segunda Nativa</option></select></label><label>Horário da partida<select id="battle-time"><option value="Aleatório">Aleatório</option></select></label><label>Bioma da arena<select id="battle-biome"><option value="Aleatório">Aleatório</option></select></label><label class="essence-drop-setting">Chance de drop de Essência <span id="essence-drop-rate-value">20%</span><input id="essence-drop-rate" type="range" min="0" max="100" step="1" value="20"><small>O vencedor rola uma chance de obter uma Essência guardada para absorção posterior.</small></label></div><button id="start-battle" type="button">Iniciar combate</button><p class="muted">A iniciativa é rolada a cada turno: 1D10 + AGI. Horário e bioma são configurados para esta partida.</p></div>
+      <div class="form-panel battle-setup"><div class="grid"><label id="fighter-a-label">Sua Nativa<select id="fighter-a"><option value="">Selecione sua Nativa</option></select></label><label id="fighter-b-label">Nativa da CPU<select id="fighter-b"><option value="">Selecione uma Nativa</option></select></label><label>Horário da partida<select id="battle-time"><option value="Aleatório">Aleatório</option></select></label><label>Bioma da arena<select id="battle-biome"><option value="Aleatório">Aleatório</option></select></label><label class="essence-drop-setting">Chance de drop de Essência <span id="essence-drop-rate-value">20%</span><input id="essence-drop-rate" type="range" min="0" max="100" step="1" value="20"><small>O vencedor rola uma chance de obter uma Essência guardada para absorção posterior.</small></label></div><button id="start-battle" type="button">Iniciar combate</button><p class="muted">Escolha uma Nativa para comandar e outra para a CPU, ou sorteie o adversário. A iniciativa é rolada a cada turno: 1D10 + AGI.</p></div>
       <div id="battle-arena" class="battle-arena empty"><p>Configure os combatentes para abrir a arena.</p></div>
     </section>
 
     <section id="rules" class="view">
       <div class="section-heading"><div><span class="eyebrow">REFERÊNCIA RÁPIDA</span><h2>Regras-base</h2><p>Resumo das regras implementadas neste protótipo.</p></div></div>
       <div class="rules-grid">
-        <article class="rule-card"><h3>Criação e progressão</h3><ul><li>42 XPA para distribuir entre sete atributos, todos iniciando em 1.</li><li>O custo para subir de N para N+1 é N+1 XPA.</li><li>Ao criar, a Nativa recebe 1 XPA de vínculo.</li><li>Para subir de nível, precisa de XP igual ao nível de destino; ao subir, recebe XPA igual ao novo nível.</li><li>Estágios: 1–9, estágio 1; 10–16, estágio 2; 17+, estágio 3.</li></ul></article>
+        <article class="rule-card"><h3>Criação e progressão</h3><ul><li>Distribua de 37 a 42 dos 42 XPA de criação; até 5 pontos não gastos ficam na ficha para melhorar atributos depois.</li><li>Todos os sete atributos começam em 1. O custo para subir de N para N+1 é N+1 XPA.</li><li>Ao criar, a Nativa recebe 1 XPA de vínculo além dos pontos guardados.</li><li>Para subir de nível, precisa de XP igual ao nível de destino; ao subir, recebe XPA igual ao novo nível.</li><li>Estágios: 1–9, estágio 1; 10–16, estágio 2; 17+, estágio 3.</li></ul></article>
         <article class="rule-card"><h3>Combate</h3><ul><li>Iniciativa: 1D10 + AGI, rolada novamente a cada turno.</li><li>Precisão negativa representa penalidade: -1 erra no 1; -2 erra de 1 a 2; e assim por diante.</li><li>Dano físico: ATQ + dano da técnica − DEF.</li><li>Dano especial: POT + dano da técnica − RES.</li><li>Golpes ofensivos acertados causam pelo menos 1 de dano antes do modificador de afinidade.</li><li>Fraqueza: +2 dano. Resistência: −2 dano. O resultado final não fica abaixo de zero.</li><li>HP máximo = HP × 5. MP máximo = MP × 2.</li><li>MP é gasto ao usar técnicas; a recarga é controlada por turnos.</li></ul></article>
         <article class="rule-card"><h3>Essências</h3><ul><li>Primeira essência: nível 5; concede repertório de outra afinidade e técnica de linhagem ou arquétipo, sem alterar defesas.</li><li>Segunda essência: nível 12 e estágio 2; concede outra afinidade e técnica, alterando fraquezas e resistências junto da afinidade original.</li><li>Terceira essência: nível 17, ainda indisponível.</li></ul></article>
-        <article class="rule-card"><h3>Limites deste protótipo</h3><ul><li>O combate é local e manual: duas fichas no mesmo navegador, sem multiplayer online.</li><li>Efeitos escritos nas técnicas são exibidos no registro; nem todos são automatizados nesta versão.</li><li>Fotos são guardadas no IndexedDB do navegador, separadas dos dados das fichas.</li><li>Os dados permanecem neste navegador e não são sincronizados entre dispositivos.</li></ul></article>
+        <article class="rule-card"><h3>Limites deste protótipo</h3><ul><li>A arena oferece combates contra CPU e duelos PvP online.</li><li>Efeitos escritos nos golpes são exibidos no registro; nem todos são automatizados nesta versão.</li><li>Fotos são guardadas no IndexedDB do navegador, separadas dos dados das fichas.</li><li>As fichas locais precisam ser sincronizadas para uso nos recursos online.</li></ul></article>
       </div>
     </section>
 
@@ -229,6 +229,18 @@
       </div>
 <div class="form-panel"><h3>Acesso administrativo</h3><p>O acesso é definido pelo papel admin no perfil da conta no servidor. A permissão de mestre de uma mesa é independente da administração do jogo.</p></div></section>
   </main></div>
+  <button id="site-help-launch" class="site-help-launch" type="button" aria-label="Abrir ajuda do NATIVA" title="Ajuda do NATIVA">?</button>
+  <dialog id="site-help-dialog" class="site-help-dialog" aria-labelledby="site-help-title">
+    <div class="site-help-head"><div><span class="eyebrow">GUIA DO JOGADOR</span><h2 id="site-help-title">Ajuda do NATIVA</h2><p>Atalhos e explicações para as principais áreas.</p></div><button id="site-help-close" class="secondary" type="button" aria-label="Fechar ajuda">Fechar</button></div>
+    <div class="site-help-content">
+      <section><h3>Criação de Nativas</h3><p>Preencha identidade, linhagem, bioma, afinidade e arquétipo. Distribua entre 37 e 42 XPA nos atributos: os pontos restantes, até 5, ficam disponíveis na ficha para melhorias futuras. Todos começam no valor 1.</p></section>
+      <section><h3>Golpes iniciais</h3><p>Você pode escolher até quatro golpes, no máximo um de cada origem: linhagem, bioma, afinidade e arquétipo. Golpes em revisão aparecem identificados e não podem ser usados em combate.</p></section>
+      <section><h3>Bestiário e progressão</h3><p>Abra a ficha de uma Nativa para consultar traços, golpes, imagens e atributos. XPA melhora atributos; XP recebido em combates pode elevar o nível.</p></section>
+      <section><h3>Arena</h3><p>Escolha um combate contra CPU ou PvP online. Na arena, selecione uma ação por turno; golpes sem PM suficiente ou em recarga ficam indisponíveis. Consulte o histórico para ver resultados e efeitos.</p></section>
+      <section><h3>Ateliê, acervo e mesas</h3><p>Gere artes no Ateliê e vincule retratos no acervo. Nas mesas compartilhadas, acompanhe a campanha e use a ficha vinculada àquela sala para preservar a progressão da mesa.</p></section>
+      <p class="site-help-note">Use o botão <b>?</b> no canto da tela para reabrir este guia a qualquer momento.</p>
+    </div>
+  </dialog>
   <footer><span>NATIVA · Um mundo extraordinariamente brasileiro</span><span>Natureza. Vínculo. Jornada.</span></footer>
 </body>
 </html>

@@ -1644,3 +1644,57 @@ body:has(#battle.active) main { max-width:none; padding:16px clamp(12px,2vw,30px
 @media(prefers-reduced-motion:reduce) {
   .damage-float,.precision-die-overlay.rolling .d10-shell,.precision-die-overlay.rolling .d10-shell span { animation:none!important; }
 }
+
+/* Golpes prontos para uso ganham contraste; apenas bloqueios ficam apagados. */
+.battle-commands .battle-technique-card:not(.unavailable) {
+  border-color:#a8d48a;
+  background:linear-gradient(135deg,#355f3f,#24462f 55%,#1d3828);
+  box-shadow:inset 0 1px 0 #efffe34a,0 3px 10px #07150b8c,0 0 10px #8ecb7330;
+}
+.battle-commands .battle-technique-card:not(.unavailable) .battle-technique { color:#f6ffe9; }
+.battle-commands .battle-technique-card:not(.unavailable) .technique-card-name { color:#fff7dc; text-shadow:0 1px 7px #0009; }
+.battle-commands .battle-technique-card:not(.unavailable) .technique-cost { border-color:#e3d796a8; background:#cdb86b24; color:#fff0a6; text-shadow:0 1px 5px #0008; }
+.battle-commands .battle-technique-card:not(.unavailable) .technique-badge { border-color:#cfebaf70; background:#15271db8; color:#f0f8dc; text-shadow:0 1px 4px #0008; }
+.battle-commands .battle-technique-card:not(.unavailable) .source-badge { color:#d6f0b1; }
+.battle-commands .battle-technique-card:not(.unavailable) .affinity-badge { border-color:#8dd5dda0; background:#154955a6; color:#dffbff; }
+.battle-commands .battle-technique-card:not(.unavailable) .category-badge { border-color:#e4cc8e9c; background:#49391d9c; color:#ffedbd; }
+.battle-commands .battle-technique-card:not(.unavailable) .technique-card-stats { color:#dcebd0; }
+.battle-commands .battle-technique-card:not(.unavailable) .technique-card-stats b { color:#fff4c2; }
+.battle-commands .battle-technique-card:not(.unavailable):hover,
+.battle-commands .battle-technique-card:not(.unavailable):focus-within,
+.battle-commands .battle-technique-card:not(.unavailable).details-open {
+  border-color:#e6edaa;
+  background:linear-gradient(135deg,#4a774c,#315d3a 58%,#25472f);
+  box-shadow:0 0 0 1px #d7efa272,0 8px 20px #030b06a8,inset 0 1px 0 #ffffff55;
+}
+.battle-commands .battle-technique-card.selected:not(.unavailable) {
+  border-color:#fff0ac;
+  background:linear-gradient(135deg,#657c3c,#476637 58%,#315035);
+  box-shadow:0 0 0 2px #f2dc8c8a,0 0 20px #d4cc6c55,inset 0 1px 0 #ffffff75;
+}
+.battle-commands .battle-technique-card.unavailable {
+  border-color:#68594d;
+  background:linear-gradient(135deg,#292c25,#20251f);
+  box-shadow:inset 0 1px 0 #ffffff0b;
+}
+.battle-commands .battle-technique-card.unavailable .battle-technique { color:#a6a99d; }
+.battle-commands .battle-technique-card.unavailable .technique-card-name,
+.battle-commands .battle-technique-card.unavailable .technique-badge,
+.battle-commands .battle-technique-card.unavailable .technique-card-stats { color:#a3a397; }
+
+/* Ajuda global e regras de orçamento inicial */
+.budget-line{line-height:1.5}
+.technique-card button:disabled{filter:saturate(.55)}
+.site-help-launch{position:fixed;right:22px;bottom:22px;z-index:60;width:54px;height:54px;padding:0;border:2px solid #f2d38a;border-radius:50%;background:radial-gradient(circle at 35% 25%,#e9c878,#a36d2c 72%);color:#172319;font-size:27px;font-weight:950;box-shadow:0 8px 28px #0008,0 0 0 5px #dfbd6c22;transition:transform .2s ease,box-shadow .2s ease}
+.site-help-launch:hover{transform:translateY(-3px) rotate(-6deg);box-shadow:0 10px 32px #000a,0 0 24px #e4c57566}
+.site-help-dialog{width:min(720px,calc(100% - 28px));max-height:min(82vh,850px);padding:0;border:1px solid #7e8c5c;border-radius:20px;background:linear-gradient(145deg,#1a3023,#101d16);color:var(--text);box-shadow:0 28px 90px #000b}
+.site-help-dialog::backdrop{background:#06100cd9;backdrop-filter:blur(5px)}
+.site-help-head{position:sticky;top:0;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:23px 26px 18px;border-bottom:1px solid #405342;background:linear-gradient(110deg,#223b2b,#17271e)}
+.site-help-head h2{margin:6px 0;font-size:clamp(24px,4vw,32px)}
+.site-help-head p{margin:0;color:var(--muted);font-size:13px}
+.site-help-content{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:20px 24px 24px;overflow:auto}
+.site-help-content section{padding:16px;border:1px solid #3c5340;border-radius:13px;background:linear-gradient(145deg,#213729,#17271e)}
+.site-help-content section h3{margin:0 0 7px;color:var(--lime);font-size:16px}
+.site-help-content section p{margin:0;color:#c6d2c3;font-size:13px;line-height:1.55}
+.site-help-note{grid-column:1/-1;margin:0;padding:12px 14px;border-left:3px solid var(--gold);background:#c8aa6520;color:#e4d5aa;font-size:12px}
+@media(max-width:600px){.site-help-launch{right:14px;bottom:calc(78px + env(safe-area-inset-bottom));width:48px;height:48px;font-size:24px}.site-help-head{align-items:flex-start;padding:18px}.site-help-head .secondary{padding:8px 11px}.site-help-content{grid-template-columns:1fr;padding:14px}.site-help-note{grid-column:1}.site-help-content section{padding:14px}}

@@ -26,7 +26,7 @@ import {
 import { MODOS_BATALHA, escolherAcaoCpu } from "./battle-modes.js";
 
 const $ = selector => document.querySelector(selector);
-const LIMITE_TECNICAS = 6;
+const LIMITE_TECNICAS = 4;
 const CHAVE_CONFIG_ESSENCIA_MESA = "nativa.table.essence-reward.v1";
 const MODOS_ESSENCIA_RESERVADOS = [MODOS_RECOMPENSA_ESSENCIA.DROP, MODOS_RECOMPENSA_ESSENCIA.SINCRONIA];
 const DEFINICOES_ATRIBUTOS = [["ATQ","Ataque"],["POT","Potência"],["DEF","Defesa"],["RES","Resistência"],["AGI","Agilidade"],["HP","Vida"],["MP","Pontos de magia"]];
@@ -43,12 +43,9 @@ let urlPreviaArte = null;
 let urlsAcervoArte = [];
 
 function atualizarRotulosModoBatalha(){
-  const modo=$("#battle-mode")?.value||MODOS_BATALHA.LOCAL;
-  const labelA=$("#fighter-a-label");
   const labelB=$("#fighter-b-label");
   const adversarioAleatorio=$("#fighter-b")?.value==="random";
-  if(labelA)labelA.firstChild.textContent=modo===MODOS_BATALHA.CPU?"Nativa do jogador ":"Nativa do Jogador 1 ";
-  if(labelB)labelB.firstChild.textContent=adversarioAleatorio?"Adversário aleatório ":modo===MODOS_BATALHA.CPU?"Nativa da CPU ":"Nativa do Jogador 2 ";
+  if(labelB)labelB.firstChild.textContent=adversarioAleatorio?"Adversário aleatório ":"Nativa da CPU ";
 }
 
 function carregarConfigEssenciaMesa(){
@@ -369,16 +366,16 @@ function renderizarPerfilLinhagem(){
 function renderizarAtributos(){
   const usado=xpUsado();
   $("#attrs").innerHTML=DEFINICOES_ATRIBUTOS.map(([key,label])=>`<div class="attr"><span><b>${key}</b><small>${label}</small></span><span class="attr-controls"><button type="button" data-down="${key}" aria-label="Diminuir ${key}">−</button><b>${atributos[key]}</b><button type="button" data-up="${key}" aria-label="Aumentar ${key}" ${usado+atributos[key]+1>42?"disabled":""}>＋</button></span></div>`).join("");
-  $("#budget").textContent=`${42-usado} XPA restantes · ${usado} de 42 utilizados`;
+  $("#budget").textContent=`${42-usado} XPA livres · use pelo menos 37 e até 42`;
 }
 $("#attrs").addEventListener("click",e=>{const key=e.target.dataset.up||e.target.dataset.down;if(!key)return;if(e.target.dataset.up&&xpUsado()+atributos[key]+1<=42)atributos[key]++;if(e.target.dataset.down&&atributos[key]>1)atributos[key]--;renderizarAtributos();});
 function tecnicasDaOrigem(origem,grupo){return TECNICAS.filter(t=>t.origem===origem&&t.grupo===grupo);}
 function textoPrecisao(t){return t.precisao===null?"Sem teste de precisão":`−${Math.abs(t.precisao)} (falha de 1 a ${Math.abs(t.precisao)})`;}
-function cartaoTecnica(t){const selected=tecnicasSelecionadas.has(t.id);const locked=tecnicasSelecionadas.size>=LIMITE_TECNICAS;const estado=obterEstadoSeletorTecnica(t,selected,locked);const candidates=(t.sinergiasCandidatas||[]).filter(x=>x.tracoId);return `<article class="technique-card"><div class="technique-heading"><b>${escapar(t.nome)}</b><span class="technique-status">${escapar(t.status)}</span></div><p class="technique-meta">${escapar(t.categoria)} · MP ${t.mp??"pendente"} · Recarga ${t.recarga??"pendente"} · Precisão ${textoPrecisao(t)} · Dano ${t.dano??"pendente"}</p><p>${escapar(t.efeito)}</p>${estado.aviso?`<p class="technique-observation">${escapar(estado.aviso)}</p>`:""}${candidates.length?`<p class="muted">Sinergias candidatas: ${candidates.map(x=>escapar(x.nome)).join(", ")} (não aplicadas).</p>`:""}<button type="button" data-add-technique="${escapar(t.id)}" ${estado.botaoDesabilitado?"disabled":""}>${estado.textoBotao}</button></article>`;}
+function cartaoTecnica(t){const selected=tecnicasSelecionadas.has(t.id);const origemOcupada=!selected&&[...tecnicasSelecionadas].some(id=>obterTecnicaPorId(id,{incluirArquivo:false})?.origem===t.origem);const locked=tecnicasSelecionadas.size>=LIMITE_TECNICAS;const estado=obterEstadoSeletorTecnica(t,selected,locked);const candidates=(t.sinergiasCandidatas||[]).filter(x=>x.tracoId);const desabilitado=estado.botaoDesabilitado||origemOcupada;const textoBotao=selected?"Adicionada":origemOcupada?"Grupo já escolhido":estado.textoBotao;return `<article class="technique-card"><div class="technique-heading"><b>${escapar(t.nome)}</b><span class="technique-status">${escapar(t.status)}</span></div><p class="technique-meta">${escapar(t.categoria)} · MP ${t.mp??"pendente"} · Recarga ${t.recarga??"pendente"} · Precisão ${textoPrecisao(t)} · Dano ${t.dano??"pendente"}</p><p>${escapar(t.efeito)}</p>${estado.aviso?`<p class="technique-observation">${escapar(estado.aviso)}</p>`:""}${candidates.length?`<p class="muted">Sinergias candidatas: ${candidates.map(x=>escapar(x.nome)).join(", ")} (não aplicadas).</p>`:""}<button type="button" data-add-technique="${escapar(t.id)}" ${desabilitado?"disabled":""}>${textoBotao}</button></article>`;}
 function grupoTecnicas(titulo,origem,grupo){const lista=tecnicasDaOrigem(origem,grupo);const vazio=origem==="arquetipo"?"Este arquétipo ainda não possui golpes cadastrados na versão atual.":"Selecione a característica correspondente para visualizar técnicas.";return `<details class="technique-group"><summary>${titulo}<span>${lista.length} técnicas</span></summary><div class="technique-list">${lista.length?lista.map(cartaoTecnica).join(""):`<p class="muted">${vazio}</p>`}</div></details>`;}
 function renderizarSeletorTecnicas(){const lineage=$("#lineage").value;$("#technique-groups").innerHTML=[grupoTecnicas("Afinidade","afinidade",$("#affinity").value),grupoTecnicas("Linhagem","linhagem",lineage),grupoTecnicas("Bioma","bioma",$("#bioma").value),grupoTecnicas("Arquétipo","arquetipo",$("#archetype").value)].join("");renderizarTecnicasSelecionadas();}
-function renderizarTecnicasSelecionadas(){const ts=TECNICAS.filter(t=>tecnicasSelecionadas.has(t.id));$("#technique-count").textContent=`${ts.length} de ${LIMITE_TECNICAS} técnicas selecionadas`;$("#selected-techniques").innerHTML=ts.length?ts.map(t=>`<div class="selected-technique"><div><b>${escapar(t.nome)}</b><small>${escapar(t.origem)} · ${escapar(t.grupo)}</small></div><button type="button" data-remove-technique="${escapar(t.id)}">Remover</button></div>`).join(""):'<p class="muted">Nenhuma técnica selecionada.</p>';}
-$("#technique-groups").addEventListener("click",e=>{const id=e.target.dataset.addTechnique;const tecnica=obterTecnicaPorId(id,{incluirArquivo:false});if(!id||!adicionarTecnicaSelecionada(tecnicasSelecionadas,tecnica,LIMITE_TECNICAS))return;renderizarSeletorTecnicas();});
+function renderizarTecnicasSelecionadas(){const ts=TECNICAS.filter(t=>tecnicasSelecionadas.has(t.id));$("#technique-count").textContent=`${ts.length} de ${LIMITE_TECNICAS} golpes · um por grupo`;$("#selected-techniques").innerHTML=ts.length?ts.map(t=>`<div class="selected-technique"><div><b>${escapar(t.nome)}</b><small>${escapar(t.origem)} · ${escapar(t.grupo)}</small></div><button type="button" data-remove-technique="${escapar(t.id)}">Remover</button></div>`).join(""):'<p class="muted">Nenhum golpe selecionado.</p>';}
+$("#technique-groups").addEventListener("click",e=>{const id=e.target.dataset.addTechnique;const tecnica=obterTecnicaPorId(id,{incluirArquivo:false});const origemOcupada=tecnica&&[...tecnicasSelecionadas].some(existingId=>obterTecnicaPorId(existingId,{incluirArquivo:false})?.origem===tecnica.origem);if(!id||origemOcupada||!adicionarTecnicaSelecionada(tecnicasSelecionadas,tecnica,LIMITE_TECNICAS))return;renderizarSeletorTecnicas();});
 $("#selected-techniques").addEventListener("click",e=>{const id=e.target.dataset.removeTechnique;if(!id)return;tecnicasSelecionadas.delete(id);renderizarSeletorTecnicas();});
 
 const { guardarFoto, obterFoto, removerFoto } = repositorioLocal;
@@ -392,8 +389,8 @@ $("#form").addEventListener("submit", async e => {
     location.replace(authHref("login", safeDestination(location.href, location.href)));
     return;
   }
-  if (xpUsado() !== 42) {
-    $("#msg").textContent = `Distribua exatamente os 42 XPA. Você utilizou ${xpUsado()}.`;
+  if (xpUsado() < 37 || xpUsado() > 42) {
+    $("#msg").textContent = `Use entre 37 e 42 XPA na criação. Até 5 podem ficar guardados para melhorar atributos depois; você usou ${xpUsado()}.`;
     return;
   }
   const submit = form.querySelector('button[type="submit"]');
@@ -406,6 +403,7 @@ $("#form").addEventListener("submit", async e => {
     species: f.get("species").trim(), bioma: f.get("bioma"), affinity: f.get("affinity"),
     archetype: f.get("archetype"), attrs: atributos, techniques: tecnicasSelecionadas
   });
+  n.xpa = 1 + (42 - xpUsado());
   const soundId=$("#native-sound-choice")?.value;const soundTitle=$("#native-sound-choice")?.selectedOptions[0]?.textContent;
   if(soundId)n.soundEffect={provider:"epidemic-sound",id:soundId,title:soundTitle||"Efeito selecionado"};
   nativas.push(n);
@@ -439,6 +437,10 @@ $("#form").addEventListener("submit", async e => {
 });
 
 function mostrarTela(id){document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active",v.id===id));document.querySelectorAll("[data-view]").forEach(b=>b.classList.toggle("active",b.dataset.view===id));if(id==="list")void renderizarLista();if(id==="art-studio"||id==="gallery"){void carregarAlvosArte();void renderizarAcervoArte();}if(id==="battle")atualizarSelectsBatalha();document.dispatchEvent(new CustomEvent("nativa:view",{detail:{id}}));}
+const helpDialog=$("#site-help-dialog");
+$("#site-help-launch")?.addEventListener("click",()=>helpDialog?.showModal());
+$("#site-help-close")?.addEventListener("click",()=>helpDialog?.close());
+helpDialog?.addEventListener("click",event=>{if(event.target===helpDialog)helpDialog.close();});
 document.querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>mostrarTela(b.dataset.view)));
 document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>mostrarTela(b.dataset.go)));
 
@@ -889,7 +891,7 @@ async function iniciarBatalha(){
   const b=adversarioAleatorio
     ?candidatos[Math.floor(Math.random()*candidatos.length)]
     :nativas.find(n=>n.id===selecaoAdversario);
-  const modo=adversarioAleatorio||$("#battle-mode")?.value===MODOS_BATALHA.CPU?MODOS_BATALHA.CPU:MODOS_BATALHA.LOCAL;
+  const modo=MODOS_BATALHA.CPU;
 
   if(!a||!b){
     alert(adversarioAleatorio?"Escolha sua Nativa e tenha outra ficha disponível para o sorteio.":"Escolha duas Nativas.");
@@ -1561,12 +1563,7 @@ function renderizarArena(){
 
 
 
-$("#battle-mode")?.addEventListener("change",()=>{
-  if($("#battle-mode").value!==MODOS_BATALHA.CPU&&$("#fighter-b").value==="random")$("#fighter-b").value="";
-  atualizarRotulosModoBatalha();
-});
 $("#fighter-b")?.addEventListener("change",()=>{
-  if($("#fighter-b").value==="random")$("#battle-mode").value=MODOS_BATALHA.CPU;
   atualizarRotulosModoBatalha();
 });
 $("#start-battle").addEventListener("click",iniciarBatalha);
