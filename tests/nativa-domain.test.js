@@ -27,7 +27,7 @@ test("produz objeto equivalente ao literal usado antes da extração", () => {
     species: "Lobo-guará", bioma: "Cerrado", affinity: "Fogo", archetype: "Guardião",
     attrs: { ATQ: 2, POT: 3, DEF: 4, RES: 2, AGI: 3, HP: 4, MP: 2 },
     techniques: ["linhagem-canideos-faro", "arquetipo-guardiao-protecao"],
-    nivel: 1, xp: 0, xpa: 42, estagio: 1, essencias: [],
+    nivel: 1, xp: 0, xpa: 1, estagio: 1, essencias: [],
     afinidadesEssencia: [], historicoProgressao: [], photoId: null,
     tracos: obterTracosPadraoLinhagem("Canídeos"), tracosQuimericos: [], habitos: []
   };
@@ -62,7 +62,7 @@ test("usa valores iniciais e preserva o ID local sem criar ID remoto", () => {
   assert.equal(ficha.id, "local-id-123");
   assert.equal(ficha.nivel, 1);
   assert.equal(ficha.xp, 0);
-  assert.equal(ficha.xpa, 42);
+  assert.equal(ficha.xpa, 1);
   assert.equal(ficha.estagio, 1);
   assert.deepEqual(ficha.essencias, []);
   assert.deepEqual(ficha.afinidadesEssencia, []);
@@ -111,7 +111,7 @@ test("a ficha criada continua compatível com as funções existentes de progres
   assert.equal(progresso.niveisConquistados.length, 1);
   ficha.nivel = 5;
   assert.equal(verificarEssencia(ficha, "primeira").permitido, true);
-  ficha.essenciasDisponiveis = [{ id: "essencia-de-teste" }];
+  ficha.essenciasDisponiveis = [{ id: "essencia-de-teste", origem: "combate" }];
   assert.equal(absorverEssencia(ficha, "primeira", "Água"), ficha);
   assert.deepEqual(ficha.essencias, ["primeira"]);
   assert.deepEqual(ficha.essenciasDisponiveis, []);

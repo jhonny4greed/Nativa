@@ -5,7 +5,9 @@ export function initializeArenaFullscreen() {
   function sync() {
     const active=document.fullscreenElement===arena||arena.classList.contains("arena-expanded");
     button.setAttribute("aria-pressed",String(active));
-    button.textContent=active?"Sair da tela cheia":"⛶ Tela cheia";
+    button.textContent=active?"×":"⛶ Tela cheia";
+    button.setAttribute("aria-label",active?"Sair da tela cheia":"Expandir arena em tela cheia");
+    button.title=active?"Sair da tela cheia":"Expandir arena em tela cheia";
     document.body.classList.toggle("arena-fullscreen-open",active);
     document.documentElement.classList.toggle("arena-playing-fullscreen",active&&arena.querySelector(".battlefield"));
     if(!active&&screen.orientation?.unlock)screen.orientation.unlock();

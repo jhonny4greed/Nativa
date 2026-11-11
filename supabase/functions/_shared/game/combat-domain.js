@@ -41,7 +41,7 @@ export function modificadorAfinidade(_atacante, defensor, tecnica) {
   const defesas = [
     defensor.nativa.affinity,
     ...((defensor.nativa.essencias || []).includes("segunda")
-      ? [defensor.nativa.afinidadesEssencia?.[1]].filter(Boolean)
+      ? [defensor.nativa.afinidadesEssencia?.[0]].filter(Boolean)
       : [])
   ];
 

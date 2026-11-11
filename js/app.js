@@ -1,6 +1,6 @@
 import { defaultPortrait } from "./creature-art.js";
 import { requireAuthenticatedUser } from "./session-gate.js";
-import { authHref, safeDestination } from "./access.js";
+import { authHref, safeDestination, isAdmin } from "./access.js";
 import { arenaPortrait } from "./arena-art.js";
 import { initializeArenaFullscreen } from "./arena-fullscreen.js";
 import { initializeOnlineArena } from "./online-arena.js";
@@ -19,6 +19,7 @@ import { servicoSincronizacao } from "./sync-service.js";
 import { estudioImagens } from "./art-studio.js";
 import { aplicarArteComoRetrato, galeriaImagens } from "./art-gallery.js";
 import { criarRegistroUrlsFotosArena } from "./battle-photo-urls.js";
+import { enviarRetratoNativa, obterRetratoNativa, removerRetratoNativa } from "./native-portraits.js";
 import {
   criarCombatente, obterTecnicasCombatente as tecnicasCombatente,
   avancarCombatentesDeTurno, resolverTurnoCombate
@@ -27,8 +28,7 @@ import { MODOS_BATALHA, escolherAcaoCpu } from "./battle-modes.js";
 
 const $ = selector => document.querySelector(selector);
 const LIMITE_TECNICAS = 4;
-const CHAVE_CONFIG_ESSENCIA_MESA = "nativa.table.essence-reward.v1";
-const MODOS_ESSENCIA_RESERVADOS = [MODOS_RECOMPENSA_ESSENCIA.DROP, MODOS_RECOMPENSA_ESSENCIA.SINCRONIA];
+const CHAVE_CONFIG_ESSENCIA_MESA = "nativa.table.essence-reward.v2";
 const DEFINICOES_ATRIBUTOS = [["ATQ","Ataque"],["POT","Potência"],["DEF","Defesa"],["RES","Resistência"],["AGI","Agilidade"],["HP","Vida"],["MP","Pontos de magia"]];
 let atributos = Object.fromEntries(DEFINICOES_ATRIBUTOS.map(([key])=>[key,1]));
 let tecnicasSelecionadas = new Set();
@@ -50,16 +50,19 @@ function atualizarRotulosModoBatalha(){
 
 function carregarConfigEssenciaMesa(){
   try{
-    const salvo=JSON.parse(localStorage.getItem(CHAVE_CONFIG_ESSENCIA_MESA)||"null");
-    return {modo:MODOS_ESSENCIA_RESERVADOS.includes(salvo?.modo)&&salvo.modo===MODOS_RECOMPENSA_ESSENCIA.DROP?salvo.modo:CONFIG_ESSENCIA_PADRAO.modo,chanceDrop:Number.isFinite(Number(salvo?.chanceDrop))?Math.max(0,Math.min(100,Number(salvo.chanceDrop))):CONFIG_ESSENCIA_PADRAO.chanceDrop};
+    if(!isAdmin(document.documentElement.dataset.applicationRole))return {...CONFIG_ESSENCIA_PADRAO};
+    const key=`${CHAVE_CONFIG_ESSENCIA_MESA}:${document.documentElement.dataset.userId||"admin"}`;
+    const salvo=JSON.parse(localStorage.getItem(key)||"null");
+    return {modo:CONFIG_ESSENCIA_PADRAO.modo,chanceDrop:Number.isFinite(Number(salvo?.chanceDrop))?Math.max(0,Math.min(100,Number(salvo.chanceDrop))):CONFIG_ESSENCIA_PADRAO.chanceDrop};
   }catch{return {...CONFIG_ESSENCIA_PADRAO};}
 }
 function salvarConfigEssenciaMesa(config){
-  const normalizada={modo:MODOS_RECOMPENSA_ESSENCIA.DROP,chanceDrop:Math.max(0,Math.min(100,Number(config.chanceDrop)||0))};
-  try{localStorage.setItem(CHAVE_CONFIG_ESSENCIA_MESA,JSON.stringify(normalizada));}catch{}
+  const admin=isAdmin(document.documentElement.dataset.applicationRole);
+  const normalizada={modo:MODOS_RECOMPENSA_ESSENCIA.DROP,chanceDrop:admin?Math.max(0,Math.min(100,Number(config.chanceDrop)||0)):CONFIG_ESSENCIA_PADRAO.chanceDrop};
+  try{if(admin){const key=`${CHAVE_CONFIG_ESSENCIA_MESA}:${document.documentElement.dataset.userId||"admin"}`;localStorage.setItem(key,JSON.stringify(normalizada));}}catch{}
   const controle=$("#essence-drop-rate");
   const valor=$("#essence-drop-rate-value");
-  if(controle)controle.value=String(normalizada.chanceDrop);
+  if(controle&&admin)controle.value=String(normalizada.chanceDrop);
   if(valor)valor.textContent=`${normalizada.chanceDrop}%`;
   return normalizada;
 }
@@ -81,11 +84,12 @@ const NATIVAS_DE_TESTE = [
       RES: 3, AGI: 3, HP: 3, MP: 4
     },
     techniques: [
-      "linhagem-canideos-mordida-persistente",
+      "linhagem-v2-1-canideos-faro-de-perseguicao",
       "bioma-caatinga-e-cerrado-arrancada-seca",
-      "arquetipo-predador-golpe-de-oportunidade"
+      "afinidade-fogo-brasa-de-arranque",
+      "arquetipo-predador-rasgo-de-abertura"
     ],
-    nivel: 1, xp: 0, xpa: 42, estagio: 1,
+    nivel: 1, xp: 0, xpa: 0, estagio: 1,
     essencias: [],
     afinidadesEssencia: [],
     historicoProgressao: [],
@@ -108,11 +112,12 @@ const NATIVAS_DE_TESTE = [
       RES: 3, AGI: 3, HP: 3, MP: 4
     },
     techniques: [
-      "linhagem-characiformes-mordida-voraz",
-      "bioma-rios-lagos-e-pantanal-agarrao-de-margem",
-      "arquetipo-veloz-ataque-relampago"
+      "linhagem-v2-1-characiformes-mordida-de-piranha",
+      "bioma-rios-lagos-e-pantanal-mergulho-repentino",
+      "afinidade-agua-jato-direto",
+      "arquetipo-infiltrador-golpe-cego"
     ],
-    nivel: 1, xp: 0, xpa: 42, estagio: 1,
+    nivel: 1, xp: 0, xpa: 0, estagio: 1,
     essencias: [],
     afinidadesEssencia: [],
     historicoProgressao: [],
@@ -135,11 +140,12 @@ const NATIVAS_DE_TESTE = [
       RES: 3, AGI: 3, HP: 3, MP: 4
     },
     techniques: [
-      "linhagem-xenartros-garras-escavadoras",
-      "bioma-floresta-e-mata-camuflagem-de-folhas",
-      "arquetipo-guardiao-postura-de-fortaleza"
+      "linhagem-v2-1-xenartros-defesa-esferica",
+      "bioma-floresta-e-mata-bote-de-emboscada",
+      "afinidade-terra-pedra-arremessada",
+      "arquetipo-guardiao-muralha-instintiva"
     ],
-    nivel: 1, xp: 0, xpa: 42, estagio: 1,
+    nivel: 1, xp: 0, xpa: 0, estagio: 1,
     essencias: [],
     afinidadesEssencia: [],
     historicoProgressao: [],
@@ -162,11 +168,12 @@ const NATIVAS_DE_TESTE = [
       RES: 5, AGI: 3, HP: 3, MP: 4
     },
     techniques: [
-      "linhagem-aves-corredoras-e-campestres-chute-poderoso",
-      "linhagem-aves-corredoras-e-campestres-bicada-de-impacto",
-      "arquetipo-veloz-ataque-relampago"
+      "linhagem-v2-1-aves-corredoras-e-campestres-chute-de-ema",
+      "bioma-campos-sulinos-e-pampa-arrancada-de-coxilha",
+      "afinidade-vento-corte-de-ar",
+      "arquetipo-infiltrador-golpe-cego"
     ],
-    nivel: 1, xp: 0, xpa: 42, estagio: 1,
+    nivel: 1, xp: 0, xpa: 0, estagio: 1,
     essencias: [],
     afinidadesEssencia: [],
     historicoProgressao: [],
@@ -189,11 +196,12 @@ const NATIVAS_DE_TESTE = [
       RES: 3, AGI: 5, HP: 3, MP: 4
     },
     techniques: [
-      "linhagem-morcegos-ecolocalizacao",
-      "linhagem-morcegos-voo-erratico",
-      "arquetipo-canalizador-foco-interno"
+      "linhagem-v2-1-morcegos-ecolocalizacao",
+      "bioma-costa-restinga-e-manguezal-investida-de-mare",
+      "afinidade-energia-pulso-luminoso",
+      "arquetipo-canalizador-condensacao-arcana"
     ],
-    nivel: 1, xp: 0, xpa: 42, estagio: 1,
+    nivel: 1, xp: 0, xpa: 0, estagio: 1,
     essencias: [],
     afinidadesEssencia: [],
     historicoProgressao: [],
@@ -232,10 +240,44 @@ async function carregarNativas() {
     await repositorioLocal.marcarPresetsCarregados();
   }
 
-  return dados.map(migrarNativa);
+  dados=dados.map(migrarNativa);
+  return await mesclarProgressaoRemotaDaConta(dados);
+}
+
+async function mesclarProgressaoRemotaDaConta(dados){
+  try{
+    const client=await obterClienteSupabase();
+    const {data:sessionData,error:sessionError}=await client.auth.getSession();if(sessionError)throw sessionError;
+    const userId=sessionData?.session?.user?.id;if(!userId)return dados;
+    const {data:remoteRows,error}=await client.from("nativas").select("id,owner_id,local_id,format_version,data,revision").is("deleted_at",null);
+    if(error)throw error;
+    const operations=await repositorioLocal.listarOperacoesSincronizacao();let changed=false;const lineupUpdates=[];
+    for(const row of remoteRows||[]){
+      if(row.owner_id!==userId)continue;
+      const index=dados.findIndex(n=>n.id===row.local_id);if(idsPresetCatalogo.has(row.local_id))continue;
+      const pending=operations.some(op=>op.userId===userId&&op.localId===row.local_id&&["pending","blocked","failed","conflict"].includes(op.status));
+      if(pending)continue;
+      const metadata=await repositorioLocal.obterMetadadosSincronizacao(row.local_id);
+      if((metadata?.remoteRevision||0)>=row.revision)continue;
+      const normalized=migrarNativa({...row.data,ownerId:userId});
+      normalized.progressResetVersion=1;
+      normalized.atributosIniciais ||= structuredClone(normalized.attrs);
+      normalized.golpesIniciais=normalizarGolpesIniciais(normalized,row.data.golpesIniciais||row.data.techniques);
+      normalized.techniques=[...normalized.golpesIniciais];
+      if(index<0)dados.push(normalized);else dados[index]=normalized;
+      changed=true;
+      if(JSON.stringify(normalized)!==JSON.stringify(row.data))lineupUpdates.push(normalized);
+      await repositorioLocal.salvarMetadadosSincronizacao(row.local_id,{remoteId:row.id,remoteRevision:row.revision,remoteFormatVersion:row.format_version,syncState:"synced",lastSyncedSnapshot:row.data,localConflictSnapshot:null,remoteConflictSnapshot:null});
+    }
+    if(changed)await repositorioLocal.salvarNativas(dados);
+    for(const native of lineupUpdates)await repositorioLocal.enfileirarSaveSeAssociada(native);
+    return dados;
+  }catch(error){console.warn("Não foi possível atualizar o bestiário a partir das fichas da conta.",error);return dados;}
 }
 
 function migrarNativa(n){
+  const preset=NATIVAS_DE_TESTE.find(item=>item.id===n.id);
+  if(preset){n.nivel=1;n.xp=0;n.xpTotal=0;n.xpa=0;n.estagio=1;n.attrs=structuredClone(preset.attrs);n.techniques=[...preset.techniques];n.golpesIniciais=[...preset.techniques];n.atributosIniciais=structuredClone(preset.attrs);n.essencias=[];n.afinidadesEssencia=[];n.essenciasDisponiveis=[];n.historicoProgressao=[];}
   n.attrs ||= {ATQ:1,POT:1,DEF:1,RES:1,AGI:1,HP:1,MP:1};
   n.techniques ||= [];
   if (!Array.isArray(n.tracos)) n.tracos = obterTracosPadraoLinhagem(n.lineageName || n.lineage);
@@ -258,7 +300,18 @@ function migrarNativa(n){
   inicializarProgressao(n);
   return n;
 }
+function normalizarGolpesIniciais(nativa, lista=nativa.golpesIniciais||nativa.techniques||[]){
+  const grupos=[["linhagem",nativa.lineageName||nativa.lineage],["bioma",nativa.bioma],["afinidade",nativa.affinity],["arquetipo",nativa.archetype]];
+  return grupos.map(([origin,group])=>{
+    const previous=lista.map(id=>obterTecnicaPorId(id,{incluirArquivo:false})).find(move=>move?.origem===origin&&move.grupo===group&&podeAprenderTecnica(move));
+    return previous||TECNICAS.find(move=>move.origem===origin&&move.grupo===group&&podeAprenderTecnica(move));
+  }).filter(Boolean).map(move=>move.id);
+}
 async function salvarDados(nativaAlterada = null){
+  if(nativaAlterada?.photoId&&!nativaAlterada.photoStoragePath){
+    try{const blob=await obterFoto(nativaAlterada.photoId);if(blob)nativaAlterada.photoStoragePath=await enviarRetratoNativa(nativaAlterada,blob,nativaAlterada.photoId);}
+    catch(error){const status=$("#bestiary-status");if(status)status.textContent=`Retrato salvo no dispositivo, mas não foi enviado à conta: ${error.message}`;}
+  }
   const colecao = JSON.parse(JSON.stringify(nativas));
   const snapshot = nativaAlterada ? JSON.parse(JSON.stringify(nativaAlterada)) : null;
   if (snapshot?.id && fichasEmExclusao.has(snapshot.id)) {
@@ -334,7 +387,8 @@ function preencherSelect(seletor,itens,placeholder){const el=$(seletor);if(!el)r
 function descricaoSelect(idDesc,idSelect,itens){const el=$(idSelect);const out=$(idDesc);if(!el||!out)return;const item=itens.find(x=>x.nome===el.value);out.textContent=item?.descricao||"Selecione uma opção para conhecer suas características.";}
 function configurarFormularios(){
   salvarConfigEssenciaMesa(carregarConfigEssenciaMesa());
-  $("#essence-drop-rate").addEventListener("input",event=>salvarConfigEssenciaMesa({chanceDrop:event.target.value}));
+  $("#essence-drop-rate")?.addEventListener("input",event=>salvarConfigEssenciaMesa({chanceDrop:event.target.value}));
+  $("#essence-drop-reset")?.addEventListener("click",()=>salvarConfigEssenciaMesa(CONFIG_ESSENCIA_PADRAO));
   preencherSelect("#groupBio",GRUPOS_BIOLOGICOS,"Selecione um grupo");
   preencherSelect("#bioma",BIOMAS,"Selecione um bioma");
   preencherSelect("#affinity",AFINIDADES,"Selecione uma afinidade");
@@ -383,7 +437,8 @@ const { guardarFoto, obterFoto, removerFoto } = repositorioLocal;
 $("#form").addEventListener("submit", async e => {
   e.preventDefault();
   const form = e.currentTarget;
-  try { await requireAuthenticatedUser(await obterClienteSupabase()); }
+  let sessionUser;
+  try { sessionUser=await requireAuthenticatedUser(await obterClienteSupabase()); }
   catch {
     document.documentElement.removeAttribute("data-authenticated");
     location.replace(authHref("login", safeDestination(location.href, location.href)));
@@ -403,7 +458,11 @@ $("#form").addEventListener("submit", async e => {
     species: f.get("species").trim(), bioma: f.get("bioma"), affinity: f.get("affinity"),
     archetype: f.get("archetype"), attrs: atributos, techniques: tecnicasSelecionadas
   });
+  n.ownerId=sessionUser.id;
   n.xpa = 1 + (42 - xpUsado());
+  n.progressResetVersion=1;
+  n.atributosIniciais = structuredClone(atributos);
+  n.golpesIniciais = [...tecnicasSelecionadas];
   const soundId=$("#native-sound-choice")?.value;const soundTitle=$("#native-sound-choice")?.selectedOptions[0]?.textContent;
   if(soundId)n.soundEffect={provider:"epidemic-sound",id:soundId,title:soundTitle||"Efeito selecionado"};
   nativas.push(n);
@@ -436,7 +495,7 @@ $("#form").addEventListener("submit", async e => {
   submit.disabled = false;
 });
 
-function mostrarTela(id){document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active",v.id===id));document.querySelectorAll("[data-view]").forEach(b=>b.classList.toggle("active",b.dataset.view===id));if(id==="list")void renderizarLista();if(id==="art-studio"||id==="gallery"){void carregarAlvosArte();void renderizarAcervoArte();}if(id==="battle")atualizarSelectsBatalha();document.dispatchEvent(new CustomEvent("nativa:view",{detail:{id}}));}
+function mostrarTela(id){document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active",v.id===id));document.querySelectorAll("[data-view]").forEach(b=>b.classList.toggle("active",b.dataset.view===id));if(id==="list")void renderizarLista();if(id==="art-studio"||id==="gallery"){void carregarAlvosArte();void renderizarAcervoArte();}if(id==="battle")atualizarSelectsBatalha();if(id==="settings")void atualizarSeletorResetProgressao();document.dispatchEvent(new CustomEvent("nativa:view",{detail:{id}}));}
 const helpDialog=$("#site-help-dialog");
 $("#site-help-launch")?.addEventListener("click",()=>helpDialog?.showModal());
 $("#site-help-close")?.addEventListener("click",()=>helpDialog?.close());
@@ -732,7 +791,7 @@ async function renderizarLista(){
     else if(estado?.associationState==="no-session")estadoTexto="Somente leitura · entre na conta associada";
     else if(estado?.associationState==="ambiguous")estadoTexto="Somente leitura · vínculo entre contas ambíguo";
     if(estado?.queueCount)estadoTexto+=` · fila local ${estado.pendingCount} pendente${estado.pendingCount===1?"":"s"}${estado.hasBlockedOperations?", dependência ou resolução necessária":""} · ainda não enviada`;
-    const foto=await obterFoto(n.photoId);let photoUrl=foto?URL.createObjectURL(foto):defaultPortrait(n);const t=(n.techniques||[]).map(id=>obterTecnicaPorId(id)).filter(Boolean);const maxHP=(n.attrs.HP||1)*5,maxMP=(n.attrs.MP||1)*2;const resumo=obterResumoProgressao(n);const essenciasGuardadas=(n.essenciasDisponiveis||[]).map(x=>x.oponenteNome||"Combate");const fotoHtml=photoUrl?`<img class="creature-photo" src="${photoUrl}" alt="Retrato de ${escapar(n.name)}">`:'<div class="photo-placeholder">✦</div>';
+    const foto=await obterRetratoNativa(n);let photoUrl=foto?URL.createObjectURL(foto):defaultPortrait(n);const t=(n.techniques||[]).map(id=>obterTecnicaPorId(id)).filter(Boolean);const maxHP=(n.attrs.HP||1)*5,maxMP=(n.attrs.MP||1)*2;const resumo=obterResumoProgressao(n);const essenciasGuardadas=(n.essenciasDisponiveis||[]).map(x=>x.oponenteNome||"Combate");const fotoHtml=photoUrl?`<img class="creature-photo" src="${photoUrl}" alt="Retrato de ${escapar(n.name)}">`:'<div class="photo-placeholder">✦</div>';
     const idCard=idValido?n.id:`ficha-local-${index}`;
     const disabled=somenteLeitura?"disabled":"";
     const deleteDisabled=somenteLeitura&&estado?.associationState!=="deleted"?"disabled":"";
@@ -744,8 +803,8 @@ async function renderizarLista(){
     const listaTracos=(n.tracos||[]).map(id=>CATALOGO_TRACOS.find(x=>x.id===id)).filter(Boolean);
     const tracosHtml=listaTracos.length?listaTracos.map(x=>`<details class="profile-trait"><summary>${escapar(x.nome)} <span class="muted">· ${escapar(x.categoria)}</span></summary><p>${escapar(x.descricao)}</p></details>`).join(""):'<p class="muted">Nenhum traço cadastrado.</p>';
     const listaHabitos=(n.habitos||[]).map(id=>CATALOGO_HABITOS.find(x=>x.id===id)?.nome||id);
-    return `<article class="card ${somenteLeitura?"card-readonly":""}" data-card="${escapar(idCard)}" data-card-index="${index}">${fotoHtml}<div class="card-body"><div class="card-top"><div><h3>${escapar(n.name)}</h3><span class="tag">Nível ${resumo.nivel} · Estágio ${resumo.estagio}</span></div><span class="tag">${escapar(n.affinity)}</span></div><p>${escapar(n.groupBio)} · ${escapar(n.lineageName||n.lineage)}${n.species?` · ${escapar(n.species)}`:""}</p><p>${escapar(n.bioma)} · ${escapar(n.archetype)}${n.player?` · Jogador: ${escapar(n.player)}`:""}</p><p class="sync-state" role="status">${escapar(estadoTexto)}</p>${associationHelp}${missingIdHelp}${unassociatedHelp}<nav class="profile-tabs" aria-label="Abas da ficha"><button type="button" class="active" data-profile-tab="overview">Visão geral</button><button type="button" data-profile-tab="biology">Traços e hábitos</button><button type="button" data-profile-tab="techniques">Golpes</button><button type="button" data-profile-tab="images">Imagens criadas</button></nav><div class="stat-chips" data-profile-pane="overview">${DEFINICOES_ATRIBUTOS.map(([k])=>`<span>${k} ${n.attrs[k]||1}</span>`).join("")}<span>HP ${maxHP}</span><span>MP ${maxMP}</span></div><section class="profile-biology" data-profile-pane="biology" hidden><h4>Traços</h4><p>${tracosHtml}</p><button type="button" class="small secondary" data-edit-traits="${index}" ${disabled}>Editar traços</button><h4>Traços Quiméricos</h4><p>${(n.tracosQuimericos||[]).length?(n.tracosQuimericos||[]).map(escapar).join(" · "):"Nenhum registrado"}</p><button type="button" class="small secondary" data-edit-chimeric="${index}" ${disabled}>Registrar/editar Traços Quiméricos</button><h4>Hábitos</h4><p>${listaHabitos.length?listaHabitos.map(escapar).join(" · "):"Nenhum hábito cadastrado."}</p><button type="button" class="small secondary" data-edit-habits="${index}" ${disabled}>Editar hábitos</button></section><section class="profile-techniques" data-profile-pane="techniques" hidden><h4 style="margin-top:13px">Golpes (${t.length})</h4>${t.length?t.map(x=>`<details class="technique-detail"><summary>${escapar(x.nome)} · ${escapar(x.categoria)} · MP ${x.mp??"pendente"} · dano ${x.dano??"—"}</summary><p>${escapar(x.efeito)}</p>${x.estadoCatalogo==="em-revisao"?'<p class="muted">Em revisão. Não pode ser usado em combate até receber aprovação.</p>':x.estadoCatalogo==="arquivado"?'<p class="muted">Golpe arquivado; disponível apenas para preservar fichas antigas.</p>':''}${htmlSinergiasFicha(x,n)}</details>`).join(""):'<p class="muted">Nenhum golpe cadastrado.</p>'}</section><section data-profile-pane="images" hidden><p>Arte gerada para Nativas, técnicas e ataques fica no acervo desta conta.</p><button type="button" class="small secondary" data-go="gallery">Abrir imagens criadas</button><button type="button" class="small secondary" data-go="art-studio">Criar imagem</button></section>
-    <div class="progress-panel"><h4>Progressão</h4><div class="progress-grid"><div><strong>${resumo.xpAtual}/${resumo.xpNecessario}</strong><span>${resumo.nivel>=17?"Nível máximo temporário · 17":"XP para próximo nível"} · ${resumo.xpAcumulado} acumulado</span></div><div><strong>${resumo.xpaDisponivel}</strong><span>XPA disponível</span></div><div><strong>${(n.essencias||[]).length}/3</strong><span>Essências absorvidas</span></div><div><strong>${(n.essenciasDisponiveis||[]).length}</strong><span>Essências guardadas</span></div></div>${essenciasGuardadas.length?`<p class="pending-essences">Guardadas de: ${essenciasGuardadas.map(escapar).join(" · ")}</p>`:""}<div class="progress-controls"><input type="number" min="1" step="1" placeholder="XP" data-xp-input data-index="${index}" ${disabled||resumo.nivel>=17?"disabled":""}><button type="button" class="small" data-add-xp-index="${index}" ${disabled||resumo.nivel>=17?"disabled":""}>Adicionar XP</button><button type="button" class="small secondary" data-essence-index="${index}" ${disabled}>Essência</button></div><details class="technique-group"><summary>Atributos · gastar XPA</summary><div class="stat-chips">${DEFINICOES_ATRIBUTOS.map(([key,label])=>`<span>${key} ${label}: ${n.attrs[key]||1} <button type="button" data-profile-attribute="${key}" data-index="${index}" ${disabled||resumo.xpaDisponivel<((n.attrs[key]||1)+1)?"disabled":""}>＋</button></span>`).join("")}</div></details></div>
+    return `<article class="card ${somenteLeitura?"card-readonly":""}" data-card="${escapar(idCard)}" data-card-index="${index}">${fotoHtml}<div class="card-body"><div class="card-top"><div><h3>${escapar(n.name)}</h3><span class="tag">Nível ${resumo.nivel} · Estágio ${resumo.estagio}</span></div><span class="tag">${escapar(n.affinity)}</span></div><p>${escapar(n.groupBio)} · ${escapar(n.lineageName||n.lineage)}${n.species?` · ${escapar(n.species)}`:""}</p><p>${escapar(n.bioma)} · ${escapar(n.archetype)}${n.player?` · Jogador: ${escapar(n.player)}`:""}</p><p class="sync-state" role="status">${escapar(estadoTexto)}</p>${associationHelp}${missingIdHelp}${unassociatedHelp}<nav class="profile-tabs" aria-label="Abas da ficha"><button type="button" class="active" data-profile-tab="overview">Visão geral</button><button type="button" data-profile-tab="biology">Traços e hábitos</button><button type="button" data-profile-tab="techniques">Golpes</button><button type="button" data-profile-tab="images">Imagens criadas</button></nav><div class="stat-chips" data-profile-pane="overview">${DEFINICOES_ATRIBUTOS.map(([k])=>`<span>${k} ${n.attrs[k]||1}</span>`).join("")}<span>HP ${maxHP}</span><span>MP ${maxMP}</span></div><section class="profile-biology" data-profile-pane="biology" hidden><h4>Traços</h4><p>${tracosHtml}</p><button type="button" class="small secondary" data-edit-traits="${index}" ${disabled} ${isAdmin(document.documentElement.dataset.applicationRole)?"":"hidden"}>Editar traços</button><h4>Traços Quiméricos</h4><p>${(n.tracosQuimericos||[]).length?(n.tracosQuimericos||[]).map(escapar).join(" · "):"Nenhum registrado"}</p><button type="button" class="small secondary" data-edit-chimeric="${index}" ${disabled} ${isAdmin(document.documentElement.dataset.applicationRole)?"":"hidden"}>Registrar/editar Traços Quiméricos</button><h4>Hábitos</h4><p>${listaHabitos.length?listaHabitos.map(escapar).join(" · "):"Nenhum hábito cadastrado."}</p><button type="button" class="small secondary" data-edit-habits="${index}" ${disabled} ${isAdmin(document.documentElement.dataset.applicationRole)?"":"hidden"}>Editar hábitos</button></section><section class="profile-techniques" data-profile-pane="techniques" hidden><h4 style="margin-top:13px">Golpes (${t.length})</h4>${t.length?t.map(x=>`<details class="technique-detail"><summary>${escapar(x.nome)} · ${escapar(x.categoria)} · MP ${x.mp??"pendente"} · dano ${x.dano??"—"}</summary><p>${escapar(x.efeito)}</p>${x.estadoCatalogo==="em-revisao"?'<p class="muted">Em revisão. Não pode ser usado em combate até receber aprovação.</p>':x.estadoCatalogo==="arquivado"?'<p class="muted">Golpe arquivado; disponível apenas para preservar fichas antigas.</p>':''}${htmlSinergiasFicha(x,n)}</details>`).join(""):'<p class="muted">Nenhum golpe cadastrado.</p>'}</section><section data-profile-pane="images" hidden><p>Arte gerada para Nativas, técnicas e ataques fica no acervo desta conta.</p><button type="button" class="small secondary" data-go="gallery">Abrir imagens criadas</button><button type="button" class="small secondary" data-go="art-studio">Criar imagem</button></section>
+    <div class="progress-panel"><h4>Progressão</h4><div class="progress-grid"><div><strong>${resumo.xpAtual}/${resumo.xpNecessario}</strong><span>${resumo.nivel>=17?"Nível máximo temporário · 17":"XP para próximo nível"} · ${resumo.xpAcumulado} acumulado</span></div><div><strong>${resumo.xpaDisponivel}</strong><span>XPA disponível</span></div><div><strong>${(n.essencias||[]).length}/3</strong><span>Essências absorvidas</span></div><div><strong>${(n.essenciasDisponiveis||[]).length}</strong><span>Essências guardadas</span></div></div>${essenciasGuardadas.length?`<p class="pending-essences">Guardadas de: ${essenciasGuardadas.map(escapar).join(" · ")}</p>`:""}<div class="progress-controls"><button type="button" class="small secondary" data-essence-index="${index}" ${disabled}>Essência</button></div><details class="technique-group"><summary>Atributos · gastar XPA</summary><div class="stat-chips">${DEFINICOES_ATRIBUTOS.map(([key,label])=>`<span>${key} ${label}: ${n.attrs[key]||1} <button type="button" data-profile-attribute="${key}" data-index="${index}" ${disabled||resumo.xpaDisponivel<((n.attrs[key]||1)+1)?"disabled":""}>＋</button></span>`).join("")}</div></details></div>
     <div class="card-actions">${associationAction}<label class="small secondary ${somenteLeitura?"disabled-label":""}" style="display:inline-flex;align-items:center;gap:7px;padding:8px 10px;border-radius:8px;cursor:pointer">${n.photoId?"Trocar foto":"Adicionar foto"}<input type="file" accept="image/*" data-photo-index="${index}" ${disabled} hidden></label>${n.photoId?`<button type="button" class="small secondary" data-remove-photo-index="${index}" ${disabled}>Remover foto</button>`:""}<button type="button" class="small danger" data-delete-index="${index}" data-delete-retry="${estado?.associationState==="deleted"?"true":"false"}" ${deleteDisabled}>Excluir</button></div></div></article>`;
   }));
   if (versao === versaoRenderLista){$("#cards").innerHTML=html.join("");personalizarCardsBestiario(abas);}
@@ -754,9 +813,10 @@ function nativaNoIndice(valor){const indice=Number(valor);return Number.isIntege
 $("#cards").addEventListener("click",async e=>{
   const aba=e.target.closest("[data-profile-tab]");
   if(aba){const card=aba.closest(".card");card.querySelectorAll("[data-profile-tab]").forEach(button=>button.classList.toggle("active",button===aba));card.querySelectorAll("[data-profile-pane]").forEach(pane=>pane.hidden=pane.dataset.profilePane!==aba.dataset.profileTab);return;}
-  if(e.target.dataset.editChimeric!==undefined){const n=nativaNoIndice(e.target.dataset.editChimeric);if(!n||!await podeEditarFicha(n))return;const anterior=JSON.parse(JSON.stringify(n));const entrada=prompt("Registre Traços Quiméricos em texto, separados por vírgula. Nenhum efeito automático será aplicado.",(n.tracosQuimericos||[]).join(", "));if(entrada===null)return;n.tracosQuimericos=entrada.split(",").map(x=>x.trim()).filter(Boolean);try{await salvarEdicaoNativa(n,anterior);await renderizarLista();}catch(error){restaurarFicha(n,anterior);alert(`Não foi possível salvar: ${error.message}`);}return;}
+  if(e.target.dataset.editChimeric!==undefined){if(!isAdmin(document.documentElement.dataset.applicationRole))return;const n=nativaNoIndice(e.target.dataset.editChimeric);if(!n||!await podeEditarFicha(n))return;const anterior=JSON.parse(JSON.stringify(n));const entrada=prompt("Registre Traços Quiméricos em texto, separados por vírgula. Nenhum efeito automático será aplicado.",(n.tracosQuimericos||[]).join(", "));if(entrada===null)return;n.tracosQuimericos=entrada.split(",").map(x=>x.trim()).filter(Boolean);try{await salvarEdicaoNativa(n,anterior);await renderizarLista();}catch(error){restaurarFicha(n,anterior);alert(`Não foi possível salvar: ${error.message}`);}return;}
   const indexFicha=Number(e.target.dataset.editTraits ?? e.target.dataset.editHabits);
   if(e.target.dataset.editTraits!==undefined||e.target.dataset.editHabits!==undefined){
+    if(!isAdmin(document.documentElement.dataset.applicationRole))return;
     const n=nativaNoIndice(indexFicha);if(!n||!await podeEditarFicha(n))return;
     const anterior=JSON.parse(JSON.stringify(n));
     const isTrait=e.target.dataset.editTraits!==undefined;
@@ -827,9 +887,7 @@ $("#cards").addEventListener("click",async e=>{
   }
 
   const photoRemoveIndex=e.target.dataset.removePhotoIndex;
-  if(photoRemoveIndex!==undefined){const n=nativaNoIndice(photoRemoveIndex);if(!n||!await podeEditarFicha(n))return;const anterior=JSON.parse(JSON.stringify(n));const photoId=n.photoId;n.photoId=null;const resultado=await salvarEdicaoNativa(n,anterior);if(resultado.persisted&&photoId)await removerFoto(photoId);return;}
-  const xpIndex=e.target.dataset.addXpIndex;
-  if(xpIndex!==undefined){const n=nativaNoIndice(xpIndex);if(!n||!await podeEditarFicha(n))return;const lock=n.id||`indice:${xpIndex}`;if(progressaoEmCurso.has(lock))return;progressaoEmCurso.add(lock);const input=e.target.closest(".card").querySelector("[data-xp-input]");const anterior=JSON.parse(JSON.stringify(n));try{const result=adicionarXP(n,Number(input.value));const salvo=await salvarEdicaoNativa(n,anterior);if(!salvo.persisted)return;const lv=result.niveisConquistados.map(x=>`Nível ${x.nivelNovo} (+${x.xpaRecebido} XPA)`).join(", ");alert(lv?`Progressão: ${lv}`:"XP adicionada.");}catch(err){restaurarFicha(n,anterior);alert(err.message);}finally{progressaoEmCurso.delete(lock);}return;}
+  if(photoRemoveIndex!==undefined){const n=nativaNoIndice(photoRemoveIndex);if(!n||!await podeEditarFicha(n))return;const anterior=JSON.parse(JSON.stringify(n));const photoId=n.photoId,storagePath=n.photoStoragePath;n.photoId=null;n.photoStoragePath=null;const resultado=await salvarEdicaoNativa(n,anterior);if(resultado.persisted){if(photoId)await removerFoto(photoId);if(storagePath)await removerRetratoNativa(storagePath);}return;}
   const attributeIndex=e.target.dataset.index;
   const attribute=e.target.dataset.profileAttribute;
   if(attribute&&attributeIndex!==undefined){const n=nativaNoIndice(attributeIndex);if(!n||!await podeEditarFicha(n))return;const lock=n.id||`indice:${attributeIndex}`;if(progressaoEmCurso.has(lock))return;progressaoEmCurso.add(lock);const anterior=JSON.parse(JSON.stringify(n));try{aumentarAtributo(n,attribute);const salvo=await salvarEdicaoNativa(n,anterior);if(salvo.persisted)await renderizarLista();}catch(err){restaurarFicha(n,anterior);alert(err.message);}finally{progressaoEmCurso.delete(lock);}return;}
@@ -841,12 +899,17 @@ $("#cards").addEventListener("click",async e=>{
 $("#cards").addEventListener("change",async e=>{
   const index=e.target.dataset.photoIndex;if(index===undefined||!e.target.files?.[0])return;
   const n=nativaNoIndice(index);if(!n||!await podeEditarFicha(n))return;
-  const file=e.target.files[0];if(!file.type.startsWith("image/")){alert("Selecione um arquivo de imagem.");return;}if(file.size>8*1024*1024){alert("A imagem deve ter no máximo 8 MB.");return;}
+  const file=e.target.files[0];if(!["image/jpeg","image/png","image/webp"].includes(file.type.toLowerCase())){alert("Use uma imagem JPG, PNG ou WebP.");return;}if(file.size>8*1024*1024){alert("A imagem deve ter no máximo 8 MB.");return;}
   const anterior=JSON.parse(JSON.stringify(n));
-  try{const photoId=`photo-${crypto.randomUUID()}`;await guardarFoto(photoId,file);n.photoId=photoId;const resultado=await salvarEdicaoNativa(n,anterior);if(!resultado.persisted)await removerFoto(photoId);else if(anterior.photoId)await removerFoto(anterior.photoId);}catch{restaurarFicha(n,anterior);alert("Não foi possível guardar a foto neste navegador.");}
+  try{const photoId=`photo-${crypto.randomUUID()}`;await guardarFoto(photoId,file);n.photoId=photoId;n.photoStoragePath=null;const resultado=await salvarEdicaoNativa(n,anterior);if(!resultado.persisted)await removerFoto(photoId);else{if(anterior.photoId)await removerFoto(anterior.photoId);if(anterior.photoStoragePath)await removerRetratoNativa(anterior.photoStoragePath);}}catch(error){restaurarFicha(n,anterior);alert(`Não foi possível guardar a foto: ${error.message}`);}
 });
-function escolherTecnicaPrompt(lista,titulo){if(!lista.length)throw new Error("Não há técnicas disponíveis para essa escolha.");const texto=lista.map((t,i)=>`${i+1}. ${t.nome} (${t.categoria})`).join("\n");const resposta=prompt(`${titulo}\n\n${texto}\n\nDigite o número da técnica:`);const idx=Number(resposta)-1;if(!Number.isInteger(idx)||idx<0||idx>=lista.length)throw new Error("Seleção cancelada ou inválida.");return lista[idx];}
-async function iniciarAbsorcaoEssencia(n){if(!await podeEditarFicha(n))return;const anterior=JSON.parse(JSON.stringify(n));try{if(!(n.essenciasDisponiveis||[]).length)throw new Error("Não há Essências guardadas. Vença combates para tentar obter uma.");const tipo=(n.essencias||[]).includes("primeira")?"segunda":"primeira";const check=verificarEssencia(n,tipo);if(!check.permitido)throw new Error(check.motivo);const afinidades=AFINIDADES.map(x=>x.nome).filter(x=>x!==n.affinity&&!(n.afinidadesEssencia||[]).includes(x));const nova=prompt(`Escolha a afinidade da ${ESSENCIAS[tipo].nome}:\n${afinidades.map((x,i)=>`${i+1}. ${x}`).join("\n")}\n\nDigite o nome exatamente como aparece:`);if(!nova)return;if(!afinidades.includes(nova))throw new Error("Afinidade inválida.");let escolhas=[];if(tipo==="primeira"){const a=escolherTecnicaPrompt(TECNICAS.filter(t=>t.origem==="afinidade"&&t.grupo===nova&&podeAprenderTecnica(t)),"Escolha uma técnica da nova afinidade");const b=escolherTecnicaPrompt(TECNICAS.filter(t=>((t.origem==="linhagem"&&t.grupo===(n.lineageName||n.lineage))||(t.origem==="arquetipo"&&t.grupo===n.archetype))&&podeAprenderTecnica(t)),"Escolha uma técnica disponível da linhagem ou arquétipo");escolhas=[a,b];}else{const a=escolherTecnicaPrompt(TECNICAS.filter(t=>t.origem==="afinidade"&&t.grupo===nova&&podeAprenderTecnica(t)),"Escolha uma técnica da nova afinidade");escolhas=[a];}absorverEssencia(n,tipo,nova);n.techniques=[...new Set([...(n.techniques||[]),...escolhas.map(t=>t.id)])];const salvo=await salvarEdicaoNativa(n,anterior);if(salvo.persisted)alert(`${ESSENCIAS[tipo].nome} absorvida. Técnicas adicionadas: ${escolhas.map(t=>t.nome).join(", ")}.`);}catch(err){restaurarFicha(n,anterior);alert(err.message);}}
+let nativaInventarioEssencias=null;
+async function atualizarSeletorResetProgressao(){const select=$("#progress-reset-native");if(!select)return;const options=[];for(const n of nativas){const origin=await repositorioLocal.obterOrigemNativa(n.id).catch(()=>null);if(origin?.origin==="preset"||idsPresetCatalogo.has(n.id))continue;const permission=await repositorioLocal.podeEditarNativa(n.id).catch(()=>({allowed:false}));if(permission.allowed)options.push(new Option(`${n.name} · Nv. ${n.nivel||1}`,n.id));}select.replaceChildren(new Option("Selecione uma ficha editável",""),...options);$("#progress-reset-confirm").disabled=true;}
+$("#progress-reset-native")?.addEventListener("change",event=>{$("#progress-reset-confirm").disabled=!event.target.value;$("#progress-reset-status").textContent="";});
+$("#progress-reset-confirm")?.addEventListener("click",async()=>{const n=nativas.find(item=>item.id===$("#progress-reset-native").value);if(!n||!await podeEditarFicha(n))return;if(!confirm(`Resetar a progressão de ${n.name}? Nível, XP, XPA, Essências e melhorias registradas serão reiniciados somente nesta ficha.`))return;const previous=JSON.parse(JSON.stringify(n));try{n.nivel=1;n.xp=0;n.xpTotal=0;n.xpa=0;n.estagio=1;n.progressResetVersion=1;n.atributosIniciais||=structuredClone(n.attrs);n.attrs=structuredClone(n.atributosIniciais);if(!Array.isArray(n.golpesIniciais))n.golpesIniciais=normalizarGolpesIniciais(n,n.techniques);n.techniques=[...n.golpesIniciais].slice(0,4);n.essencias=[];n.afinidadesEssencia=[];n.essenciasDisponiveis=[];n.historicoProgressao=[];const result=await salvarEdicaoNativa(n,previous);$("#progress-reset-status").textContent=result.persisted?`${n.name} voltou ao nível 1. Seus companheiros nas mesas não foram alterados.`:"Não foi possível salvar o reset.";if(result.persisted){await atualizarSeletorResetProgressao();$("#progress-reset-native").value=n.id;}}catch(error){restaurarFicha(n,previous);$("#progress-reset-status").textContent=`Falha: ${error.message}`;}});
+async function iniciarAbsorcaoEssencia(n){if(!await podeEditarFicha(n))return;nativaInventarioEssencias=n;const dialog=$("#essence-inventory-dialog"),list=$("#essence-inventory-list");if(!dialog||!list)return;const pendentes=(n.essenciasDisponiveis||[]).filter(essence=>essence?.origem==="combate");if(!pendentes.length){list.innerHTML='<p class="muted">Nenhuma esfera ainda. Vitórias têm 5% de chance de conceder uma Essência.</p>';dialog.showModal();return;}const tipo=(n.essencias||[]).includes("primeira")?"segunda":"primeira";for(const essence of pendentes)essence.id||=crypto.randomUUID();list.innerHTML=await Promise.all(pendentes.map(async(essence)=>{let photoUrl=defaultPortrait({id:essence.oponenteId});if(essence.oponentePhotoId){try{const blob=await obterRetratoNativa({photoId:essence.oponentePhotoId,photoStoragePath:essence.oponentePhotoPath});if(blob)photoUrl=URL.createObjectURL(blob);}catch{}}const affinity=String(essence.oponenteAfinidade||"terra").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();const check=verificarEssencia(n,tipo);const sourceMoves=(essence.oponenteTecnicas||[]).map(id=>obterTecnicaPorId(id,{incluirArquivo:false})).filter(t=>t&&podeAprenderTecnica(t));const required=tipo==="primeira"?["linhagem","afinidade"]:["afinidade"];const complete=required.every(origin=>sourceMoves.some(move=>move.origem===origin));const disabled=!check.permitido||!complete;const detail=!check.permitido?check.motivo:!complete?"A ficha de origem não contém os golpes exigidos para esta Essência.":tipo==="primeira"?"Concede os golpes de linhagem e afinidade desta Nativa.":`Concede afinidade ${essence.oponenteAfinidade||"da origem"} e um golpe dela.`;return `<article class="essence-orb-card" data-affinity="${escapar(affinity)}"><div class="essence-orb"><span class="orb-glow"></span>${photoUrl?`<img src="${escapar(photoUrl)}" alt="${escapar(essence.oponenteNome||"Nativa de origem")}">`:`<span class="orb-creature-fallback">✦</span>`}</div><div class="essence-orb-info"><span class="eyebrow">ESSÊNCIA · ${tipo==="primeira"?"I":"II"}</span><h3>${escapar(essence.oponenteNome||"Nativa selvagem")}</h3><p>${escapar(essence.oponenteLinhagem||"Linhagem desconhecida")} · ${escapar(essence.oponenteAfinidade||"Afinidade desconhecida")}</p><small>${escapar(detail)}</small><button type="button" data-absorb-essence="${escapar(essence.id)}" ${disabled?"disabled":""}>${disabled?"Indisponível":"Absorver"}</button></div></article>`;})).then(cards=>cards.join(""));dialog.showModal();}
+$("#essence-inventory-close")?.addEventListener("click",()=>$("#essence-inventory-dialog")?.close());
+$("#essence-inventory-list")?.addEventListener("click",async event=>{const button=event.target.closest("[data-absorb-essence]");const n=nativaInventarioEssencias;if(!button||!n)return;const essence=(n.essenciasDisponiveis||[]).find((item,index)=>(item.id||String(index))===button.dataset.absorbEssence);if(!essence)return;const tipo=(n.essencias||[]).includes("primeira")?"segunda":"primeira";const anterior=JSON.parse(JSON.stringify(n));try{const sourceMoves=(essence.oponenteTecnicas||[]).map(id=>obterTecnicaPorId(id,{incluirArquivo:false})).filter(t=>t&&podeAprenderTecnica(t));let moves;if(tipo==="primeira"){moves=[sourceMoves.find(t=>t.origem==="linhagem"),sourceMoves.find(t=>t.origem==="afinidade")];}else{const affinity=essence.oponenteAfinidade;if(!affinity||affinity===n.affinity||(n.afinidadesEssencia||[]).includes(affinity))throw new Error("A afinidade da Nativa de origem já está presente nesta ficha.");moves=[sourceMoves.find(t=>t.origem==="afinidade"&&t.grupo===affinity)];}if(moves.some(t=>!t))throw new Error("A Nativa de origem não possui um golpe válido de cada grupo exigido.");if(moves.some(t=>(n.techniques||[]).includes(t.id)))throw new Error("Um dos golpes desta Essência já está na ficha.");const affinity=tipo==="segunda"?essence.oponenteAfinidade:null;absorverEssencia(n,tipo,affinity,essence.id||null);n.techniques=[...new Set([...(n.techniques||[]),...moves.map(t=>t.id)])];const history=n.historicoProgressao?.at(-1);if(history?.tipo==="essencia")history.golpesAdquiridos=moves.map(t=>t.id);const saved=await salvarEdicaoNativa(n,anterior);if(saved.persisted){$("#essence-inventory-dialog")?.close();alert(`${ESSENCIAS[tipo].nome} absorvida: ${moves.map(t=>t.nome).join(" · ")}.`);}}catch(error){restaurarFicha(n,anterior);alert(error.message);}});
 
 // ---------------------------- ARENA DE BATALHA ----------------------------
 
@@ -1481,7 +1544,6 @@ function renderizarArena(){
   $("#battle-arena").innerHTML=`
     <section class="battlefield battle-layout" data-mode="${escapar(batalha.modo)}" data-biome="${escapar(batalha.bioma||"")}" aria-label="Arena: ${escapar(batalha.bioma||"Bioma não definido")}">
       <header class="battlefield-topline"><span class="arena-location">${escapar(batalha.bioma||"Arena")} · ${escapar(batalha.horario||"")}</span><span class="battle-state">${batalha.encerrada?"Combate encerrado":`Turno ${batalha.turno} · ${batalha.processando?"Resolvendo ações":"Combate em andamento"}`}</span></header>
-      <div class="arena-stage" aria-label="Campo de batalha">
       <div class="arena-hud-row">
         ${renderizarHudCombatente(f[0],0)}
         <div class="turn-order ${batalha.ordem.length?"initiative-revealed":""}">
@@ -1492,6 +1554,7 @@ function renderizarArena(){
         ${renderizarHudCombatente(f[1],1)}
       </div>
 
+      <div class="arena-stage" aria-label="Campo de batalha">
         <div class="scene-backdrop" aria-hidden="true"><span class="scene-canopy"></span><span class="scene-ridge"></span><span class="scene-water"></span><span class="scene-ground"></span><span class="scene-rocks"></span><span class="scene-plants"></span><span class="scene-light"></span></div>
         <div class="arena-fighter arena-fighter-one">${renderizarCombatente(f[0],0)}</div>
         <div class="arena-stage-mark" aria-hidden="true"><span></span><b>VS</b><span></span></div>

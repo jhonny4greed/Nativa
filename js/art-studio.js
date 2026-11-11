@@ -3,8 +3,12 @@ import { obterClienteSupabase } from "./auth.js";
 const CATEGORIAS = new Set(["nativa", "biome", "technique", "other"]);
 const IMAGE_TYPES = new Set(["image/png", "image/jpeg", "image/webp"]);
 
-function mensagemErro(error, fallback) {
-  return error?.message || error?.context?.message || fallback;
+async function mensagemErro(error, fallback) {
+  const context=error?.context;
+  if(context&&typeof context.clone==="function"){
+    try{const payload=await context.clone().json();if(typeof payload?.error==="string"&&payload.error)return payload.error;}catch{/* O servidor pode retornar uma resposta sem JSON. */}
+  }
+  return error?.message || context?.message || fallback;
 }
 
 export function criarEstudioImagens({ clientProvider = obterClienteSupabase, wait = ms => new Promise(resolve => setTimeout(resolve, ms)), maxPolls = 90 } = {}) {
@@ -25,7 +29,7 @@ export function criarEstudioImagens({ clientProvider = obterClienteSupabase, wai
     const { data: task, error: startError } = await client.functions.invoke("generate-art", {
       body: { action: "start", kind, title: cleanTitle, prompt: cleanPrompt }
     });
-    if (startError) throw new Error(mensagemErro(startError, "Não foi possível iniciar a geração."));
+    if (startError) throw new Error(await mensagemErro(startError, "Não foi possível iniciar a geração."));
     if (typeof task?.taskToken !== "string" || !task.taskToken) throw new Error("O servidor não retornou uma tarefa protegida válida.");
 
     for (let attempt = 0; attempt < maxPolls; attempt++) {
@@ -36,7 +40,7 @@ export function criarEstudioImagens({ clientProvider = obterClienteSupabase, wai
       const { data: status, error: statusError } = await client.functions.invoke("generate-art", {
         body: { action: "status", taskToken: task.taskToken }
       });
-      if (statusError) throw new Error(mensagemErro(statusError, "Não foi possível consultar a geração."));
+      if (statusError) throw new Error(await mensagemErro(statusError, "Não foi possível consultar a geração."));
       if (status?.status === "failed") throw new Error(status.reason || "O provedor não conseguiu gerar a imagem.");
       onProgress({ phase: "processing", progress: Number(status?.progress) || 0, attempt: attempt + 1, maxPolls });
       if (status?.status !== "succeeded") continue;
@@ -48,7 +52,7 @@ export function criarEstudioImagens({ clientProvider = obterClienteSupabase, wai
       const { data: downloaded, error: downloadError, response } = await client.functions.invoke("generate-art", {
         body: { action: "download", taskToken: task.taskToken }
       });
-      if (downloadError) throw new Error(mensagemErro(downloadError, "A geração terminou, mas não foi possível baixar a imagem."));
+      if (downloadError) throw new Error(await mensagemErro(downloadError, "A geração terminou, mas não foi possível baixar a imagem."));
       const imageType = response?.headers?.get("x-image-content-type")?.toLowerCase();
       if (!(downloaded instanceof Blob) || !IMAGE_TYPES.has(imageType) || downloaded.size === 0 || downloaded.size > 15_000_000) {
         throw new Error("O servidor retornou um arquivo de imagem inválido ou acima de 15 MB.");

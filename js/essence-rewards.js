@@ -9,7 +9,7 @@ export const MODOS_RECOMPENSA_ESSENCIA = Object.freeze({
 
 export const CONFIG_ESSENCIA_PADRAO = Object.freeze({
   modo: MODOS_RECOMPENSA_ESSENCIA.DROP,
-  chanceDrop: 20
+  chanceDrop: 5
 });
 
 export function rolarDropEssencia(chancePercentual, random = Math.random) {
@@ -30,6 +30,9 @@ export function criarEssenciaPendente({ id, oponente, modo = MODOS_RECOMPENSA_ES
     oponenteId: oponente?.id || null,
     oponenteNome: oponente?.name || "Nativa adversária",
     oponenteLinhagem: oponente?.lineageName || oponente?.lineage || "",
-    oponenteAfinidade: oponente?.affinity || ""
+    oponenteAfinidade: oponente?.affinity || "",
+    oponenteTecnicas: Array.isArray(oponente?.techniques) ? [...oponente.techniques].slice(0, 12) : [],
+    oponentePhotoId: oponente?.photoId || null,
+    oponentePhotoPath: oponente?.photoStoragePath || null
   };
 }

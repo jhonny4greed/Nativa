@@ -94,7 +94,7 @@ test("dano físico e especial não ficam abaixo de zero; afinidades duplas anula
   assert.equal(result.fighters[1].hp, 50);
 
   const defensor = criarCombatente(nativa("c", "Dupla", {
-    affinity: "Vento", essencias: ["segunda"], afinidadesEssencia: ["Vento", "Água"]
+    affinity: "Vento", essencias: ["segunda"], afinidadesEssencia: ["Água"]
   }));
   assert.equal(modificadorAfinidade(a, defensor, jato), 0);
   const vulneravel = criarCombatente(nativa("d", "Vento", { affinity: "Vento" }));

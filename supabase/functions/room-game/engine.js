@@ -5,7 +5,7 @@ import { xpPorVitoria, adicionarXP } from "../_shared/game/progression.js";
 function npcFromCampaign(data) {
   const biome=String(data.bioma||"habitat").split(",")[0];
   const lineage=String(data.lineageName||data.lineage||"linhagem");
-  return {...structuredClone(data),id:`encounter-${crypto.randomUUID()}`,name:`Guardião ${lineage}`,species:`Encontro de ${biome}`,bioma:data.bioma,level:data.nivel||1,nivel:data.nivel||1,attrs:{...data.attrs},techniques:[...(data.techniques||[])].slice(0,6)};
+  return {...structuredClone(data),id:`encounter-${crypto.randomUUID()}`,name:`Guardião ${lineage}`,species:`Encontro de ${biome}`,bioma:data.bioma,level:data.nivel||1,nivel:data.nivel||1,attrs:{...data.attrs},techniques:[...(data.techniques||[])].slice(0,4)};
 }
 export function orderRoomParticipants(participants){return [...participants].sort((a,b)=>String(a.player_id).localeCompare(String(b.player_id)));}
 export function initialRoomState(encounter,participants) {
@@ -48,6 +48,6 @@ export function resolveRoomRound(encounter,participants,choices,random=Math.rand
 export function campaignReward(data,opponent,random=Math.random){
   const next=structuredClone(data);const xp=(next.nivel||1)>=17?0:xpPorVitoria(next.nivel||1,opponent.nivel||1);if(xp)adicionarXP(next,xp);
   let essence=null;
-  if(random()<.2){essence={id:crypto.randomUUID(),origem:"combate",oponenteId:opponent.id||null,oponenteNome:opponent.name||"Nativa selvagem",oponenteLinhagem:opponent.lineageName||opponent.lineage||"",oponenteAfinidade:opponent.affinity||""};next.essenciasDisponiveis||=[];next.essenciasDisponiveis.push(essence);}
+  if(random()<.05){essence={id:crypto.randomUUID(),origem:"combate",oponenteId:opponent.id||null,oponenteNome:opponent.name||"Nativa selvagem",oponenteLinhagem:opponent.lineageName||opponent.lineage||"",oponenteAfinidade:opponent.affinity||"",oponenteTecnicas:[...(opponent.techniques||[])].slice(0,12),oponentePhotoId:opponent.photoId||null,oponentePhotoPath:opponent.photoStoragePath||null};next.essenciasDisponiveis||=[];next.essenciasDisponiveis.push(essence);}
   return {data:next,xp,essence};
 }

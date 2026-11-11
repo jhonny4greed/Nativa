@@ -3,8 +3,9 @@ import { isAdmin, authHref, safeDestination } from "./access.js";
 import { repositorioLocal } from "./repository.js";
 import { defaultPortrait } from "./creature-art.js";
 import { featuredSummary } from "./featured-creature.js";
+import { obterRetratoNativa } from "./native-portraits.js";
 
-const LABELS = { home: "Refúgio", list: "Bestiário", create: "Criar Nativa", battle: "Arena", "art-studio": "Ateliê de imagens", gallery: "Acervo e retratos", multiplayer: "Mesas multiplayer", rules: "Guia de jogo", account: "Minha conta", admin: "Administração" };
+const LABELS = { home: "Refúgio", list: "Bestiário", create: "Criar Nativa", battle: "Arena", "art-studio": "Ateliê de imagens", gallery: "Acervo e retratos", multiplayer: "Mesas multiplayer", rules: "Guia de jogo", settings: "Configurações", account: "Minha conta", admin: "Administração" };
 const DESTINATIONS = { conta: "account", criar: "create", bestiario: "list", arena: "battle", atelie: "art-studio", regras: "rules" };
 const reduced = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 const urls = new Set();
@@ -50,7 +51,7 @@ async function selectCreature(nativa, moving = false) {
   });
   let src = defaultPortrait(nativa), owned = false;
   if (nativa.photoId) {
-    try { const blob = await repositorioLocal.obterFoto(nativa.photoId); if (blob) { src = URL.createObjectURL(blob); owned = true; } } catch { /* use the default portrait */ }
+    try { const blob = await obterRetratoNativa(nativa); if (blob) { src = URL.createObjectURL(blob); owned = true; } } catch { /* use the default portrait */ }
   }
   if (version !== imageVersion) { if (owned) URL.revokeObjectURL(src); return; }
   const image = document.getElementById("featured-portrait");
@@ -126,6 +127,8 @@ async function renderCompanions() {
 
 export async function initializeDashboard(client, user, applicationRole = "player") {
   const admin = isAdmin(applicationRole);
+  document.documentElement.dataset.userId = user.id;
+  document.documentElement.dataset.applicationRole = applicationRole;
   for (const [id, direction] of [["featured-prev", -1], ["featured-next", 1]]) {
     document.getElementById(id).addEventListener("click", () => {
       if (!collection.length) return;

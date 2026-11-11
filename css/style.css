@@ -1698,3 +1698,122 @@ body:has(#battle.active) main { max-width:none; padding:16px clamp(12px,2vw,30px
 .site-help-content section p{margin:0;color:#c6d2c3;font-size:13px;line-height:1.55}
 .site-help-note{grid-column:1/-1;margin:0;padding:12px 14px;border-left:3px solid var(--gold);background:#c8aa6520;color:#e4d5aa;font-size:12px}
 @media(max-width:600px){.site-help-launch{right:14px;bottom:calc(78px + env(safe-area-inset-bottom));width:48px;height:48px;font-size:24px}.site-help-head{align-items:flex-start;padding:18px}.site-help-head .secondary{padding:8px 11px}.site-help-content{grid-template-columns:1fr;padding:14px}.site-help-note{grid-column:1}.site-help-content section{padding:14px}}
+.essence-admin-settings label{display:grid;gap:10px;max-width:520px;color:#d8e1d5;font-weight:700}
+.essence-inventory-dialog{width:min(760px,calc(100% - 24px));max-height:84vh;padding:0;border:1px solid #748455;border-radius:20px;background:linear-gradient(145deg,#1a2d22,#0d1913);color:var(--text);box-shadow:0 28px 90px #000b;overflow:auto}
+.essence-inventory-dialog::backdrop{background:#06100cdd;backdrop-filter:blur(5px)}
+.essence-inventory-list{display:grid;gap:14px;padding:18px}
+.essence-orb-card{--orb:#90bd7b;display:grid;grid-template-columns:124px 1fr;align-items:center;gap:17px;padding:16px;border:1px solid color-mix(in srgb,var(--orb) 50%,#314437);border-radius:16px;background:linear-gradient(115deg,color-mix(in srgb,var(--orb) 12%,#15231a),#142019 60%);box-shadow:inset 0 0 22px color-mix(in srgb,var(--orb) 7%,transparent)}
+.essence-orb-card[data-affinity="fogo"]{--orb:#ff783c}.essence-orb-card[data-affinity="agua"]{--orb:#69b9ec}.essence-orb-card[data-affinity="terra"]{--orb:#bd9264}.essence-orb-card[data-affinity="vento"]{--orb:#94d994}.essence-orb-card[data-affinity="energia"]{--orb:#c48af3}
+.essence-orb{position:relative;display:grid;place-items:center;aspect-ratio:1;border:2px solid color-mix(in srgb,var(--orb) 85%,white);border-radius:50%;overflow:hidden;background:radial-gradient(circle at 36% 28%,color-mix(in srgb,var(--orb) 83%,white),color-mix(in srgb,var(--orb) 45%,#18211b) 48%,#101712 78%);box-shadow:0 0 18px color-mix(in srgb,var(--orb) 58%,transparent),inset 0 0 18px #fff5}
+.essence-orb img{position:relative;z-index:1;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 4px 7px #0008)}
+.orb-glow{position:absolute;inset:12%;border:1px solid #ffffff70;border-radius:50%;box-shadow:0 0 15px color-mix(in srgb,var(--orb) 80%,transparent);animation:orb-pulse 2.8s ease-in-out infinite}
+.orb-creature-fallback{position:relative;z-index:1;color:#fff6;font-size:54px;text-shadow:0 0 20px var(--orb)}
+.essence-orb-info h3{margin:4px 0;color:#f4ead0;font:600 23px Fraunces,serif}.essence-orb-info p{margin:0 0 8px;color:#c5d0c1;font-size:13px}.essence-orb-info small{display:block;margin-bottom:11px;color:#b3c2ad;line-height:1.45}.essence-orb-info button{padding:9px 14px;background:linear-gradient(135deg,color-mix(in srgb,var(--orb) 70%,#a5bb68),#c9d393);color:#122018}
+@keyframes orb-pulse{50%{transform:scale(.88);opacity:.45}}
+@media(max-width:560px){.essence-orb-card{grid-template-columns:82px 1fr;gap:12px;padding:12px}.essence-orb-info h3{font-size:19px}.essence-inventory-list{padding:12px}}
+
+/* Ajustes de legibilidade, controle de edição e arena em tela cheia. */
+.bestiary-grid .card-affinity-ambience { z-index:0; }
+.bestiary-grid .card > .card-body { z-index:3; }
+.profile-tabs button.active {
+  color:#fff;
+  background:linear-gradient(135deg,rgba(var(--affinity-rgb,154,190,135),.58),rgba(12,23,16,.96))!important;
+  text-shadow:0 1px 2px #000,0 0 6px #000a;
+  box-shadow:inset 0 1px 0 #ffffff35,0 2px 8px #0007;
+}
+.profile-tabs button:focus-visible,.card-actions button:focus-visible {
+  outline:2px solid #fff1b6;
+  outline-offset:2px;
+}
+
+#battle:fullscreen,#battle.arena-expanded {
+  position:fixed;
+  inset:0;
+  z-index:1000;
+  width:100vw;
+  height:100dvh;
+  max-width:none;
+  margin:0;
+  padding:0;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  background:radial-gradient(ellipse at 50% 0,#263d2c,#09140d 70%);
+}
+#battle:fullscreen>.section-heading,#battle.arena-expanded>.section-heading {
+  position:absolute;
+  inset:0 0 auto;
+  z-index:1300;
+  display:block;
+  width:100%;
+  height:0;
+  margin:0;
+  overflow:visible;
+  pointer-events:none;
+}
+#battle:fullscreen>.section-heading>div,#battle.arena-expanded>.section-heading>div { display:none; }
+#battle:fullscreen #arena-fullscreen,#battle.arena-expanded #arena-fullscreen {
+  position:fixed;
+  top:max(10px,env(safe-area-inset-top));
+  right:max(10px,env(safe-area-inset-right));
+  z-index:1400;
+  display:grid;
+  place-items:center;
+  width:38px;
+  min-width:38px;
+  height:38px;
+  padding:0;
+  border:1px solid #e3ecd272;
+  border-radius:50%;
+  background:#09140dcc;
+  color:#fff;
+  font-size:25px;
+  line-height:1;
+  opacity:.76;
+  pointer-events:auto;
+  -webkit-backdrop-filter:blur(8px);
+  backdrop-filter:blur(8px);
+  box-shadow:0 3px 12px #0008;
+}
+#battle:fullscreen #arena-fullscreen:hover,#battle.arena-expanded #arena-fullscreen:hover { opacity:1; transform:scale(1.06); }
+#battle:fullscreen .battle-arena-active,#battle.arena-expanded .battle-arena-active { margin:0; }
+#battle:fullscreen .battlefield,#battle.arena-expanded .battlefield {
+  grid-template-columns:minmax(0,1fr);
+  grid-template-areas:"top" "hud" "stage" "action" "forfeit" "commands";
+  gap:7px;
+  min-height:100dvh;
+  padding:12px clamp(12px,2vw,28px) 16px;
+  overflow:visible;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+}
+#battle:fullscreen .battlefield-topline,#battle.arena-expanded .battlefield-topline { top:7px; left:12px; right:58px; }
+#battle:fullscreen .arena-stage,#battle.arena-expanded .arena-stage { height:clamp(200px,38vh,430px); }
+#battle:fullscreen .arena-action-trigger,#battle.arena-expanded .arena-action-trigger { position:sticky; bottom:8px; z-index:30; }
+#battle:fullscreen .battle-commands,#battle.arena-expanded .battle-commands { width:min(100%,1500px); margin:0 auto; }
+#battle:fullscreen .battle-commands .battle-technique-grid,#battle.arena-expanded .battle-commands .battle-technique-grid { max-height:none; overflow:visible; }
+html.arena-playing-fullscreen body { overflow:hidden; }
+
+@media(max-width:760px) {
+  #battle:fullscreen,#battle.arena-expanded { padding:0; }
+  #battle:fullscreen .battlefield,#battle.arena-expanded .battlefield { padding:8px 9px max(12px,env(safe-area-inset-bottom)); }
+  #battle:fullscreen .arena-hud-row,#battle.arena-expanded .arena-hud-row { grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:5px; }
+  #battle:fullscreen .arena-hud-row .turn-order,#battle.arena-expanded .arena-hud-row .turn-order { grid-column:1/-1; grid-row:1; }
+  #battle:fullscreen .battle-hud,#battle.arena-expanded .battle-hud { grid-template-columns:1fr; padding:5px 7px; }
+  #battle:fullscreen .battle-hud .combatant-vitals,#battle.arena-expanded .battle-hud .combatant-vitals { grid-template-columns:1fr; }
+  #battle:fullscreen .arena-stage,#battle.arena-expanded .arena-stage { height:clamp(160px,36vh,260px); min-height:160px; }
+  #battle:fullscreen .battle-commands-grid,#battle.arena-expanded .battle-commands-grid { grid-template-columns:minmax(0,1fr); }
+  #battle:fullscreen .battle-commands .battle-technique-grid,#battle.arena-expanded .battle-commands .battle-technique-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  #battle:fullscreen .battle-commands .action-panel,#battle.arena-expanded .battle-commands .action-panel { padding:9px; }
+  #battle:fullscreen .battle-commands .battle-technique-card,#battle.arena-expanded .battle-commands .battle-technique-card { min-height:54px; }
+  #battle:fullscreen .battle-commands .battle-log,#battle.arena-expanded .battle-commands .battle-log { max-height:170px; min-height:110px; }
+}
+@media(max-width:900px) and (orientation:landscape) {
+  #battle:fullscreen .battlefield,#battle.arena-expanded .battlefield { gap:5px; }
+  #battle:fullscreen .arena-stage,#battle.arena-expanded .arena-stage { height:clamp(145px,33vh,250px); min-height:145px; }
+  #battle:fullscreen .battle-commands .battle-log,#battle.arena-expanded .battle-commands .battle-log { max-height:110px; min-height:80px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .profile-tabs button.active { text-shadow:0 1px 2px #000; }
+  #battle:fullscreen #arena-fullscreen,#battle.arena-expanded #arena-fullscreen { transition:none; }
+}

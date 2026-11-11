@@ -251,9 +251,6 @@ export function createGenerateArtHandler({ env = () => undefined, fetchImpl = fe
     catch { return json({ error: "Não foi possível validar a sessão." }, 401); }
     if (!user) return json({ error: "Entre na conta para gerar imagens." }, 401);
 
-    const allowedUsers = (env("IMAGE_GENERATION_ALLOWED_USER_IDS") || "").split(",").map(value => value.trim()).filter(Boolean);
-    if (!allowedUsers.includes(user.id)) return json({ error: "Esta conta não está autorizada a gerar imagens." }, 403);
-
     let body;
     try {
       const contentType = request.headers.get("content-type") || "";
@@ -296,6 +293,9 @@ export function createGenerateArtHandler({ env = () => undefined, fetchImpl = fe
           : error?.message === "invalid_image_size" ? "A imagem gerada excede o limite de 15 MB."
           : error?.message === "invalid_image_content" ? "O provedor retornou um conteúdo que não é uma imagem válida."
           : error?.message === "image_storage_unavailable" || error?.message === "image_storage_write_failed" ? "O armazenamento temporário de imagens está indisponível."
+          : error?.status === 401 ? "A chave NVIDIA configurada no servidor foi recusada."
+          : error?.status === 403 ? "O projeto NVIDIA não tem permissão para usar este modelo de imagem."
+          : error?.status === 429 ? "O provedor NVIDIA limitou temporariamente as gerações. Tente novamente mais tarde."
           : `O provedor recusou a geração (HTTP ${error?.status || "desconhecido"}).`;
         return json({ error: status === 413 ? "A imagem excede o limite de 15 MB." : message }, status);
       }
