@@ -218,6 +218,17 @@
       <section class="form-panel essence-admin-settings" data-admin-only hidden><div class="panel-heading"><span class="step-number">ADM</span><div><h3>Teste de drop de Essências</h3><p>Taxa de produção padrão: 5%. Este ajuste temporário está disponível apenas à conta administradora e vale para batalhas locais de teste.</p></div></div><label>Chance de drop de teste <span id="essence-drop-rate-value">5%</span><input id="essence-drop-rate" type="range" min="0" max="100" step="1" value="5"></label><button id="essence-drop-reset" type="button" class="small secondary">Restaurar 5%</button></section>
     </section>
     <section id="admin" class="view" data-admin-only hidden><div class="section-heading"><div><span class="eyebrow">ADMINISTRAÇÃO</span><h2>Observatório NATIVA</h2><p>Visão geral do mundo, disponível apenas para administradores.</p></div><button id="admin-refresh" class="secondary">Atualizar</button></div><p id="admin-overview-status" role="status"></p><div id="admin-overview" class="admin-metrics"></div>      <div class="form-panel">
+        <section class="admin-global-catalog">
+          <div class="panel-heading"><span class="step-number">CAT</span><div><h3>Catálogo biológico global</h3><p>Essas definições são compartilhadas por todas as contas. Preserve os IDs existentes para manter as fichas compatíveis. O salvamento exige papel de administrador.</p></div></div>
+          <div class="grid admin-catalog-grid">
+            <label>Traços (JSON)<textarea id="admin-catalog-traits" rows="14" spellcheck="false"></textarea></label>
+            <label>Traços quiméricos (JSON)<textarea id="admin-catalog-chimeric" rows="14" spellcheck="false"></textarea></label>
+            <label>Hábitos (JSON)<textarea id="admin-catalog-habits" rows="14" spellcheck="false"></textarea></label>
+            <label>Traços padrão por linhagem (JSON)<textarea id="admin-catalog-lineages" rows="14" spellcheck="false"></textarea></label>
+          </div>
+          <p id="admin-catalog-status" class="muted" role="status" aria-live="polite">Carregando catálogo global…</p>
+          <div class="form-actions"><button id="admin-catalog-reload" class="small secondary" type="button">Recarregar catálogo</button><button id="admin-catalog-save" type="button">Publicar catálogo para todas as contas</button></div>
+        </section>
         <p id="admin-status" class="muted" role="status" aria-live="polite">Verificando permissões…</p>
         <div class="section-heading compact"><div><h3>Usuários do projeto</h3><p class="muted">Contas registradas no Supabase Auth do projeto.</p></div><button id="admin-refresh-users" class="small secondary" type="button"><span data-icon="refresh"></span>Atualizar</button></div>
         <div id="admin-user-list" class="admin-user-list"></div>

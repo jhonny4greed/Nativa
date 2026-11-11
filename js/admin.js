@@ -1,5 +1,6 @@
 import { obterClienteSupabase } from "./auth.js";
 import { estudioImagens } from "./art-studio.js";
+import { obterCatalogoGlobalNativas, validarCatalogoGlobalNativas, aplicarCatalogoGlobalNativas } from "./traits.js";
 
 const escapar = texto => String(texto ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 
@@ -14,6 +15,15 @@ export async function inicializarPainelAdmin({ clientProvider = obterClienteSupa
   const status = document.querySelector("#admin-status");
   const userList = document.querySelector("#admin-user-list");
   const refresh = document.querySelector("#admin-refresh-users");
+  const catalogStatus = document.querySelector("#admin-catalog-status");
+  const catalogSave = document.querySelector("#admin-catalog-save");
+  const catalogReload = document.querySelector("#admin-catalog-reload");
+  const catalogInputs = {
+    tracos: document.querySelector("#admin-catalog-traits"),
+    tracosQuimericos: document.querySelector("#admin-catalog-chimeric"),
+    habitos: document.querySelector("#admin-catalog-habits"),
+    tracosPorLinhagem: document.querySelector("#admin-catalog-lineages")
+  };
   if (!navButton || !status || !userList || !refresh) return;
 
   let client = null;
@@ -21,6 +31,7 @@ export async function inicializarPainelAdmin({ clientProvider = obterClienteSupa
   let users = [];
   let allowlist = [];
   let currentUserId = null;
+  let catalogRevision = 1;
 
   async function invoke(action, extra = {}) {
     const { data, error } = await client.functions.invoke("admin-panel", { body: { action, ...extra } });
@@ -93,6 +104,52 @@ export async function inicializarPainelAdmin({ clientProvider = obterClienteSupa
   });
 
   refresh.addEventListener("click", () => { void carregarPainel().catch(() => { status.textContent = "Não foi possível atualizar a lista."; }); });
+
+  function preencherEditorCatalogo(catalogo) {
+    for (const [key, input] of Object.entries(catalogInputs)) {
+      if (input) input.value = JSON.stringify(catalogo[key], null, 2);
+    }
+  }
+
+  async function carregarCatalogoAdmin() {
+    if (!isAdmin || !catalogStatus) return;
+    catalogStatus.textContent = "Carregando catálogo compartilhado…";
+    const { data, error } = await client.from("nativa_global_catalog").select("catalog,revision,updated_at").eq("id", "main").maybeSingle();
+    if (error) throw error;
+    catalogRevision = Number(data?.revision || 1);
+    const catalogo = data?.catalog && Object.keys(data.catalog).length ? data.catalog : obterCatalogoGlobalNativas();
+    preencherEditorCatalogo(catalogo);
+    catalogStatus.textContent = data?.updated_at
+      ? `Revisão ${catalogRevision} · atualizada em ${formatarData(data.updated_at)}.`
+      : "Exibindo os padrões do projeto. Publique para iniciar o catálogo global.";
+  }
+
+  catalogReload?.addEventListener("click", () => {
+    void carregarCatalogoAdmin().catch(error => { catalogStatus.textContent = error.message || "Não foi possível carregar o catálogo."; });
+  });
+  catalogSave?.addEventListener("click", async () => {
+    if (!isAdmin || !client) return;
+    catalogSave.disabled = true;
+    catalogStatus.textContent = "Validando e publicando o catálogo…";
+    try {
+      const catalogo = validarCatalogoGlobalNativas(Object.fromEntries(
+        Object.entries(catalogInputs).map(([key, input]) => [key, JSON.parse(input?.value || "null")])
+      ));
+      const { data, error } = await client.rpc("save_nativa_global_catalog", {
+        p_catalog: catalogo,
+        p_expected_revision: catalogRevision
+      });
+      if (error) throw error;
+      aplicarCatalogoGlobalNativas(data.catalog);
+      catalogRevision = Number(data.revision);
+      preencherEditorCatalogo(data.catalog);
+      catalogStatus.textContent = `Catálogo publicado para todas as contas · revisão ${catalogRevision}.`;
+    } catch (error) {
+      catalogStatus.textContent = error.message || "Não foi possível publicar o catálogo.";
+    } finally {
+      catalogSave.disabled = false;
+    }
+  });
 
   // Assistente administrativo: conversa com a function admin-assistant e
   // executa ações sugeridas somente após clique explícito.
@@ -201,8 +258,9 @@ export async function inicializarPainelAdmin({ clientProvider = obterClienteSupa
       isAdmin = false;
     }
     navButton.hidden = !isAdmin;
-    if (isAdmin && users.length === 0) {
-      void carregarPainel().catch(() => { status.textContent = "Não foi possível carregar o painel."; });
+    if (isAdmin) {
+      if (users.length === 0) void carregarPainel().catch(() => { status.textContent = "Não foi possível carregar o painel."; });
+      void carregarCatalogoAdmin().catch(error => { if (catalogStatus) catalogStatus.textContent = error.message || "Não foi possível carregar o catálogo."; });
     }
   }
 

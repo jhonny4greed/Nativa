@@ -59,7 +59,7 @@ const descricoesTracos = {
 };
 for (const traco of CATALOGO_TRACOS) traco.descricao = descricoesTracos[traco.nome] || traco.descricao;
 
-const TRACOS_COMUNS_POR_LINHAGEM = {
+const NOMES_TRACOS_POR_LINHAGEM = {
   "Felinos": ["Quadrúpede", "Cauda", "Garras", "Presas", "Faro desenvolvido"],
   "Canídeos": ["Quadrúpede", "Cauda", "Presas", "Faro desenvolvido", "Audição aguçada"],
   "Mustelídeos": ["Quadrúpede", "Cauda", "Garras", "Presas"],
@@ -89,8 +89,14 @@ const TRACOS_COMUNS_POR_LINHAGEM = {
   "Crustáceos": ["Exoesqueleto", "Carapaça", "Pinças"]
 };
 
+const TRACOS_POR_LINHAGEM_PADRAO = Object.fromEntries(Object.entries(NOMES_TRACOS_POR_LINHAGEM).map(([linhagem, nomes]) => [
+  linhagem,
+  nomes.map(nome => CATALOGO_TRACOS.find(item => item.nome === nome)?.id).filter(Boolean)
+]));
+let tracosPorLinhagem = structuredClone(TRACOS_POR_LINHAGEM_PADRAO);
+
 export function obterTracosPadraoLinhagem(linhagem) {
-  return (TRACOS_COMUNS_POR_LINHAGEM[linhagem] || []).map(nome => CATALOGO_TRACOS.find(item => item.nome === nome)?.id).filter(Boolean);
+  return [...(tracosPorLinhagem[linhagem] || [])];
 }
 
 /** Retorna o registro estruturado de um traço pelo seu ID persistido. */
@@ -104,8 +110,10 @@ export function nativaPossuiTraco(nativa, tracoId) {
 }
 
 export function obterTracosComunsLinhagem(linhagem) {
-  return [...(TRACOS_COMUNS_POR_LINHAGEM[linhagem] || [])];
+  return obterTracosPadraoLinhagem(linhagem).map(id => CATALOGO_TRACOS.find(item => item.id === id)?.nome).filter(Boolean);
 }
+
+export const CATALOGO_TRACOS_QUIMERICOS = [];
 
 export const CATALOGO_HABITOS = [
   ...["Diurno", "Noturno", "Crepuscular"].map((nome, i) => ({ id: `ritmo-${i + 1}`, nome, categoria: "Ritmo diário" })),
@@ -114,6 +122,72 @@ export const CATALOGO_HABITOS = [
   { id: "ecologia-migratorio", nome: "Migratório", categoria: "Deslocamento e comportamento ecológico" },
   { id: "ecologia-nomade", nome: "Nômade", categoria: "Deslocamento e comportamento ecológico" }
 ];
+
+function clonar(valor) { return JSON.parse(JSON.stringify(valor)); }
+
+export function obterCatalogoGlobalNativas() {
+  return {
+    tracos: clonar(CATALOGO_TRACOS),
+    tracosQuimericos: clonar(CATALOGO_TRACOS_QUIMERICOS),
+    habitos: clonar(CATALOGO_HABITOS.map(item => ({ descricao: "", ...item }))),
+    tracosPorLinhagem: clonar(tracosPorLinhagem)
+  };
+}
+
+export function validarCatalogoGlobalNativas(catalogo) {
+  if (!catalogo || typeof catalogo !== "object" || Array.isArray(catalogo)) throw new Error("O catálogo precisa ser um objeto JSON.");
+  const validarLista = (chave, { descricao = true, limite = 500 } = {}) => {
+    const lista = catalogo[chave];
+    if (!Array.isArray(lista) || lista.length > limite) throw new Error(`“${chave}” precisa ser uma lista com até ${limite} itens.`);
+    const ids = new Set();
+    return lista.map((item, index) => {
+      if (!item || typeof item !== "object" || Array.isArray(item)) throw new Error(`Item ${index + 1} de “${chave}” inválido.`);
+      const id = String(item.id || "").trim();
+      const nome = String(item.nome || "").trim();
+      const categoria = String(item.categoria || "").trim();
+      const texto = String(item.descricao || "").trim();
+      if (!/^[a-z0-9][a-z0-9-]{0,119}$/.test(id)) throw new Error(`ID inválido em “${chave}”: ${id || `item ${index + 1}`}.`);
+      if (ids.has(id)) throw new Error(`ID duplicado em “${chave}”: ${id}.`);
+      if (!nome || nome.length > 100 || !categoria || categoria.length > 100) throw new Error(`Nome ou categoria inválida em “${chave}” (${id}).`);
+      if (descricao && (!texto || texto.length > 1000)) throw new Error(`Informe uma descrição de até 1.000 caracteres para “${nome}”.`);
+      if (texto.length > 1000) throw new Error(`A descrição de “${nome}” excede 1.000 caracteres.`);
+      ids.add(id);
+      return { id, nome, categoria, descricao: texto };
+    });
+  };
+  const tracos = validarLista("tracos");
+  const tracosQuimericos = validarLista("tracosQuimericos");
+  const habitos = validarLista("habitos", { descricao: false });
+  const tracosPorLinhagemFonte = catalogo.tracosPorLinhagem;
+  if (!tracosPorLinhagemFonte || typeof tracosPorLinhagemFonte !== "object" || Array.isArray(tracosPorLinhagemFonte)) throw new Error("“tracosPorLinhagem” precisa ser um objeto de linhagens e IDs de traço.");
+  const idsTracos = new Set(tracos.map(item => item.id));
+  const tracosPorLinhagem = {};
+  for (const [linhagem, ids] of Object.entries(tracosPorLinhagemFonte)) {
+    if (!linhagem.trim() || linhagem.length > 100 || !Array.isArray(ids) || ids.length > 100) throw new Error(`Lista de traços inválida para a linhagem “${linhagem}”.`);
+    const unicos = [...new Set(ids.map(String))];
+    if (unicos.some(id => !idsTracos.has(id))) throw new Error(`A linhagem “${linhagem}” contém um ID que não existe em “tracos”.`);
+    tracosPorLinhagem[linhagem] = unicos;
+  }
+  return { tracos, tracosQuimericos, habitos, tracosPorLinhagem };
+}
+
+export function aplicarCatalogoGlobalNativas(catalogo) {
+  const validado = validarCatalogoGlobalNativas(catalogo);
+  CATALOGO_TRACOS.splice(0, CATALOGO_TRACOS.length, ...validado.tracos);
+  CATALOGO_TRACOS_QUIMERICOS.splice(0, CATALOGO_TRACOS_QUIMERICOS.length, ...validado.tracosQuimericos);
+  CATALOGO_HABITOS.splice(0, CATALOGO_HABITOS.length, ...validado.habitos);
+  tracosPorLinhagem = validado.tracosPorLinhagem;
+  if (typeof document !== "undefined") document.dispatchEvent(new CustomEvent("nativa:global-catalog-updated", { detail: { revision: null } }));
+  return validado;
+}
+
+export async function carregarCatalogoGlobalNativas(client) {
+  const { data, error } = await client.from("nativa_global_catalog").select("catalog,revision").eq("id", "main").maybeSingle();
+  if (error) throw error;
+  if (!data?.catalog || !Object.keys(data.catalog).length) return { revision: data?.revision || 0, source: "bundled" };
+  aplicarCatalogoGlobalNativas(data.catalog);
+  return { revision: data.revision, source: "remote" };
+}
 
 export const PERIODOS_BATALHA = ["Amanhecer", "Dia", "Entardecer", "Noite"];
 

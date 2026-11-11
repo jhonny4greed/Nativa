@@ -39,6 +39,12 @@ if (user) {
     }
   }
   const role = await getApplicationRole(client);
+  const { carregarCatalogoGlobalNativas } = await import("./traits.js");
+  try {
+    await carregarCatalogoGlobalNativas(client);
+  } catch (error) {
+    console.warn("Não foi possível carregar o catálogo biológico global; usando o catálogo local.", error);
+  }
   await initializeDashboard(client, user, role);
   await import("./app.js");
   if (role === "admin") {

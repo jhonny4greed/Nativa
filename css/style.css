@@ -1488,6 +1488,10 @@ body:has(#battle.active) main { max-width:none; padding:16px clamp(12px,2vw,30px
 .auth-google{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:12px}
 #online-auth-status{margin:14px 0 0;color:var(--lime);font-size:13px}
 .admin-user-list{display:grid;gap:10px}
+.admin-global-catalog{margin:18px 0;padding:18px;border:1px solid var(--line);border-radius:14px;background:#111e17}
+.admin-catalog-grid textarea{min-height:280px;resize:vertical;font:500 .78rem/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;tab-size:2}
+.admin-catalog-grid label{align-self:start}
+@media(max-width:760px){.admin-catalog-grid{grid-template-columns:1fr}.admin-catalog-grid textarea{min-height:220px}}
 .admin-user{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 16px;border:1px solid var(--line);border-radius:11px;background:#111e17}
 .admin-user-info{display:grid;gap:2px;min-width:0}
 .admin-user-info strong{font-size:14px}
