@@ -46,8 +46,9 @@ function atualizarRotulosModoBatalha(){
   const modo=$("#battle-mode")?.value||MODOS_BATALHA.LOCAL;
   const labelA=$("#fighter-a-label");
   const labelB=$("#fighter-b-label");
+  const adversarioAleatorio=$("#fighter-b")?.value==="random";
   if(labelA)labelA.firstChild.textContent=modo===MODOS_BATALHA.CPU?"Nativa do jogador ":"Nativa do Jogador 1 ";
-  if(labelB)labelB.firstChild.textContent=modo===MODOS_BATALHA.CPU?"Nativa da CPU ":"Nativa do Jogador 2 ";
+  if(labelB)labelB.firstChild.textContent=adversarioAleatorio?"Adversário aleatório ":modo===MODOS_BATALHA.CPU?"Nativa da CPU ":"Nativa do Jogador 2 ";
 }
 
 function carregarConfigEssenciaMesa(){
@@ -627,8 +628,73 @@ $("#art-gallery")?.addEventListener("click",async event=>{
   }
 });
 
+function afinidadeVisualCard(afinidade){
+  const normalizada=String(afinidade||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLocaleLowerCase("pt-BR");
+  return ({fogo:"fogo",agua:"agua",terra:"terra",vento:"ar",ar:"ar",energia:"energia"})[normalizada]||"neutro";
+}
+
+function abasAtivasBestiario(){
+  return new Map([...$("#cards").querySelectorAll(".card")].map(card=>[
+    card.dataset.card,
+    card.querySelector(".profile-tabs [data-profile-tab].active")?.dataset.profileTab||"overview"
+  ]));
+}
+
+function personalizarCardsBestiario(abAsAtivas){
+  const valorSeguro=valor=>escapar(valor??"—");
+  $("#cards").querySelectorAll(".card").forEach(card=>{
+    const indice=Number(card.dataset.cardIndex),n=nativas[indice];
+    if(!n)return;
+    const afinidade=afinidadeVisualCard(n.affinity);
+    card.dataset.affinity=afinidade;
+    card.classList.add(`affinity-${afinidade}`);
+    const ambience=document.createElement("div");ambience.className="card-affinity-ambience";ambience.setAttribute("aria-hidden","true");
+    card.prepend(ambience);
+
+    const affinityTag=card.querySelector(".card-top > .tag");
+    if(affinityTag){affinityTag.classList.add("affinity-tag");affinityTag.dataset.affinity=afinidade;}
+
+    const factParagraphs=[...card.querySelectorAll(":scope > .card-body > p:not(.sync-state)")].slice(0,2);
+    if(factParagraphs.length===2){
+      const facts=document.createElement("div");facts.className="creature-facts";
+      const values=[
+        [n.lineageName||n.lineage,n.species].filter(Boolean).join(" · ")||factParagraphs[0].textContent,
+        [n.bioma,n.archetype].filter(Boolean).join(" · ")||factParagraphs[1].textContent
+      ];
+      const labels=["LINHAGEM E ESPÉCIE","BIOMA E ARQUÉTIPO"];
+      factParagraphs.forEach((paragraph,index)=>{
+        paragraph.className=`creature-fact creature-fact-${index===0?"lineage":"habitat"}`;
+        paragraph.innerHTML=`<small>${labels[index]}</small><span>${valorSeguro(values[index])}</span>`;
+        facts.append(paragraph);
+      });
+      card.querySelector(".card-top")?.after(facts);
+    }
+
+    const imageTab=card.querySelector('[data-profile-tab="images"]');
+    if(imageTab){imageTab.dataset.profileTab="attributes";imageTab.textContent="Atributos";}
+    card.querySelector('[data-profile-pane="images"]')?.remove();
+    const oldStats=card.querySelector('.stat-chips[data-profile-pane="overview"]');
+    const resumo=obterResumoProgressao(n);
+    const overview=document.createElement("section");overview.className="profile-overview";overview.dataset.profilePane="overview";
+    overview.innerHTML=`<span class="eyebrow">PERFIL DA NATIVA</span><strong>${valorSeguro(n.species||n.groupBio||n.lineageName||n.lineage)}</strong><p>Vínculo ${valorSeguro(n.lineageName||n.lineage)} · ${valorSeguro(n.archetype)} · nível ${resumo.nivel}.</p>`;
+    const attributes=document.createElement("section");attributes.className="profile-attributes";attributes.dataset.profilePane="attributes";
+    const cardsAtributos=DEFINICOES_ATRIBUTOS.map(([key,label])=>{
+      const valor=Number(n.attrs?.[key])||1,custo=valor+1,insuficiente=resumo.xpaDisponivel<custo;
+      return `<article class="profile-attribute" data-attribute="${key}"><div class="attribute-rune" aria-hidden="true">${key}</div><div class="attribute-value"><strong>${valor}</strong><span>${label}</span></div><button type="button" class="attribute-up" data-profile-attribute="${key}" data-index="${indice}" aria-label="Aumentar ${label} de ${valorSeguro(n.name)} para ${valor+1} por ${custo} XPA" ${card.classList.contains("card-readonly")||insuficiente?"disabled":""}>＋</button><small class="attribute-cost">PRÓXIMO · ${custo} XPA</small></article>`;
+    }).join("");
+    attributes.innerHTML=`<div class="attributes-console"><div><span class="eyebrow">EVOLUÇÃO · NÍVEL ${resumo.nivel}</span><strong>Potencial disponível</strong></div><b>${resumo.xpaDisponivel} <small>XPA</small></b></div><div class="profile-attribute-grid">${cardsAtributos}</div><div class="derived-vitals"><div><span>PV MÁXIMO</span><strong>${(Number(n.attrs?.HP)||1)*5}</strong></div><div><span>PM MÁXIMO</span><strong>${(Number(n.attrs?.MP)||1)*2}</strong></div></div>`;
+    if(oldStats){oldStats.replaceWith(overview);overview.after(attributes);}
+    card.querySelector(".progress-panel > .technique-group")?.remove();
+
+    const aba=abAsAtivas.get(card.dataset.card)||"overview";
+    card.querySelectorAll("[data-profile-tab]").forEach(button=>button.classList.toggle("active",button.dataset.profileTab===aba));
+    card.querySelectorAll("[data-profile-pane]").forEach(pane=>pane.hidden=pane.dataset.profilePane!==aba);
+  });
+}
+
 async function renderizarLista(){
   if (!nativasCarregadas) return;
+  const abas=abasAtivasBestiario();
   const versao = ++versaoRenderLista;
   const fichasParaRenderizar = JSON.parse(JSON.stringify(nativas));
   await origensPresetsProntas;
@@ -680,7 +746,7 @@ async function renderizarLista(){
     <div class="progress-panel"><h4>Progressão</h4><div class="progress-grid"><div><strong>${resumo.xpAtual}/${resumo.xpNecessario}</strong><span>${resumo.nivel>=17?"Nível máximo temporário · 17":"XP para próximo nível"} · ${resumo.xpAcumulado} acumulado</span></div><div><strong>${resumo.xpaDisponivel}</strong><span>XPA disponível</span></div><div><strong>${(n.essencias||[]).length}/3</strong><span>Essências absorvidas</span></div><div><strong>${(n.essenciasDisponiveis||[]).length}</strong><span>Essências guardadas</span></div></div>${essenciasGuardadas.length?`<p class="pending-essences">Guardadas de: ${essenciasGuardadas.map(escapar).join(" · ")}</p>`:""}<div class="progress-controls"><input type="number" min="1" step="1" placeholder="XP" data-xp-input data-index="${index}" ${disabled||resumo.nivel>=17?"disabled":""}><button type="button" class="small" data-add-xp-index="${index}" ${disabled||resumo.nivel>=17?"disabled":""}>Adicionar XP</button><button type="button" class="small secondary" data-essence-index="${index}" ${disabled}>Essência</button></div><details class="technique-group"><summary>Atributos · gastar XPA</summary><div class="stat-chips">${DEFINICOES_ATRIBUTOS.map(([key,label])=>`<span>${key} ${label}: ${n.attrs[key]||1} <button type="button" data-profile-attribute="${key}" data-index="${index}" ${disabled||resumo.xpaDisponivel<((n.attrs[key]||1)+1)?"disabled":""}>＋</button></span>`).join("")}</div></details></div>
     <div class="card-actions">${associationAction}<label class="small secondary ${somenteLeitura?"disabled-label":""}" style="display:inline-flex;align-items:center;gap:7px;padding:8px 10px;border-radius:8px;cursor:pointer">${n.photoId?"Trocar foto":"Adicionar foto"}<input type="file" accept="image/*" data-photo-index="${index}" ${disabled} hidden></label>${n.photoId?`<button type="button" class="small secondary" data-remove-photo-index="${index}" ${disabled}>Remover foto</button>`:""}<button type="button" class="small danger" data-delete-index="${index}" data-delete-retry="${estado?.associationState==="deleted"?"true":"false"}" ${deleteDisabled}>Excluir</button></div></div></article>`;
   }));
-  if (versao === versaoRenderLista) $("#cards").innerHTML=html.join("");
+  if (versao === versaoRenderLista){$("#cards").innerHTML=html.join("");personalizarCardsBestiario(abas);}
 }
 function nativaNoIndice(valor){const indice=Number(valor);return Number.isInteger(indice)&&indice>=0&&indice<nativas.length?nativas[indice]:null;}
 $("#cards").addEventListener("click",async e=>{
@@ -764,7 +830,7 @@ $("#cards").addEventListener("click",async e=>{
   if(xpIndex!==undefined){const n=nativaNoIndice(xpIndex);if(!n||!await podeEditarFicha(n))return;const lock=n.id||`indice:${xpIndex}`;if(progressaoEmCurso.has(lock))return;progressaoEmCurso.add(lock);const input=e.target.closest(".card").querySelector("[data-xp-input]");const anterior=JSON.parse(JSON.stringify(n));try{const result=adicionarXP(n,Number(input.value));const salvo=await salvarEdicaoNativa(n,anterior);if(!salvo.persisted)return;const lv=result.niveisConquistados.map(x=>`Nível ${x.nivelNovo} (+${x.xpaRecebido} XPA)`).join(", ");alert(lv?`Progressão: ${lv}`:"XP adicionada.");}catch(err){restaurarFicha(n,anterior);alert(err.message);}finally{progressaoEmCurso.delete(lock);}return;}
   const attributeIndex=e.target.dataset.index;
   const attribute=e.target.dataset.profileAttribute;
-  if(attribute&&attributeIndex!==undefined){const n=nativaNoIndice(attributeIndex);if(!n||!await podeEditarFicha(n))return;const lock=n.id||`indice:${attributeIndex}`;if(progressaoEmCurso.has(lock))return;progressaoEmCurso.add(lock);const anterior=JSON.parse(JSON.stringify(n));try{aumentarAtributo(n,attribute);await salvarEdicaoNativa(n,anterior);}catch(err){restaurarFicha(n,anterior);alert(err.message);}finally{progressaoEmCurso.delete(lock);}return;}
+  if(attribute&&attributeIndex!==undefined){const n=nativaNoIndice(attributeIndex);if(!n||!await podeEditarFicha(n))return;const lock=n.id||`indice:${attributeIndex}`;if(progressaoEmCurso.has(lock))return;progressaoEmCurso.add(lock);const anterior=JSON.parse(JSON.stringify(n));try{aumentarAtributo(n,attribute);const salvo=await salvarEdicaoNativa(n,anterior);if(salvo.persisted)await renderizarLista();}catch(err){restaurarFicha(n,anterior);alert(err.message);}finally{progressaoEmCurso.delete(lock);}return;}
   const raiseIndex=e.target.dataset.raiseIndex;
   if(raiseIndex!==undefined){const n=nativaNoIndice(raiseIndex);if(!n||!await podeEditarFicha(n))return;const escolha=prompt("Qual atributo deseja melhorar? ATQ, POT, DEF, RES, AGI, HP ou MP");if(!escolha)return;const lock=n.id||`indice:${raiseIndex}`;if(progressaoEmCurso.has(lock))return;progressaoEmCurso.add(lock);const anterior=JSON.parse(JSON.stringify(n));try{aumentarAtributo(n,escolha.trim().toUpperCase());await salvarEdicaoNativa(n,anterior);}catch(err){restaurarFicha(n,anterior);alert(err.message);}finally{progressaoEmCurso.delete(lock);}return;}
   const essenceIndex=e.target.dataset.essenceIndex;
@@ -787,10 +853,13 @@ function atualizarSelectsBatalha(){
     const el=$(sel);
     if(!el)return;
     const atual=el.value;
+    const opcaoAleatoria=sel==="#fighter-b"?'<option value="random">🎲 Enfrentar Nativa aleatória · CPU</option>':"";
     el.innerHTML='<option value="">Selecione uma Nativa</option>'+
+      opcaoAleatoria+
       nativas.map(n=>`<option value="${escapar(n.id)}">${escapar(n.name)} — Nv. ${n.nivel||1}</option>`).join("");
-    if(nativas.some(n=>n.id===atual))el.value=atual;
+    if(atual==="random"||nativas.some(n=>n.id===atual))el.value=atual;
   });
+  atualizarRotulosModoBatalha();
 }
 
 function substituirFotoCombatente(combatente, blob){
@@ -814,11 +883,16 @@ function liberarFotosBatalha({manterBatalha=false}={}){
 async function iniciarBatalha(){
   if(onlineArena?.isActive()){alert("Finalize o duelo online antes de iniciar uma simulação local.");return;}
   const a=nativas.find(n=>n.id===$("#fighter-a").value);
-  const b=nativas.find(n=>n.id===$("#fighter-b").value);
-  const modo=$("#battle-mode")?.value===MODOS_BATALHA.CPU?MODOS_BATALHA.CPU:MODOS_BATALHA.LOCAL;
+  const selecaoAdversario=$("#fighter-b").value;
+  const adversarioAleatorio=selecaoAdversario==="random";
+  const candidatos=nativas.filter(n=>n.id!==a?.id);
+  const b=adversarioAleatorio
+    ?candidatos[Math.floor(Math.random()*candidatos.length)]
+    :nativas.find(n=>n.id===selecaoAdversario);
+  const modo=adversarioAleatorio||$("#battle-mode")?.value===MODOS_BATALHA.CPU?MODOS_BATALHA.CPU:MODOS_BATALHA.LOCAL;
 
   if(!a||!b){
-    alert("Escolha duas Nativas.");
+    alert(adversarioAleatorio?"Escolha sua Nativa e tenha outra ficha disponível para o sorteio.":"Escolha duas Nativas.");
     return;
   }
 
@@ -881,6 +955,9 @@ function prepararTurno(inicial=false){
   batalha.escolhas={};
   batalha.ordem=[];
   batalha.rolls=null;
+  batalha.precisionRoll=null;
+  batalha.damageTurn=null;
+  batalha.fighters.forEach(combatente=>{combatente.damageThisTurn=0;});
 
   // Libera as escolhas para o novo turno.
   batalha.processando=false;
@@ -951,7 +1028,10 @@ function apresentarEventosCombate(eventos){
     }
     if(evento.type==="support")batalha.log.push(`✨ ${evento.attacker} usa ${evento.technique}. Efeito: ${evento.description} (efeito registrado para aplicação na mesa).`);
     if(evento.type==="miss")batalha.log.push(`💨 ${evento.attacker} tenta usar ${evento.technique}, mas erra! D10: ${evento.roll}. Precisava superar ${evento.threshold}.${evento.sinergias?.length?` ${evento.sinergias.map(s=>s.descricao).join(" ")}`:""}`);
-    if(evento.type==="hit")batalha.log.push(`⚔️ ${evento.attacker} usa ${evento.technique}! D10: ${evento.roll}. Dano: ${evento.offensive} + ${evento.techniqueDamage} − ${evento.defense} = ${evento.baseDamage}${evento.affinityModifier?` (${evento.affinityModifier>0?"+":""}${evento.affinityModifier} afinidade)`:""}${evento.bonusDano?` (+${evento.bonusDano} por sinergia)`:""}. ${evento.target} recebe ${evento.damage} de dano.${evento.sinergias?.length?` ${evento.sinergias.map(s=>s.descricao).join(" ")}`:""}`);
+    if(evento.type==="hit"||evento.type==="v21-hit"){
+      const precisao=evento.roll===null||evento.roll===undefined?"":` D10: ${evento.roll}.`;
+      batalha.log.push(`⚔️ ${evento.attacker} usa ${evento.technique}!${precisao} Dano: ${evento.offensive??"—"} + ${evento.techniqueDamage??"—"} − ${evento.defense??"—"} = ${evento.baseDamage??evento.damage}${evento.affinityModifier?` (${evento.affinityModifier>0?"+":""}${evento.affinityModifier} afinidade)`:""}${evento.bonusDano?` (+${evento.bonusDano} por sinergia)`:""}. ${evento.target} recebe ${evento.damage} de dano.${evento.sinergias?.length?` ${evento.sinergias.map(s=>s.descricao).join(" ")}`:""}`);
+    }
     if(evento.type==="combat-effect")batalha.log.push(`✨ ${evento.message}`);
     if(evento.type==="defend")batalha.log.push(`🛡️ ${evento.fighter} assume uma postura defensiva e passa seu turno.`);
     if(evento.type==="recover"){
@@ -1045,13 +1125,21 @@ async function executarTurno(){
   batalha.processando=true;
   batalha.aguardandoProximoTurno=false;
   try{
+    const pvAntes=fighters.map(combatente=>combatente.hp);
     const resultado=resolverTurnoCombate({fighters,choices:batalha.escolhas,random:Math.random,biomaArena:batalha.bioma});
     batalha.fighters=resultado.fighters;
+    batalha.fighters.forEach((combatente,index)=>{combatente.damageThisTurn=Math.max(0,pvAntes[index]-combatente.hp);});
+    batalha.damageTurn=batalha.turno;
     batalha.ordem=resultado.order;
     batalha.rolls=resultado.rolls;
     apresentarEventosCombate(resultado.events);
     aplicarAnimacoesTecnicas(resultado);
     if(resultado.error)throw resultado.error;
+
+    renderizarArena();
+    for(const evento of resultado.events||[]){
+      if((evento.type==="hit"||evento.type==="v21-hit"||evento.type==="miss")&&evento.roll!==null&&evento.roll!==undefined)await animarDadoPrecisao(batalha,evento.roll,evento.type!=="miss");
+    }
 
     if(resultado.ended){
       if(batalha.modo!==MODOS_BATALHA.CPU||batalha.fighters[0].hp>0){
@@ -1089,6 +1177,66 @@ async function executarTurnoSala(){
   try{await current.roomSubmit(choice,current.turno);}
   catch(error){if(batalha===current){current.processando=false;current.log.push(error.message);renderizarArena();}}
 }
+
+async function desistirDaLuta(){
+  const current=batalha;
+  if(!current||current.encerrada||current.processando)return;
+  const promptText=current.modo==="room"?"Desistir deste encontro? A caçada terminará sem recompensas; no PvP, seu oponente vencerá.":current.modo==="online"?"Desistir deste duelo? O outro jogador será declarado vencedor.":current.modo===MODOS_BATALHA.CPU?"Desistir da luta? A CPU vencerá e você não receberá recompensas.":"Encerrar esta partida local?";
+  if(!window.confirm(promptText))return;
+  current.processando=true;
+  renderizarArena();
+  try{
+    if(current.modo==="room"){
+      if(!current.roomForfeitAction)throw new Error("A desistência da sala não está disponível.");
+      await current.roomForfeitAction();
+      return;
+    }
+    if(current.modo==="online"){
+      await onlineArena.forfeit();
+      return;
+    }
+    current.encerrada=true;
+    current.processando=false;
+    if(current.modo===MODOS_BATALHA.CPU){
+      current.localForfeit=true;
+      current.localWinnerIndex=1;
+      current.log.push(`${current.fighters[0].nativa.name} desistiu. Vitória de ${current.fighters[1].nativa.name}.`);
+    }else{
+      current.localCancelled=true;
+      current.log.push("Partida local encerrada pelos jogadores. Sem vencedor e sem recompensas.");
+    }
+    liberarFotosBatalha({manterBatalha:true});
+    renderizarArena();
+  }catch(error){
+    if(batalha===current){current.processando=false;current.log.push(error.message);renderizarArena();}
+  }
+}
+
+async function animarDadoPrecisao(current,roll,hit){
+  if(!current||batalha!==current)return;
+  current.precisionRoll={roll:Number(roll)||1,hit};
+  renderizarArena();
+  const face=$("[data-d10-face]"),overlay=$("[data-precision-roll]");
+  if(!face||!overlay)return;
+  const motion=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const duration=motion?180:820,started=performance.now();
+  overlay.classList.add("rolling");
+  await new Promise(resolve=>{
+    const tick=now=>{
+      if(batalha!==current){resolve();return;}
+      const elapsed=now-started;
+      face.textContent=elapsed>=duration?String(current.precisionRoll?.roll||roll):String(1+Math.floor(Math.random()*10));
+      if(elapsed<duration)requestAnimationFrame(tick);else resolve();
+    };
+    requestAnimationFrame(tick);
+  });
+  if(batalha!==current)return;
+  overlay.classList.remove("rolling");overlay.classList.add(hit?"roll-hit":"roll-miss");
+  const label=overlay.querySelector("[data-d10-result]");if(label)label.textContent=hit?"ACERTO":"ERROU";
+  await new Promise(resolve=>setTimeout(resolve,motion?250:620));
+  if(batalha===current){current.precisionRoll=null;renderizarArena();}
+}
+
 function slugVisualTecnica(value){
   return String(value||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 }
@@ -1156,10 +1304,13 @@ function renderizarCombatente(c,indice){
   const foto=c.fotoUrl
     ?`<img class="combatant-photo" src="${c.fotoUrl}" alt="${escapar(n.name)}">`
     :`<div class="combatant-photo-placeholder" role="img" aria-label="${escapar(n.name)}, sem imagem cadastrada"><span></span></div>`;
+  const dano=batalha.damageTurn===batalha.turno&&c.damageThisTurn>0
+    ?`<span class="damage-float" aria-label="${c.damageThisTurn} de dano neste turno">−${c.damageThisTurn}<small>PV</small></span>`:"";
 
   return `
     <div class="arena-creature ${c.arenaCutout?"has-cutout":""} ${indice===0?"contestant-left":"contestant-right"} ${c.animacao?`anim-${c.animacao}`:""}" role="group" aria-label="${escapar(n.name)}">
       <div class="combatant-art">${foto}</div>
+      ${dano}
     </div>
   `;
 }
@@ -1304,14 +1455,16 @@ function renderizarArena(){
         ${batalha.modo==="online"?(batalha.onlineSubmitted?"AÇÃO CONFIRMADA · AGUARDANDO":"CONFIRMAR AÇÃO ONLINE"):batalha.modo==="room"?(batalha.roomSubmitted?"AÇÃO CONFIRMADA · AGUARDANDO":"CONFIRMAR AÇÃO DA CAMPANHA"):batalha.aguardandoProximoTurno?"Aguarde o próximo turno...":"REALIZAR AÇÃO"}
       </button>
     `;
+  const botaoDesistir=!batalha.encerrada
+    ?`<button id="forfeit-battle" class="forfeit-battle-button" type="button" ${batalha.processando?"disabled":""}>${batalha.modo==="room"?"Desistir do encontro":batalha.modo==="online"?"Desistir do duelo":"Desistir da luta"}</button>`:"";
 
   const resultado=batalha.encerrada
     ?`
       <div class="battle-result">
         <span>🏆</span>
         <div>
-          <strong>${batalha.onlineCancelled?"Duelo cancelado":batalha.roomCancelled?"Encontro encerrado pelo mestre":"Combate encerrado"}</strong>
-          <p>${batalha.onlineCancelled?"Sem resultado · fichas preservadas":batalha.roomCancelled?"Progresso da campanha preservado":`Vitória: ${escapar(batalha.modo==="online"?(f[batalha.onlineWinnerIndex]?.nativa.name||"Sem vencedor"):batalha.modo==="room"?(f[batalha.roomWinnerIndex]?.nativa.name||"Sem vencedor"):f.find(c=>c.hp>0)?.nativa.name||"Sem vencedor")}`}</p>
+          <strong>${batalha.onlineCancelled?"Duelo cancelado":batalha.onlineForfeit?"Duelo encerrado por desistência":batalha.roomForfeit?(batalha.roomKind==="pvp"?"Duelo encerrado por desistência":"Caçada abandonada"):batalha.roomCancelled?"Encontro encerrado pelo mestre":batalha.localForfeit?"Combate perdido por desistência":batalha.localCancelled?"Partida local encerrada":"Combate encerrado"}</strong>
+          <p>${batalha.onlineCancelled||batalha.localCancelled?"Sem vencedor · fichas preservadas":batalha.roomForfeit&&batalha.roomKind==="hunt"?"Caçada encerrada · sem recompensas":batalha.roomCancelled?"Progresso da campanha preservado":`Vitória: ${escapar(batalha.modo==="online"?(f[batalha.onlineWinnerIndex]?.nativa.name||"Sem vencedor"):batalha.modo==="room"?(f[batalha.roomWinnerIndex]?.nativa.name||"Sem vencedor"):batalha.localForfeit?f[batalha.localWinnerIndex]?.nativa.name:f.find(c=>c.hp>0)?.nativa.name||"Sem vencedor")}`}</p>
         </div>
       </div>
 
@@ -1341,8 +1494,10 @@ function renderizarArena(){
         <div class="arena-fighter arena-fighter-one">${renderizarCombatente(f[0],0)}</div>
         <div class="arena-stage-mark" aria-hidden="true"><span></span><b>VS</b><span></span></div>
         <div class="arena-fighter arena-fighter-two">${renderizarCombatente(f[1],1)}</div>
+        ${batalha.precisionRoll?`<div class="precision-die-overlay" data-precision-roll role="status" aria-live="polite"><div class="d10-shell"><span data-d10-face>${batalha.precisionRoll.roll}</span></div><small>DADO DE PRECISÃO · D10</small><strong data-d10-result>${batalha.precisionRoll.hit?"ACERTO":"ERROU"}</strong></div>`:""}
       </div>
       <div class="arena-action-trigger">${botaoExecutar}</div>
+      ${botaoDesistir}
       <div class="battle-commands">
         <div class="battle-commands-grid">
           ${!batalha.encerrada&&((batalha.modo!=="online"&&batalha.modo!=="room")||(batalha.modo==="online"&&batalha.onlineSelfIndex===0)||(batalha.modo==="room"&&batalha.roomSelfIndex===0))?renderizarPainelAcao(f[0],0):""}
@@ -1368,6 +1523,7 @@ function renderizarArena(){
   $("#new-battle")?.addEventListener("click",()=>{
     liberarFotosBatalha();
   });
+  $("#forfeit-battle")?.addEventListener("click",()=>{void desistirDaLuta();});
 
   $("#battle-arena").querySelectorAll("[data-battle-technique]").forEach(btn=>{
     btn.addEventListener("click",()=>{
@@ -1405,7 +1561,14 @@ function renderizarArena(){
 
 
 
-$("#battle-mode")?.addEventListener("change",atualizarRotulosModoBatalha);
+$("#battle-mode")?.addEventListener("change",()=>{
+  if($("#battle-mode").value!==MODOS_BATALHA.CPU&&$("#fighter-b").value==="random")$("#fighter-b").value="";
+  atualizarRotulosModoBatalha();
+});
+$("#fighter-b")?.addEventListener("change",()=>{
+  if($("#fighter-b").value==="random")$("#battle-mode").value=MODOS_BATALHA.CPU;
+  atualizarRotulosModoBatalha();
+});
 $("#start-battle").addEventListener("click",iniciarBatalha);
 
 atualizarRotulosModoBatalha();configurarFormularios();renderizarAtributos();renderizarSeletorTecnicas();
@@ -1449,21 +1612,27 @@ onlineArena=initializeOnlineArena({
     const sameTurn=previous?.turno===match.turn;
     const fighters=match.state.fighters.map((fighter,index)=>({
       ...fighter,nativa:{...fighter.nativa,player:index===0?match.hostName:match.guestName},
-      fotoUrl:arenaPortrait(fighter.nativa),arenaCutout:Boolean(arenaPortrait(fighter.nativa))
+      fotoUrl:arenaPortrait(fighter.nativa),arenaCutout:Boolean(arenaPortrait(fighter.nativa)),
+      damageThisTurn:previous?Math.max(0,(previous.fighters[index]?.hp||0)-fighter.hp):0
     }));
-    if(previous&&previous.log?.at(-1)!==match.state.history?.at(-1))aplicarAnimacoesDoHistorico(fighters,match.state.history);
+    const history=match.state.history||[];
+    const newEvents=history.slice(previous?.log.length||0);
+    if(previous&&previous.log?.at(-1)!==history.at(-1))aplicarAnimacoesDoHistorico(fighters,history);
     batalha={modo:"online",onlineMatchId:match.id,onlineSelfIndex:match.selfIndex,onlineSubmitted:match.ownConfirmed,
-      onlineWinnerIndex:match.winnerIndex,onlineCancelled:match.status==="cancelled",fighters,turno:match.turn,
-      horario:"Duelo online",bioma:match.biome,ordem:match.state.order||[],log:[...match.state.history],
+      onlineWinnerIndex:match.winnerIndex,onlineCancelled:match.status==="cancelled",onlineForfeit:match.reason==="forfeit",fighters,turno:match.turn,damageTurn:newEvents.length?match.turn:null,
+      horario:"Duelo online",bioma:match.biome,ordem:match.state.order||[],log:[...history],
       escolhas:match.ownChoice?{[match.selfIndex]:match.ownChoice}:sameTurn?previous.escolhas:{},
       tecnicaDetalhesAberta:sameTurn?previous?.tecnicaDetalhesAberta:null,
       paineisGolpesAbertos:previous?.paineisGolpesAbertos||[],encerrada:match.status!=="active",processando:false,aguardandoProximoTurno:false};
     renderizarArena();
+    const current=batalha;
+    const rolls=newEvents.map(line=>{const parsed=String(line).match(/D10:\s*(\d+)/i);return parsed?{roll:Number(parsed[1]),hit:/recebe\s+\d+\s+de\s+dano/i.test(line)}:null;}).filter(Boolean);
+    if(rolls.length)void (async()=>{for(const roll of rolls)await animarDadoPrecisao(current,roll.roll,roll.hit);})();
   }
 });
 
 function atualizarArenaDaSala(detail){
-  const {encounter,roomId,userId,roomSubmit}=detail||{};
+  const {encounter,roomId,userId,roomSubmit,roomForfeit}=detail||{};
   if(!encounter?.state?.fighters?.length)return;
   const participants=[...(encounter.participants||[])].sort((a,b)=>String(a.player_id).localeCompare(String(b.player_id)));
   const selfIndex=participants.findIndex(p=>p.player_id===userId);
@@ -1474,21 +1643,25 @@ function atualizarArenaDaSala(detail){
     const wild=encounter.kind==="hunt"&&index===1;
     const nativa={...fighter.nativa,player:wild?"Selvagem":participants[index]?.display_name||"Jogador"};
     const portrait=arenaPortrait(nativa)||defaultPortrait(nativa);
-    return {...fighter,nativa,fotoUrl:portrait,arenaCutout:Boolean(arenaPortrait(nativa))};
+    return {...fighter,nativa,fotoUrl:portrait,arenaCutout:Boolean(arenaPortrait(nativa)),damageThisTurn:same?Math.max(0,(same.fighters[index]?.hp||0)-fighter.hp):0};
   });
   const history=encounter.state.history||[];
+  const newEvents=history.slice(same?.log.length||0);
   if(same&&same.log?.at(-1)!==history.at(-1))aplicarAnimacoesDoHistorico(fighters,history);
   const winnerIndex=encounter.winner_id?participants.findIndex(p=>p.player_id===encounter.winner_id):-1;
   const sameTurn=same?.turno===encounter.turn;
   batalha={modo:"room",roomId,roomEncounterId:encounter.id,roomSelfIndex:selfIndex,
     roomSubmitted:Boolean(encounter.own_choice)&&encounter.status==="active",
-    roomCancelled:encounter.status==="cancelled",roomWinnerIndex:winnerIndex,
-    roomSubmit,fighters,turno:encounter.turn,horario:"Encontro da campanha",
+    roomCancelled:encounter.status==="cancelled"&&!encounter.result?.forfeit,roomForfeit:Boolean(encounter.result?.forfeit),roomKind:encounter.kind,roomWinnerIndex:winnerIndex,
+    roomSubmit,roomForfeitAction:roomForfeit,fighters,turno:encounter.turn,damageTurn:newEvents.length?encounter.turn:null,horario:"Encontro da campanha",
     bioma:fighters[0]?.nativa?.bioma||"Habitat da campanha",ordem:encounter.state.order||[],
     log:[...history],escolhas:encounter.own_choice?{[selfIndex]:encounter.own_choice}:sameTurn?same.escolhas:{},
     tecnicaDetalhesAberta:sameTurn?same?.tecnicaDetalhesAberta:null,
     encerrada:encounter.status!=="active",processando:false,aguardandoProximoTurno:false};
   renderizarArena();
+  const current=batalha;
+  const rolls=newEvents.map(line=>{const parsed=String(line).match(/D10:\s*(\d+)/i);return parsed?{roll:Number(parsed[1]),hit:/recebe\s+\d+\s+de\s+dano/i.test(line)}:null;}).filter(Boolean);
+  if(rolls.length)void (async()=>{for(const roll of rolls)await animarDadoPrecisao(current,roll.roll,roll.hit);})();
 }
 
 document.addEventListener("nativa:room-arena-open",event=>{

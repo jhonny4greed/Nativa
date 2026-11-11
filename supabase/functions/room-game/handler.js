@@ -50,6 +50,9 @@ export function createRoomGameHandler({env=()=>undefined,fetchImpl=fetch,random=
     await submit(payload.encounterId,payload.turn,payload.choice);result=await rpc("room_game_context",{p_room_id:payload.roomId});
    }else if(body.action==="cancel"){
     await rpc("room_game_cancel",{p_encounter_id:payload.encounterId});result=await rpc("room_game_context",{p_room_id:payload.roomId});
+   }else if(body.action==="forfeit"){
+    if(!uuid.test(payload.encounterId))throw new Error("Encontro inválido");
+    await rpc("room_game_forfeit",{p_encounter_id:payload.encounterId});result=await rpc("room_game_context",{p_room_id:payload.roomId});
    }else throw new Error("Ação de mesa desconhecida");
    return json(result);
   }catch(error){return json({error:String(error.message||"Mesa indisponível").slice(0,240)},400);}

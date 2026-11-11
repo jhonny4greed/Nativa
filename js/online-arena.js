@@ -113,6 +113,7 @@ export function initializeOnlineArena({onMatch,onLocal}) {
   const invite=new URL(location.href).searchParams.get("duelo");if(invite){$("#online-invite-code").value=invite;void setLane(true);}
   return {
     async submit(choice,turn){if(!match||match.status!=="active")throw new Error("Duelo não está ativo");const result=await invoke("submit",{matchId:match.id,turn,choice});version=-1;paintMatch(result);await poll();},
+    async forfeit(){if(!match||match.status!=="active")throw new Error("Duelo não está ativo");const result=await invoke("forfeit",{matchId:match.id});version=-1;paintMatch(result);await poll();},
     isActive:()=>match?.status==="active",
     isOnline:()=>!panel.hidden
   };

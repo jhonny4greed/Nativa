@@ -255,6 +255,10 @@ export async function inicializarSalas() {
             roomSubmit: async (choice, turn) => {
               await chamarJogo("submit", { roomId, encounterId: encounter.id, turn, choice });
               await carregarNativasDaSala(roomId);
+            },
+            roomForfeit: async () => {
+              await chamarJogo("forfeit", { roomId, encounterId: encounter.id });
+              await carregarNativasDaSala(roomId);
             }
           } }));
         }
@@ -944,6 +948,10 @@ export async function inicializarSalas() {
         encounter, roomId: salaSelecionada.id, userId: usuarioAtual.id,
         roomSubmit: async (choice, turn) => {
           await chamarJogo("submit", { roomId: salaSelecionada.id, encounterId, turn, choice });
+          await carregarNativasDaSala(salaSelecionada.id);
+        },
+        roomForfeit: async () => {
+          await chamarJogo("forfeit", { roomId: salaSelecionada.id, encounterId });
           await carregarNativasDaSala(salaSelecionada.id);
         }
       } }));

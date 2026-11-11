@@ -40,13 +40,20 @@ test("HUD conserva imagens reais, fallback, barras e controles das ações", () 
   assert.match(app, /renderizarHistorico\(\)/);
 });
 
+test("arena oferece o sorteio de uma Nativa adversária como primeiro modo de CPU", () => {
+  assert.match(app, /value="random">🎲 Enfrentar Nativa aleatória · CPU/);
+  assert.match(app, /const candidatos=nativas\.filter\(n=>n\.id!==a\?\.id\)/);
+  assert.match(app, /adversarioAleatorio\|\|\$\("#battle-mode"\)\?\.value===MODOS_BATALHA\.CPU/);
+  assert.match(app, /if\(\$\("#fighter-b"\)\.value==="random"\)\$\("#battle-mode"\)\.value=MODOS_BATALHA\.CPU/);
+});
+
 test("arena organiza HUDs compactos, combatentes no campo e comandos antes do histórico", () => {
   assert.match(app, /class="battlefield battle-layout"/);
   assert.match(app, /arena-hud-row[\s\S]*?renderizarHudCombatente\(f\[0\],0\)[\s\S]*?renderizarHudCombatente\(f\[1\],1\)/);
   assert.match(app, /arena-stage[\s\S]*?renderizarCombatente\(f\[0\],0\)[\s\S]*?renderizarCombatente\(f\[1\],1\)/);
   assert.match(app, /battle-commands-grid[\s\S]*?renderizarPainelAcao\(f\[0\],0\)[\s\S]*?renderizarPainelAcao\(f\[1\],1\)/);
-  assert.match(app, /arena-stage[\s\S]*?<div class="arena-action-trigger">\$\{botaoExecutar\}<\/div>[\s\S]*?<div class="battle-commands">[\s\S]*?renderizarHistorico\(\)/);
-  assert.match(css, /grid-template-areas:"top" "hud" "stage" "commands"/);
+  assert.match(app, /arena-stage[\s\S]*?<div class="arena-action-trigger">\$\{botaoExecutar\}<\/div>[\s\S]*?\$\{botaoDesistir\}[\s\S]*?<div class="battle-commands">[\s\S]*?renderizarHistorico\(\)/);
+  assert.match(css, /grid-template-areas:"top" "hud" "stage" "action" "forfeit" "commands"/);
   assert.match(css, /body:has\(#battle\.active\) main \{ max-width:none;/);
   assert.match(css, /\.arena-stage \{[\s\S]*?height:clamp\(190px,29vh,330px\)/);
 });
