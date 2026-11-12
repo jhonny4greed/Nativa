@@ -57,8 +57,10 @@ test("sem teste de precisão não interpreta o travessão como dado e não repet
   assert.equal(actions[0].roll, null);
 });
 test("velocidades por ação e modo desligado têm durações determinísticas", () => {
-  assert.equal(animationDuration({ effects: true, speed: "normal" }), 5500);
-  assert.equal(animationDuration({ effects: true, speed: "fast" }), 2750);
-  assert.equal(animationDuration({ effects: true, speed: "slow" }), 8250);
+  assert.equal(animationDuration({ effects: true, speed: "normal" }), 5000);
+  assert.equal(animationDuration({ effects: true, speed: "fast" }), 4000);
+  assert.equal(animationDuration({ effects: true, speed: "slow" }), 6000);
+  assert.equal(animationDuration({ effects: true, speed: "very_fast" }), 3000);
+  assert.equal(animationDuration({ effects: true, speed: "very_slow" }), 8000);
   assert.equal(animationDuration({ effects: false, speed: "slow" }), 0);
 });

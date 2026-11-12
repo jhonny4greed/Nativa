@@ -1,8 +1,9 @@
+const SPEEDS = { very_fast:3000, fast:4000, normal:5000, slow:6000, very_slow:8000 };
 let preferences = { effects: true, speed: "normal" };
 export const getArenaPreferences = () => ({ ...preferences });
 export function animationDuration(settings) {
   if (!settings.effects) return 0;
-  return { fast: 2750, normal: 5500, slow: 8250 }[settings.speed] || 5500;
+  return SPEEDS[settings.speed] || SPEEDS.normal;
 }
 export async function initializeArenaPreferences(client, user) {
   const key = `nativa.arena.preferences:${user.id}`;
@@ -12,7 +13,7 @@ export async function initializeArenaPreferences(client, user) {
     if (value) {
       preferences = {
         effects: value.effects !== false,
-        speed: ["fast", "normal", "slow"].includes(value.speed) ? value.speed : "normal"
+        speed: Object.hasOwn(SPEEDS,value.speed) ? value.speed : "normal"
       };
       pending = Boolean(value.pending);
     }
@@ -20,7 +21,7 @@ export async function initializeArenaPreferences(client, user) {
   const panel = document.createElement("section");
   panel.className = "form-panel arena-preferences";
   panel.innerHTML =
-    '<h3>Efeitos da arena</h3><p>Escolha como acompanhar cada ação. Esta preferência pertence à sua conta e não muda as regras da batalha.</p><label class="checkbox-row"><input id="arena-effects-enabled" type="checkbox"> Ativar efeitos e animações de combate</label><label>Velocidade das animações<select id="arena-effects-speed"><option value="fast">Rápida · cerca de 3 segundos por ação</option><option value="normal">Normal · cerca de 5,5 segundos por ação</option><option value="slow">Lenta · cerca de 8 segundos por ação</option></select></label><p class="muted">Desativar elimina as animações e a espera. A opção de reduzir movimentos do dispositivo também é respeitada.</p><p id="arena-effects-status" role="status"></p>';
+    '<h3>Efeitos da arena</h3><p>Escolha como acompanhar cada ação. Esta preferência pertence à sua conta e não muda as regras da batalha.</p><label class="checkbox-row"><input id="arena-effects-enabled" type="checkbox"> Ativar efeitos e animações de combate</label><label>Velocidade das animações<select id="arena-effects-speed"><option value="very_fast">Muito rápido · 3 segundos por ação</option><option value="fast">Rápido · 4 segundos por ação</option><option value="normal">Normal · 5 segundos por ação</option><option value="slow">Devagar · 6 segundos por ação</option><option value="very_slow">Muito devagar · 8 segundos por ação</option></select></label><p class="muted">Desativar elimina as animações e a espera. A opção de reduzir movimentos do dispositivo também é respeitada.</p><p id="arena-effects-status" role="status"></p>';
   document.querySelector("#settings .section-heading").after(panel);
   const enabled = panel.querySelector("input"),
     speed = panel.querySelector("select"),
@@ -86,7 +87,7 @@ export async function initializeArenaPreferences(client, user) {
     if (!error && data && !pending) {
       preferences = {
         effects: data.arena_effects !== false,
-        speed: ["fast", "normal", "slow"].includes(data.arena_speed) ? data.arena_speed : "normal"
+        speed: Object.hasOwn(SPEEDS,data.arena_speed) ? data.arena_speed : "normal"
       };
       cache();
       render();

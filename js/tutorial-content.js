@@ -339,7 +339,7 @@ export const TUTORIALS = {
     step(
       ".arena-preferences",
       "Seu ritmo de combate",
-      "Ative ou desative os efeitos e escolha a velocidade de cada ação. O padrão dura cerca de 5,5 segundos por Nativa; as opções rápida e lenta mudam apenas a apresentação. Sua escolha fica salva na conta."
+      "Ative ou desative os efeitos e escolha a velocidade de cada ação. O padrão dura cerca de 5 segundos por Nativa; as opções rápida e lenta mudam apenas a apresentação. Sua escolha fica salva na conta."
     ),
     step(
       "#progress-reset-native",

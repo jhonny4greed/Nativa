@@ -55,7 +55,7 @@
 #battle:is(:fullscreen,.arena-expanded):has(.battlefield) .battle-technique { min-height:66px; padding:7px!important; gap:4px; flex-direction:column!important; align-items:stretch!important; }
 #battle:is(:fullscreen,.arena-expanded):has(.battlefield) .technique-card-name { font-size:11px; }
 #battle:is(:fullscreen,.arena-expanded):has(.battlefield) .technique-card-badges { gap:2px; }
-#battle:is(:fullscreen,.arena-expanded):has(.battlefield) .technique-card-stats { display:none; }
+#battle:is(:fullscreen,.arena-expanded):has(.battlefield) .technique-card-stats { display:flex; justify-content:flex-end; }
 #battle:is(:fullscreen,.arena-expanded):has(.battlefield) .touch-effect-hint { display:none; }
 #battle:is(:fullscreen,.arena-expanded):has(.battlefield) .special-actions { display:flex; justify-content:center; margin:4px 0 0; gap:6px; }
 #battle:is(:fullscreen,.arena-expanded):has(.battlefield) .special-action { width:auto; min-height:36px; padding:5px 12px; }

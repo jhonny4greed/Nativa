@@ -222,7 +222,7 @@ export function createCombatPresenter({
       place(panel);
       document.querySelector(".arena-stage")?.classList.add("cinematic-stage");
       if (["hit", "v21-hit"].includes(action.type)) actorNode(action.targetIndex)?.classList.add("receiving-hit");
-      await pause(total * 0.4);
+      await pause(total * 0.44);
     } finally {
       window.removeEventListener("resize", reposition);
       window.removeEventListener("scroll", reposition, true);

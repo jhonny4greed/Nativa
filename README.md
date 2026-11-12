@@ -68,6 +68,6 @@ Imagens recém-geradas aparecem como prévia até clicar em **Salvar no acervo**
 
 ## Efeitos da arena
 
-Cada ação tem uma apresentação sequencial: destaque da Nativa, nome do golpe, D10 de precisão quando aplicável e resultado (dano, erro ou efeito de suporte). A próxima Nativa só começa após esse fluxo. O padrão é cerca de 5,5 segundos por ação; as Configurações oferecem velocidade rápida (~3 s), normal e lenta (~8 s), além de desativar os efeitos e a espera. Preferências são salvas por conta em `player_preferences`, com cache e reenvio local. O resolvedor e o servidor continuam sendo a fonte dos resultados; as animações apenas os apresentam. HP e MP visuais acompanham a sequência, sem alterar as fichas.
+Cada ação tem uma apresentação sequencial: destaque da Nativa, nome do golpe, D10 de precisão quando aplicável e resultado (dano, erro ou efeito de suporte). A próxima Nativa só começa após esse fluxo. O padrão é cerca de 5 segundos por ação; as Configurações oferecem velocidade muito rápida (3 s), rápida (4 s), normal (5 s), devagar (6 s) e muito devagar (8 s), além de desativar os efeitos e a espera. Preferências são salvas por conta em `player_preferences`, com cache e reenvio local. O resolvedor e o servidor continuam sendo a fonte dos resultados; as animações apenas os apresentam. HP e MP visuais acompanham a sequência, sem alterar as fichas.
 
 A confirmação de ação fica sobreposta ao cenário, entre as Nativas, acima dos golpes, sem faixa de fundo. A migration `20261112010000_arena_preferences.sql` cria as preferências com RLS por conta.
