@@ -1,0 +1,282 @@
+/* The confirmation belongs to the illustrated field, without a toolbar background. */
+#battle .arena-stage > .arena-action-trigger,
+#battle:is(:fullscreen, .arena-expanded):has(.battlefield) .arena-stage > .arena-action-trigger {
+  position: absolute;
+  z-index: 12;
+  left: 0;
+  right: 0;
+  bottom: 7px;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  background: none;
+  border: 0;
+  box-shadow: none;
+  pointer-events: none;
+}
+#battle .arena-stage > .arena-action-trigger button {
+  pointer-events: auto;
+  background: linear-gradient(120deg, #e4d39bdf, #b9d397df);
+  backdrop-filter: blur(4px);
+  box-shadow: 0 3px 15px #0006;
+}
+#battle:is(:fullscreen, .arena-expanded):has(.battlefield) .battlefield {
+  grid-template-areas: "top" "stage" "commands" "footer";
+  grid-template-rows: 24px minmax(120px, 1fr) auto auto;
+}
+.arena-preferences label:not(.checkbox-row) {
+  display: grid;
+  gap: 8px;
+  max-width: 420px;
+  margin: 16px 0;
+}
+.arena-preferences [role="status"] {
+  font-size: 12px;
+  color: #c5dba9;
+}
+.combat-cinematic {
+  position: fixed;
+  z-index: 8;
+  transform: translate(-50%, -40%);
+  width: max-content;
+  min-width: 200px;
+  max-width: 420px;
+  display: grid;
+  justify-items: center;
+  gap: 9px;
+  padding: 14px 20px;
+  border: 1px solid #f2dda16e;
+  border-radius: 5px 20px;
+  background: linear-gradient(145deg, #102d25ef, #081c18e8);
+  box-shadow:
+    0 12px 40px #0008,
+    inset 0 1px #ffffff28,
+    0 0 28px #d4bf6329;
+  text-align: center;
+  color: #fff7dc;
+  backdrop-filter: blur(8px);
+  animation: cinematic-enter 0.35s ease both;
+  pointer-events: none;
+}
+.combat-cinematic > small {
+  font:
+    800 9px/1.3 Inter,
+    sans-serif;
+  letter-spacing: 0.16em;
+  color: #dbd9a6;
+}
+.cinematic-technique {
+  font:
+    650 clamp(16px, 2.5vw, 26px)/1.2 Fraunces,
+    Georgia,
+    serif;
+  text-wrap: balance;
+}
+.cinematic-result {
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+  font-size: 12px;
+  max-width: 370px;
+}
+.cinematic-result > small {
+  font-size: 9px;
+  letter-spacing: 0.13em;
+  color: #ccd6be;
+}
+.cinematic-result p {
+  font-size: 12px;
+  line-height: 1.45;
+  margin: 0;
+  text-wrap: pretty;
+}
+.cinematic-die {
+  width: 62px;
+  height: 62px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(140deg, #efdca7, #85754c);
+  clip-path: polygon(50% 0, 95% 27%, 88% 80%, 50% 100%, 12% 80%, 5% 27%);
+  color: #14281b;
+  font-size: 30px;
+  font-weight: 900;
+  filter: drop-shadow(0 0 10px #ead28e77);
+}
+[data-phase="roll"] .cinematic-die {
+  animation: cinematic-die-spin 0.4s ease-in-out infinite alternate;
+}
+.cinematic-outcome {
+  font:
+    850 clamp(22px, 4vw, 38px)/1.1 Inter,
+    sans-serif;
+  letter-spacing: -0.03em;
+}
+.is-hit .cinematic-outcome {
+  color: #ffce99;
+  text-shadow: 0 0 18px #ec7b3180;
+  animation: cinematic-impact 0.45s ease both;
+}
+.is-miss .cinematic-outcome {
+  color: #e8d9c3;
+  animation: cinematic-enter 0.3s ease both;
+}
+.is-support {
+  border-color: #9eeacb9e;
+  box-shadow: 0 0 30px #5ecaae44;
+}
+.is-support .cinematic-outcome {
+  color: #b4f7da;
+}
+#battle .arena-fighter.acting-native {
+  z-index: 6;
+}
+#battle .arena-fighter.acting-native .combatant-art {
+  animation: native-anticipation 0.95s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 12px #ffe6a599) drop-shadow(0 0 2px #fff9db);
+}
+#battle .arena-fighter.acting-native::after {
+  content: "";
+  position: absolute;
+  inset: auto 12% 0;
+  width: 76%;
+  height: 20%;
+  border: 2px solid #eed9a9bb;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, #f1d07933, transparent 70%);
+  transform: rotate(-8deg);
+  box-shadow:
+    0 0 24px #ffde8b77,
+    inset 0 0 18px #ffde8b44;
+  animation: native-rune 1.3s ease-in-out infinite alternate;
+}
+#battle .arena-fighter.receiving-hit .combatant-art {
+  animation: native-impact 0.55s ease both;
+}
+#battle .cinematic-stage::after {
+  background: linear-gradient(90deg, #06191055, transparent 30%, transparent 70%, #06191055);
+}
+@keyframes native-anticipation {
+  from {
+    transform: translateY(0) scale(1);
+  }
+  to {
+    transform: translateY(-5px) scale(1.045);
+  }
+}
+@keyframes native-rune {
+  from {
+    opacity: 0.55;
+    transform: rotate(-8deg) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(-8deg) scale(1.08);
+  }
+}
+@keyframes native-impact {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    transform: translateX(9px);
+    filter: brightness(1.8);
+  }
+  40%,
+  80% {
+    transform: translateX(-7px);
+  }
+}
+@keyframes cinematic-enter {
+  from {
+    opacity: 0;
+    translate: 0 8px;
+    scale: 0.94;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+    scale: 1;
+  }
+}
+@keyframes cinematic-impact {
+  0% {
+    scale: 1.5;
+    opacity: 0;
+  }
+  45% {
+    scale: 0.95;
+    opacity: 1;
+  }
+  100% {
+    scale: 1;
+  }
+}
+@keyframes cinematic-die-spin {
+  from {
+    rotate: -6deg;
+    scale: 0.95;
+  }
+  to {
+    rotate: 6deg;
+    scale: 1.05;
+  }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .combat-cinematic {
+    padding: 7px 12px;
+    gap: 4px;
+    min-width: 160px;
+    max-width: 42vw;
+    border-radius: 5px 12px;
+  }
+  .combat-cinematic > small {
+    font-size: 7px;
+  }
+  .cinematic-technique {
+    font-size: 15px;
+  }
+  .cinematic-die {
+    width: 40px;
+    height: 40px;
+    font-size: 23px;
+  }
+  .cinematic-result {
+    gap: 3px;
+  }
+  .cinematic-result p {
+    font-size: 10px;
+    max-height: 58px;
+    overflow: hidden;
+  }
+  .cinematic-outcome {
+    font-size: 24px;
+  }
+}
+@media (max-width: 420px) {
+  .combat-cinematic {
+    min-width: 180px;
+    max-width: calc(100vw - 24px);
+    padding: 12px;
+  }
+  .cinematic-result p {
+    font-size: 11px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .combat-cinematic,
+  .cinematic-die,
+  .cinematic-outcome,
+  #battle .arena-fighter.acting-native .combatant-art,
+  #battle .arena-fighter.acting-native::after,
+  #battle .arena-fighter.receiving-hit .combatant-art {
+    animation: none !important;
+  }
+}
+
+.arena-effects-disabled #battle .arena-creature,
+.arena-effects-disabled #battle .combatant-art,
+.arena-effects-disabled #battle .battle-technique-card::before {
+  animation: none !important;
+}

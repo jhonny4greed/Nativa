@@ -24,6 +24,7 @@ if (user) {
   await import("../css/arena-game.css");
   await import("../css/arena-online.css");
   await import("../css/arena-layout.css");
+  await import("../css/arena-cinematic.css");
   observeIcons();
   const { initializeDashboard } = await import("./dashboard.js");
   // Preserve the existing profile bootstrap for new e-mail and OAuth accounts.
@@ -47,6 +48,8 @@ if (user) {
     console.warn("Não foi possível carregar o catálogo biológico global; usando o catálogo local.", error);
   }
   await initializeDashboard(client, user, role);
+  const { initializeArenaPreferences } = await import("./arena-preferences.js");
+  await initializeArenaPreferences(client,user);
   await import("./app.js");
   if (role === "admin") {
     const { inicializarPainelAdmin } = await import("./admin.js");

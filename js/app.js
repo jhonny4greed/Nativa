@@ -1,3 +1,5 @@
+import { getArenaPreferences, animationDuration } from "./arena-preferences.js";
+import { createCombatPresenter, combatActions, historyActions } from "./arena-sequence.js";
 import { defaultPortrait } from "./creature-art.js";
 import { requireAuthenticatedUser } from "./session-gate.js";
 import { authHref, safeDestination, isAdmin } from "./access.js";
@@ -34,6 +36,7 @@ let atributos = Object.fromEntries(DEFINICOES_ATRIBUTOS.map(([key])=>[key,1]));
 let tecnicasSelecionadas = new Set();
 let batalha = null;
 let onlineArena = null;
+const apresentador=createCombatPresenter({getBattle:()=>batalha,identity:identidadeEfeitos,preferences:getArenaPreferences,duration:animationDuration,render:renderizarArena,techniques:tecnicasCombatente});
 const urlsFotosArena = criarRegistroUrlsFotosArena({
   criarUrl: blob => URL.createObjectURL(blob),
   revogarUrl: url => URL.revokeObjectURL(url)
@@ -1033,6 +1036,7 @@ function prepararTurno(inicial=false){
 // Registra a ação escolhida pelo jogador.
 
 function selecionarAcao(indice,tipo,tecnicaId=null){
+  if(apresentador.busy())return;
   if(
     !batalha||
     batalha.encerrada||
@@ -1106,33 +1110,6 @@ function apresentarEventosCombate(eventos){
   }
 }
 
-function aplicarAnimacoesTecnicas(resultado){
-  for(const evento of resultado.events||[]){
-    if(!evento.technique||!evento.attacker)continue;
-    const combatente=resultado.fighters.find(item=>item.nativa.name===evento.attacker);
-    if(!combatente)continue;
-    const tecnica=tecnicasCombatente(combatente).find(item=>item.nome===evento.technique);
-    if(!tecnica)continue;
-    if(evento.type==="support"||tecnica.categoria==="Suporte")combatente.animacao="support";
-    else if(evento.type==="miss")combatente.animacao="miss";
-    else combatente.animacao=tecnica.categoria==="Especial"?"attack-special":"attack-physical";
-  }
-}
-
-function aplicarAnimacoesDoHistorico(combatentes,historico){
-  const lines=historico||[];
-  let roundStart=lines.findLastIndex?.(line=>/^Turno \d+$/i.test(line))??-1;
-  if(roundStart<0)roundStart=lines.map(line=>/^Turno \d+$/i.test(line)).lastIndexOf(true);
-  for(const line of lines.slice(roundStart+1)){
-    const match=String(line).match(/^(.+?) (usa|erra) (.+?)(?::| e causa | \(D10:|\.$)/);
-    if(!match)continue;
-    const fighter=combatentes.find(item=>item.nativa.name===match[1]);
-    const technique= fighter&&tecnicasCombatente(fighter).find(item=>item.nome===match[3]);
-    if(!fighter||!technique)continue;
-    fighter.animacao=match[2]==="erra"?"miss":technique.categoria==="Especial"?"attack-special":technique.categoria==="Suporte"?"support":"attack-physical";
-  }
-}
-
 // Executa escolhas e apresenta o resultado produzido pelo domínio.
 async function concederRecompensasVitoria(batalhaAtual){
   if(batalhaAtual.recompensaAplicada)return;
@@ -1193,13 +1170,12 @@ async function executarTurno(){
     batalha.ordem=resultado.order;
     batalha.rolls=resultado.rolls;
     apresentarEventosCombate(resultado.events);
-    aplicarAnimacoesTecnicas(resultado);
+    batalha.fighters.forEach(f=>{f.animacao=null;});
     if(resultado.error)throw resultado.error;
 
-    renderizarArena();
-    for(const evento of resultado.events||[]){
-      if((evento.type==="hit"||evento.type==="v21-hit"||evento.type==="miss")&&evento.roll!==null&&evento.roll!==undefined)await animarDadoPrecisao(batalha,evento.roll,evento.type!=="miss");
-    }
+    const current=batalha;
+    await apresentador.enqueue(combatActions(resultado.events||[],batalha.fighters),`${identidadeEfeitos(current)}:${current.turno}`,fighters);
+    if(batalha!==current)return;
 
     if(resultado.ended){
       if(batalha.modo!==MODOS_BATALHA.CPU||batalha.fighters[0].hp>0){
@@ -1272,58 +1248,9 @@ async function desistirDaLuta(){
   }
 }
 
-const efeitosApresentados=new Set();
-let filaDados=Promise.resolve();
 function identidadeEfeitos(current){
   if(!current)return null;
   return current.onlineMatchId||current.roomEncounterId||(current.fxId||=crypto.randomUUID());
-}
-function camadaEfeitos(){
-  let layer=$("#arena-effects");
-  if(!layer){layer=document.createElement("div");layer.id="arena-effects";layer.className="arena-effects";$("#battle").append(layer);}
-  return layer;
-}
-function apresentarDanosUmaVez(){
-  if(!batalha||batalha.damageTurn!==batalha.turno)return;
-  batalha.fighters.forEach((fighter,index)=>{
-    if(!fighter.damageThisTurn)return;
-    const key=`${identidadeEfeitos(batalha)}:${batalha.damageTurn}:${index}`;
-    if(efeitosApresentados.has(key))return;
-    efeitosApresentados.add(key);
-    if(efeitosApresentados.size>1000)efeitosApresentados.delete(efeitosApresentados.values().next().value);
-    const anchor=$(`#battle-arena .${index===0?"contestant-left":"contestant-right"}`);
-    if(!anchor)return;
-    const rect=anchor.getBoundingClientRect(),float=document.createElement("span");
-    float.className="damage-float";float.textContent=`−${fighter.damageThisTurn} HP`;
-    float.style.left=`${rect.left+rect.width/2}px`;float.style.top=`${rect.top+rect.height*.2}px`;
-    camadaEfeitos().append(float);setTimeout(()=>float.remove(),3000);
-  });
-}
-async function animarDadoPrecisao(current,roll,hit){
-  const identity=identidadeEfeitos(current);
-  const play=async()=>{
-    if(identidadeEfeitos(batalha)!==identity)return;
-    const overlay=document.createElement("div");overlay.className="precision-die-overlay";overlay.setAttribute("role","status");overlay.setAttribute("aria-live","polite");
-    overlay.innerHTML='<div class="d10-shell"><span data-d10-face></span></div><small>DADO DE PRECISÃO · D10</small><strong data-d10-result>ROLANDO…</strong>';
-    const rect=$("#battle-arena .arena-scene")?.getBoundingClientRect()||$("#battle-arena").getBoundingClientRect();
-    overlay.style.top=`${Math.max(120,Math.min(innerHeight-140,rect.top+Math.min(rect.height,innerHeight)/2))}px`;
-    camadaEfeitos().append(overlay);
-    const face=overlay.querySelector('[data-d10-face]');
-    const reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const duration=reduced?0:1000,started=performance.now();
-    if(!reduced)overlay.classList.add("rolling");
-    await new Promise(resolve=>{
-      const tick=now=>{
-        if(identidadeEfeitos(batalha)!==identity){resolve();return;}
-        face.textContent=now-started>=duration?String(roll):String(1+Math.floor(Math.random()*10));
-        if(now-started<duration)requestAnimationFrame(tick);else resolve();
-      };requestAnimationFrame(tick);
-    });
-    overlay.classList.remove("rolling");overlay.classList.add(hit?"roll-hit":"roll-miss");
-    overlay.querySelector('[data-d10-result]').textContent=hit?"ACERTO":"ERROU";
-    await new Promise(resolve=>setTimeout(resolve,1800));overlay.remove();
-  };
-  filaDados=filaDados.then(play,play);await filaDados;
 }
 
 function slugVisualTecnica(value){
@@ -1405,6 +1332,7 @@ function renderizarCombatente(c,indice){
 
 function renderizarHudCombatente(c,indice){
   const n=c.nativa;
+  const visual=apresentador.vitals(indice)||c;
   const rotuloJogador=batalha.modo===MODOS_BATALHA.CPU&&indice===1
     ?"CPU"
     :n.player||`Jogador ${indice+1}`;
@@ -1416,9 +1344,9 @@ function renderizarHudCombatente(c,indice){
         <span class="combatant-player">${escapar(rotuloJogador)}</span>
       </div></div>
       <div class="combatant-vitals" aria-label="Condição de ${escapar(n.name)}">
-        <div class="vital-line"><div class="bar-label"><span>HP</span><b>${c.hp}/${c.maxHP}</b></div><div class="bar hp"><span style="width:${Math.max(0,c.hp/c.maxHP*100)}%"></span></div></div>
-        <div class="vital-line"><div class="bar-label"><span>MP</span><b>${c.mp}/${c.maxMP}</b></div><div class="bar mp"><span style="width:${Math.max(0,c.mp/c.maxMP*100)}%"></span></div></div>
-        <span class="condition-state">${c.hp<=0?"Fora de combate":"Sem condições"}</span>
+        <div class="vital-line"><div class="bar-label"><span>HP</span><b>${visual.hp}/${c.maxHP}</b></div><div class="bar hp"><span style="width:${Math.max(0,visual.hp/c.maxHP*100)}%"></span></div></div>
+        <div class="vital-line"><div class="bar-label"><span>MP</span><b>${visual.mp}/${c.maxMP}</b></div><div class="bar mp"><span style="width:${Math.max(0,visual.mp/c.maxMP*100)}%"></span></div></div>
+        <span class="condition-state">${visual.hp<=0?"Fora de combate":"Sem condições"}</span>
       </div>
     </article>
   `;
@@ -1527,27 +1455,28 @@ function renderizarArena(){
   }
 
   const f=batalha.fighters;
+  const encerradaVisual=batalha.encerrada&&!apresentador.busy();
 
   const order=batalha.ordem.length
     ?batalha.ordem.map(i=>f[i].nativa.name).join(" → ")
     :"Aguardando as escolhas dos jogadores";
 
-  const botaoExecutar=batalha.encerrada
+  const botaoExecutar=encerradaVisual
     ?""
     :`
       <button
         id="execute-turn"
         class="execute-battle-button"
         type="button"
-        ${Object.keys(batalha.escolhas).length<(batalha.modo===MODOS_BATALHA.CPU||batalha.modo==="online"||batalha.modo==="room"?1:2)||batalha.processando||batalha.aguardandoProximoTurno||batalha.onlineSubmitted||batalha.roomSubmitted?"disabled":""}
+        ${Object.keys(batalha.escolhas).length<(batalha.modo===MODOS_BATALHA.CPU||batalha.modo==="online"||batalha.modo==="room"?1:2)||batalha.processando||batalha.aguardandoProximoTurno||batalha.onlineSubmitted||batalha.roomSubmitted||apresentador.busy()?"disabled":""}
       >
         ${batalha.modo==="online"?(batalha.onlineSubmitted?"AÇÃO CONFIRMADA · AGUARDANDO":"CONFIRMAR AÇÃO ONLINE"):batalha.modo==="room"?(batalha.roomSubmitted?"AÇÃO CONFIRMADA · AGUARDANDO":"CONFIRMAR AÇÃO DA CAMPANHA"):batalha.aguardandoProximoTurno?"Aguarde o próximo turno...":"REALIZAR AÇÃO"}
       </button>
     `;
-  const botaoDesistir=!batalha.encerrada
-    ?`<button id="forfeit-battle" class="forfeit-battle-button" type="button" ${batalha.processando?"disabled":""}>${batalha.modo==="room"?"Desistir do encontro":batalha.modo==="online"?"Desistir do duelo":"Desistir da luta"}</button>`:"";
+  const botaoDesistir=!encerradaVisual
+    ?`<button id="forfeit-battle" class="forfeit-battle-button" type="button" ${batalha.processando||apresentador.busy()?"disabled":""}>${batalha.modo==="room"?"Desistir do encontro":batalha.modo==="online"?"Desistir do duelo":"Desistir da luta"}</button>`:"";
 
-  const resultado=batalha.encerrada
+  const resultado=encerradaVisual
     ?`
       <div class="battle-result">
         <span>🏆</span>
@@ -1567,7 +1496,7 @@ function renderizarArena(){
 
   $("#battle-arena").innerHTML=`
     <section class="battlefield battle-layout" data-mode="${escapar(batalha.modo)}" data-biome="${escapar(batalha.bioma||"")}" aria-label="Arena: ${escapar(batalha.bioma||"Bioma não definido")}">
-      <header class="battlefield-topline"><span class="arena-location">${escapar(batalha.bioma||"Arena")} · ${escapar(batalha.horario||"")}</span><span class="battle-state">${batalha.encerrada?"Combate encerrado":`Turno ${batalha.turno} · ${batalha.processando?"Resolvendo ações":"Combate em andamento"}`}</span></header>
+      <header class="battlefield-topline"><span class="arena-location">${escapar(batalha.bioma||"Arena")} · ${escapar(batalha.horario||"")}</span><span class="battle-state">${encerradaVisual?"Combate encerrado":`Turno ${batalha.turno} · ${batalha.processando?"Resolvendo ações":"Combate em andamento"}`}</span></header>
       <div class="arena-stage" aria-label="Campo de batalha">
         <div class="scene-backdrop" aria-hidden="true"><span class="scene-canopy"></span><span class="scene-ridge"></span><span class="scene-water"></span><span class="scene-ground"></span><span class="scene-rocks"></span><span class="scene-plants"></span><span class="scene-light"></span></div>
         <div class="arena-hud-row">
@@ -1582,18 +1511,18 @@ function renderizarArena(){
         <div class="arena-fighter arena-fighter-one">${renderizarCombatente(f[0],0)}</div>
         <div class="arena-stage-mark" aria-hidden="true"><span></span><b>VS</b><span></span></div>
         <div class="arena-fighter arena-fighter-two">${renderizarCombatente(f[1],1)}</div>
+        <div class="arena-action-trigger">${botaoExecutar}</div>
 
       </div>
       <div class="battle-commands">
         <div class="battle-commands-grid">
-          ${!batalha.encerrada&&((batalha.modo!=="online"&&batalha.modo!=="room")||(batalha.modo==="online"&&batalha.onlineSelfIndex===0)||(batalha.modo==="room"&&batalha.roomSelfIndex===0))?renderizarPainelAcao(f[0],0):""}
-          ${!batalha.encerrada&&batalha.modo===MODOS_BATALHA.LOCAL?renderizarPainelAcao(f[1],1):""}
-          ${!batalha.encerrada&&batalha.modo==="online"&&batalha.onlineSelfIndex===1?renderizarPainelAcao(f[1],1):""}
-          ${!batalha.encerrada&&batalha.modo==="room"&&batalha.roomSelfIndex===1?renderizarPainelAcao(f[1],1):""}
+          ${!encerradaVisual&&((batalha.modo!=="online"&&batalha.modo!=="room")||(batalha.modo==="online"&&batalha.onlineSelfIndex===0)||(batalha.modo==="room"&&batalha.roomSelfIndex===0))?renderizarPainelAcao(f[0],0):""}
+          ${!encerradaVisual&&batalha.modo===MODOS_BATALHA.LOCAL?renderizarPainelAcao(f[1],1):""}
+          ${!encerradaVisual&&batalha.modo==="online"&&batalha.onlineSelfIndex===1?renderizarPainelAcao(f[1],1):""}
+          ${!encerradaVisual&&batalha.modo==="room"&&batalha.roomSelfIndex===1?renderizarPainelAcao(f[1],1):""}
         </div>
         ${resultado}
       </div>
-      <div class="arena-action-trigger">${botaoExecutar}</div>
       <footer class="battle-footer">
         <details class="battle-history"><summary>Histórico da batalha</summary>${renderizarHistorico()}</details>
         ${botaoDesistir}
@@ -1601,9 +1530,10 @@ function renderizarArena(){
     </section>
   `;
 
-  apresentarDanosUmaVez();
+
   batalha.fighters.forEach(fighter=>{fighter.animacao=null;});
   $("#execute-turn")?.addEventListener("click",()=>{
+    if(apresentador.busy())return;
     if(batalha?.modo==="room"){void executarTurnoSala();return;}
     if(batalha?.modo!=="online"){void executarTurno();return;}
     const current=batalha;
@@ -1709,7 +1639,7 @@ onlineArena=initializeOnlineArena({
     }));
     const history=match.state.history||[];
     const newEvents=previous?history.slice(previous.log.length):[];
-    if(previous&&previous.log?.at(-1)!==history.at(-1))aplicarAnimacoesDoHistorico(fighters,history);
+
     batalha={modo:"online",onlineMatchId:match.id,onlineSelfIndex:match.selfIndex,onlineSubmitted:match.ownConfirmed,
       onlineWinnerIndex:match.winnerIndex,onlineCancelled:match.status==="cancelled",onlineForfeit:match.reason==="forfeit",fighters,turno:match.turn,damageTurn:newEvents.length?match.turn:null,
       horario:"Duelo online",bioma:match.biome,ordem:match.state.order||[],log:[...history],
@@ -1717,9 +1647,7 @@ onlineArena=initializeOnlineArena({
       tecnicaDetalhesAberta:sameTurn?previous?.tecnicaDetalhesAberta:null,
       paineisGolpesAbertos:previous?.paineisGolpesAbertos||[],encerrada:match.status!=="active",processando:false,aguardandoProximoTurno:false};
     renderizarArena();
-    const current=batalha;
-    const rolls=newEvents.map(line=>{const parsed=String(line).match(/D10:\s*(\d+)/i);return parsed?{roll:Number(parsed[1]),hit:/recebe\s+\d+\s+de\s+dano/i.test(line)}:null;}).filter(Boolean);
-    if(rolls.length)void (async()=>{for(const roll of rolls)await animarDadoPrecisao(current,roll.roll,roll.hit);})();
+    void apresentador.enqueue(historyActions(newEvents,fighters,tecnicasCombatente),`online:${match.id}:${history.length}`,previous?.fighters);
   }
 });
 
@@ -1739,7 +1667,7 @@ function atualizarArenaDaSala(detail){
   });
   const history=encounter.state.history||[];
   const newEvents=same?history.slice(same.log.length):[];
-  if(same&&same.log?.at(-1)!==history.at(-1))aplicarAnimacoesDoHistorico(fighters,history);
+
   const winnerIndex=encounter.winner_id?participants.findIndex(p=>p.player_id===encounter.winner_id):-1;
   const sameTurn=same?.turno===encounter.turn;
   batalha={modo:"room",roomId,roomEncounterId:encounter.id,roomSelfIndex:selfIndex,
@@ -1751,9 +1679,7 @@ function atualizarArenaDaSala(detail){
     tecnicaDetalhesAberta:sameTurn?same?.tecnicaDetalhesAberta:null,
     encerrada:encounter.status!=="active",processando:false,aguardandoProximoTurno:false};
   renderizarArena();
-  const current=batalha;
-  const rolls=newEvents.map(line=>{const parsed=String(line).match(/D10:\s*(\d+)/i);return parsed?{roll:Number(parsed[1]),hit:/recebe\s+\d+\s+de\s+dano/i.test(line)}:null;}).filter(Boolean);
-  if(rolls.length)void (async()=>{for(const roll of rolls)await animarDadoPrecisao(current,roll.roll,roll.hit);})();
+  void apresentador.enqueue(historyActions(newEvents,fighters,tecnicasCombatente),`room:${encounter.id}:${history.length}`,same?.fighters);
 }
 
 document.addEventListener("nativa:room-arena-open",event=>{

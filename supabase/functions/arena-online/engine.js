@@ -26,11 +26,11 @@ function describe(e) {
   if(e.type==="initiative")return `Iniciativa: ${e.order.map(i=>e.names[i]).join(" → ")}.`;
   if(e.type==="hit"||e.type==="v21-hit")return `${e.attacker} usa ${e.technique} (D10: ${e.roll??"—"}, acerto): ${e.target} recebe ${e.damage} de dano.`;
   if(e.type==="miss")return `${e.attacker} erra ${e.technique} (D10: ${e.roll??"—"}, falha).`;
-  if(e.type==="support")return `${e.attacker} usa ${e.technique}: suporte.`;
+  if(e.type==="support")return `${e.attacker} usa ${e.technique}: ${e.description||"suporte"}.`;
   if(e.type==="defeat")return `${e.defeated} foi derrotada. Vitória de ${e.winner}.`;
   if(e.message)return e.message;
-  if(e.type==="defend")return `${e.name||e.actor||"Nativa"} assume uma postura defensiva.`;
-  if(e.type==="recover")return `${e.name||e.actor||"Nativa"} recupera MP.`;
+  if(e.type==="defend")return `${e.fighter||e.name||e.actor||"Nativa"} assume uma postura defensiva.`;
+  if(e.type==="recover")return `${e.fighter||e.name||e.actor||"Nativa"} recupera ${e.recovered||0} MP.`;
   return null;
 }
 export function resolveOnlineRound(match,choices,random) {

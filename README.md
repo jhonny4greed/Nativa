@@ -68,4 +68,6 @@ Imagens recém-geradas aparecem como prévia até clicar em **Salvar no acervo**
 
 ## Efeitos da arena
 
-Dano e dado usam uma camada independente dos painéis. Atualizar a interface não reinicia a animação de dano. O D10 rola por 1 segundo e mantém o resultado por 1,8 segundo; números de dano permanecem por cerca de 2,8 segundos. Movimentos reduzidos são respeitados. O dado indica precisão, não dano.
+Cada ação tem uma apresentação sequencial: destaque da Nativa, nome do golpe, D10 de precisão quando aplicável e resultado (dano, erro ou efeito de suporte). A próxima Nativa só começa após esse fluxo. O padrão é cerca de 5,5 segundos por ação; as Configurações oferecem velocidade rápida (~3 s), normal e lenta (~8 s), além de desativar os efeitos e a espera. Preferências são salvas por conta em `player_preferences`, com cache e reenvio local. O resolvedor e o servidor continuam sendo a fonte dos resultados; as animações apenas os apresentam. HP e MP visuais acompanham a sequência, sem alterar as fichas.
+
+A confirmação de ação fica sobreposta ao cenário, entre as Nativas, acima dos golpes, sem faixa de fundo. A migration `20261112010000_arena_preferences.sql` cria as preferências com RLS por conta.

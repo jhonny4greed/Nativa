@@ -23,7 +23,7 @@ export function validateRoomChoice(state,index,choice) {
   if((fighter.cooldowns[technique.id]||0)>0||fighter.mp<technique.mp)throw new Error("Golpe indisponível: confira MP e recarga.");
   return {tipo:"attack",tecnicaId:technique.id};
 }
-function describe(e){if(e.type==="initiative")return `Iniciativa: ${e.order.map(i=>e.names[i]).join(" → ")}.`;if(e.type==="hit"||e.type==="v21-hit")return `${e.attacker} usa ${e.technique} (D10: ${e.roll??"—"}, acerto): ${e.target} recebe ${e.damage} de dano.`;if(e.type==="support")return `${e.attacker} usa ${e.technique}: suporte.`;if(e.type==="miss")return `${e.attacker} erra ${e.technique} (D10: ${e.roll??"—"}, falha).`;if(e.type==="defeat")return `${e.defeated} foi derrotada. Vitória de ${e.winner}.`;return e.message||null;}
+function describe(e){if(e.type==="initiative")return `Iniciativa: ${e.order.map(i=>e.names[i]).join(" → ")}.`;if(e.type==="hit"||e.type==="v21-hit")return `${e.attacker} usa ${e.technique} (D10: ${e.roll??"—"}, acerto): ${e.target} recebe ${e.damage} de dano.`;if(e.type==="support")return `${e.attacker} usa ${e.technique}: ${e.description||"suporte"}.`;if(e.type==="miss")return `${e.attacker} erra ${e.technique} (D10: ${e.roll??"—"}, falha).`;if(e.type==="defend")return `${e.fighter} assume uma postura defensiva.`;if(e.type==="recover")return `${e.fighter} recupera ${e.recovered||0} MP.`;if(e.type==="defeat")return `${e.defeated} foi derrotada. Vitória de ${e.winner}.`;return e.message||null;}
 export function resolveRoomRound(encounter,participants,choices,random=Math.random){
   participants=orderRoomParticipants(participants);
   const state=encounter.state||initialRoomState(encounter,participants);
