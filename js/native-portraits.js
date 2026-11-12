@@ -21,13 +21,13 @@ export async function enviarRetratoNativa(nativa, blob, photoId = nativa?.photoI
 
 export async function obterRetratoNativa(nativa) {
   if (!nativa?.photoId && !nativa?.photoStoragePath) return null;
-  const local = await repositorioLocal.obterFoto(nativa.photoId);
+  const local = nativa.photoId ? await repositorioLocal.obterFoto(nativa.photoId) : null;
   if (local) return local;
   if (!nativa.photoStoragePath) return null;
   const client = await obterClienteSupabase();
   const { data, error } = await client.storage.from(BUCKET).download(nativa.photoStoragePath);
   if (error || !data) return null;
-  await repositorioLocal.guardarFoto(nativa.photoId, data);
+  if(nativa.photoId)await repositorioLocal.guardarFoto(nativa.photoId, data);
   return data;
 }
 

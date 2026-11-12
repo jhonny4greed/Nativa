@@ -221,25 +221,48 @@ export function createGenerateArtHandler({ env = () => undefined, fetchImpl = fe
 
   async function generateImage(prompt) {
     const baseUrl = (env("NVIDIA_API_BASE_URL") || DEFAULT_BASE_URL).replace(/\/$/, "");
-    const model = env("NVIDIA_IMAGE_MODEL") || DEFAULT_MODEL;
+    const primary = env("NVIDIA_IMAGE_MODEL") || DEFAULT_MODEL;
+    const fallback = env("NVIDIA_IMAGE_FALLBACK_MODEL");
+    const models = [...new Set([primary,fallback].filter(Boolean))];
     const apiKey = env("NVIDIA_API_KEY");
-    const response = await fetchImpl(`${baseUrl}/v1/genai/${model}`, {
-      method: "POST",
-      signal: AbortSignal.timeout(120_000),
-      headers: { Authorization: `Bearer ${apiKey}`, Accept: "application/json", "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt, mode: "base", cfg_scale: DEFAULT_CFG_SCALE, width: 1024, height: 1024, seed: 0, steps: DEFAULT_STEPS })
-    });
-    if (!response.ok) throw Object.assign(new Error("provider_rejected"), { status: response.status });
-    const result = await readJsonResponse(response);
-    const encoded = result?.artifacts?.[0]?.base64
-      || result?.artifacts?.[0]?.base64_image
-      || result?.images?.[0]?.base64_image
-      || result?.artifacts?.[0]?.image;
-    const bytes = fromBase64(encoded);
-    if (bytes.byteLength === 0 || bytes.byteLength > RESULT_LIMIT) throw new Error("invalid_image_size");
-    const contentType = detectImageType(bytes);
-    if (!contentType) throw new Error("invalid_image_content");
-    return { bytes, contentType };
+    const deadline=Date.now()+120_000;
+    let failure;
+    for(const model of models){
+      if(Date.now()>=deadline)throw failure||new DOMException("Provider timed out","TimeoutError");
+      try{
+        const schnell=model==="black-forest-labs/flux.1-schnell";
+        let response = await fetchImpl(`${baseUrl}/v1/genai/${model}`, {
+          method: "POST", signal: AbortSignal.timeout(Math.max(1,deadline-Date.now())),
+          headers: { Authorization: `Bearer ${apiKey}`, Accept: "application/json", "Content-Type": "application/json", "NVCF-POLL-SECONDS":"20" },
+          body: JSON.stringify({ prompt, mode: "base", cfg_scale: schnell?0:DEFAULT_CFG_SCALE, width: 1024, height: 1024, seed: 0, steps: schnell?4:DEFAULT_STEPS })
+        });
+        let requestId=response.headers.get("nvcf-reqid");
+        // A queued request is not a failed image: poll it without starting another generation.
+        for(let attempt=0;response.status===202&&attempt<20;attempt++){
+          const id=response.headers.get("nvcf-reqid")||requestId;
+          if(!/^[0-9a-f-]{36}$/i.test(id||""))throw Object.assign(new Error("invalid_provider_response"),{requestId});
+          requestId=id;
+          await response.body?.cancel();
+          if(Date.now()>=deadline)throw new DOMException("Provider timed out","TimeoutError");
+          response=await fetchImpl(`${baseUrl}/v1/status/${encodeURIComponent(id)}`,{headers:{Authorization:`Bearer ${apiKey}`,Accept:"application/json","NVCF-POLL-SECONDS":"20"},signal:AbortSignal.timeout(Math.max(1,deadline-Date.now()))});
+        }
+        if(response.status===202)throw new DOMException("Provider still processing","TimeoutError");
+        if (!response.ok) {await response.body?.cancel();throw Object.assign(new Error("provider_rejected"), { status: response.status,requestId,model });}
+        const result = await readJsonResponse(response);
+        const encoded = result?.artifacts?.[0]?.base64 || result?.artifacts?.[0]?.base64_image || result?.images?.[0]?.base64_image || result?.artifacts?.[0]?.image;
+        if(!encoded)throw Object.assign(new Error("invalid_provider_response"),{requestId,model});
+        const bytes = fromBase64(encoded);
+        if (bytes.byteLength === 0 || bytes.byteLength > RESULT_LIMIT) throw new Error("invalid_image_size");
+        const contentType = detectImageType(bytes);
+        if (!contentType) throw new Error("invalid_image_content");
+        return { bytes, contentType,model,fallbackUsed:model!==primary };
+      }catch(error){
+        failure=error;
+        // Do not retry bad credentials, permission errors, rate limits or invalid images.
+        if(!(error.status>=500))throw error;
+      }
+    }
+    throw failure;
   }
 
   return async function handleGenerateArt(request) {
@@ -286,7 +309,7 @@ export function createGenerateArtHandler({ env = () => undefined, fetchImpl = fe
         const image = await generateImage(makePrompt(kind, title, prompt));
         const taskId = randomUUID();
         await storeImage(user.id, taskId, image);
-        return json({ taskToken: await createTaskToken(taskId, user.id, signingKey, now()) });
+        return json({ taskToken: await createTaskToken(taskId, user.id, signingKey, now()),model:image.model,fallbackUsed:image.fallbackUsed });
       } catch (error) {
         const status = error?.status === 413 ? 413 : 502;
         const message = error?.name === "TimeoutError" ? "O provedor demorou demais para gerar a imagem."
@@ -295,9 +318,13 @@ export function createGenerateArtHandler({ env = () => undefined, fetchImpl = fe
           : error?.message === "image_storage_unavailable" || error?.message === "image_storage_write_failed" ? "O armazenamento temporário de imagens está indisponível."
           : error?.status === 401 ? "A chave NVIDIA configurada no servidor foi recusada."
           : error?.status === 403 ? "O projeto NVIDIA não tem permissão para usar este modelo de imagem."
+          : error?.message === "invalid_provider_response" ? "A NVIDIA não retornou uma imagem nem uma tarefa válida. Tente novamente mais tarde."
+          : error?.status >= 500 ? `A API de imagens da NVIDIA está indisponível (HTTP ${error.status}). O pedido chegou ao provedor, mas ele falhou antes de entregar a imagem. Tente novamente mais tarde.`
           : error?.status === 429 ? "O provedor NVIDIA limitou temporariamente as gerações. Tente novamente mais tarde."
           : `O provedor recusou a geração (HTTP ${error?.status || "desconhecido"}).`;
-        return json({ error: status === 413 ? "A imagem excede o limite de 15 MB." : message }, status);
+        const code=error?.name==="TimeoutError"?"image_provider_timeout":error?.message?.startsWith("image_storage")?"image_storage_unavailable":error?.status>=500?"image_provider_unavailable":"image_generation_failed";
+        console.warn("nativa.image_generation_failed",JSON.stringify({code,providerStatus:error?.status||null,requestId:error?.requestId||null,model:error?.model||null}));
+        return json({ error: status === 413 ? "A imagem excede o limite de 15 MB." : message,code,providerStatus:error?.status||null,requestId:error?.requestId||null }, status);
       }
     }
 

@@ -61,7 +61,7 @@ export function criarEstudioImagens({ clientProvider = obterClienteSupabase, wai
       const { data: finalSession, error: finalSessionError } = await client.auth.getSession();
       if (finalSessionError) throw finalSessionError;
       if (finalSession?.session?.user?.id !== userId) throw new Error("A conta mudou durante a geração. A imagem não foi associada à outra conta.");
-      return { blob: image, kind, title: cleanTitle, prompt: cleanPrompt };
+      return { blob: image, kind, title: cleanTitle, prompt: cleanPrompt,model:task.model||null,fallbackUsed:Boolean(task.fallbackUsed) };
     }
     throw new Error("A geração ainda não terminou após o limite de espera. Você pode tentar novamente mais tarde.");
   }

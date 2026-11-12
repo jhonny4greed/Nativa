@@ -652,7 +652,7 @@ $("#art-generation-form")?.addEventListener("submit",async event=>{
     $("#art-preview-image").src=urlPreviaArte;
     $("#art-preview").hidden=false;
     $("#art-save").disabled=false;
-    status.textContent="Imagem pronta. Salve no acervo para mantê-la na sua conta.";
+    status.textContent=`Imagem pronta${result.fallbackUsed?` com o modelo alternativo ${result.model}`:""}. Salve no acervo para mantê-la na sua conta.`;
   }catch(error){status.textContent=`Não foi possível gerar a imagem: ${error.message}`;}
   finally{button.disabled=false;}
 });

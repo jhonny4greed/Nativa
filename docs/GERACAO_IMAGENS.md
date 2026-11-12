@@ -1,51 +1,33 @@
 # Ateliê de imagens do NATIVA
 
-O ateliê cria imagens para Nativas, biomas, técnicas/golpes e ideias futuras por
-meio da API de geração de imagens da NVIDIA (ai.api.nvidia.com, FLUX.1-dev). A
-aplicação chama somente a Edge Function `generate-art` do Supabase; a chave do
-provedor permanece no servidor. O botão de gerar pode consumir créditos da
-conta NVIDIA.
+A aplicação chama a função `generate-art`; a chave NVIDIA fica apenas no servidor. O modelo padrão é `black-forest-labs/flux.1-dev`, configurável por `NVIDIA_IMAGE_MODEL`. A função valida a sessão real, reserva uma das 20 tentativas diárias por conta e envia o pedido à NVIDIA.
 
-## Configuração local
+## Configuração
 
-1. Revogue e substitua qualquer chave de provedor que tenha sido compartilhada
-   em mensagens ou código.
-2. Copie `supabase/functions/.env.example` para
-   `supabase/functions/.env`.
-3. Preencha `NVIDIA_API_KEY` com a chave da NVIDIA, gere pelo menos 32 bytes
-   criptograficamente aleatórios para `IMAGE_TASK_SIGNING_KEY` e informe em
-   `IMAGE_GENERATION_ALLOWED_USER_IDS` somente os UUIDs das contas autorizadas
-   a consumir créditos.
-4. Não versione `supabase/functions/.env`; ele está coberto pelo `.gitignore`.
-5. Inicie ou sirva a função local conforme a configuração Supabase do projeto.
-   A função depende da API/Auth local e não aplica migrations.
+Configure no Supabase `NVIDIA_API_KEY` e `IMAGE_TASK_SIGNING_KEY` (pelo menos 32 bytes). A função usa `SUPABASE_URL` e a credencial de serviço do ambiente para quota e Storage. Não coloque credenciais no frontend nem no Git. A geração está disponível para contas autenticadas, sujeita à quota durável; não há allowlist de usuários.
 
-O servidor valida a sessão consultando o endpoint `/auth/v1/user`, confere a
-allowlist e assina tokens temporários de tarefa vinculados ao usuário. O
-gateway não faz a validação JWT legada para essa função; a validação é feita
-no handler para compatibilidade com tokens assimétricos. A função não usa
-`service_role` nem consulta ou grava tabelas.
+O modelo FLUX.1-dev usa 1024 × 1024, 30 passos e cfg_scale 3,5. FLUX.1-schnell, quando escolhido explicitamente no servidor, usa 4 passos e cfg_scale 0. A configuração opcional `NVIDIA_IMAGE_FALLBACK_MODEL` permite uma única alternativa quando o principal retorna HTTP 5xx. Não é usada para contornar autenticação, permissão ou rate limit. Só habilite após validar uma geração real do modelo alternativo; a interface informa quando ele foi utilizado.
 
-## Dados e limites
+## Processamento e armazenamento
 
-- A geração usa o endpoint síncrono `POST /v1/genai/{modelo}` da NVIDIA com
-  tamanho fixo 1024×1024; o modelo padrão é
-  `black-forest-labs/flux.1-dev` e pode ser trocado com
-  `NVIDIA_IMAGE_MODEL`.
-- O resultado fica em memória no isolate da função por até 15 minutos e o
-  token temporário da tarefa expira em 30 minutos; ambos ficam vinculados à
-  conta. O download é único e aceita somente PNG, JPEG e WebP até 15 MB.
-- O cliente salva o Blob no IndexedDB de fotos existente e metadados do acervo
-  em `localStorage`, filtrados pela conta atual.
-- Nada é gravado no Supabase Storage, e nenhuma foto é enviada à nuvem.
-- Aplicar uma arte como retrato cria uma cópia local do Blob para que remover ou
-  trocar a foto da ficha não apague o item original do acervo.
-- A allowlist é deliberadamente restrita para evitar que qualquer conta pública
-  gaste créditos do proprietário. Para liberar outros usuários, será necessário
-  definir limites de consumo duráveis antes da implantação pública.
+Respostas NVIDIA 202 são consultadas pelo ID da tarefa em `/v1/status/{requestId}`. Uma geração não é iniciada novamente apenas porque está na fila. Há um limite total de 120 segundos por pedido, incluindo a alternativa.
+
+O resultado validado (PNG, JPEG ou WebP, até 15 MB) fica no bucket privado `nativa-image-task-results` por até 15 minutos, vinculado à conta por token assinado. O download é único. Ao salvar, a imagem vai para `nativa-artworks` e seus metadados para `player_artworks`. Retratos vinculados usam `nativa-portraits`. IndexedDB é cache e fonte para migração de arquivos antigos, não o único armazenamento.
+
+## Diagnóstico de erros
+
+O HTTP 502 da função pode representar uma falha anterior no provedor. A resposta identifica `code`, `providerStatus` e `requestId` quando disponíveis; a interface mostra a mensagem recebida. Os logs `nativa.image_generation_failed` registram apenas esses dados e o modelo, sem chave, prompt ou imagem.
+
+- `image_provider_unavailable`: a NVIDIA respondeu HTTP 5xx antes de entregar a imagem.
+- `image_provider_timeout`: o provedor não concluiu dentro do prazo.
+- `image_storage_unavailable`: falha no bucket temporário depois da geração.
+- HTTP 401/403 da NVIDIA: conferir credencial e permissão do modelo.
+- HTTP 429: conferir quota da conta e limites do provedor.
+
+Uma falha do provedor não comprova falha no Storage: são etapas distintas. Não ative uma alternativa sem testar sua disponibilidade. Mensagens de sucesso só são exibidas após receber e validar uma imagem real.
 
 ## Implantação
 
-Antes de uma implantação, cadastre `NVIDIA_API_KEY`,
-`IMAGE_TASK_SIGNING_KEY` e `IMAGE_GENERATION_ALLOWED_USER_IDS` no ambiente
-server-side do projeto de destino e revise os limites de uso.
+Aplique as migrations de quota e buckets antes de publicar `generate-art`. Publique o frontend para atualizar as mensagens e a identificação do modelo alternativo. O SDK recebe erros estruturados da função; as chaves continuam exclusivamente no servidor.
+
+Referências oficiais: [FLUX.1-dev](https://docs.api.nvidia.com/nim/reference/black-forest-labs-flux_1-dev-infer), [FLUX.1-schnell](https://docs.api.nvidia.com/nim/reference/black-forest-labs-flux_1-schnell-infer) e [consulta de tarefas](https://docs.api.nvidia.com/nim/reference/nvidia-vila-statuspolling).

@@ -14,6 +14,8 @@ let selectedId = null;
 let featuredUrl = null;
 let collection = [];
 let imageVersion = 0;
+let selectorVersion = 0;
+const selectorUrls = new Set();
 
 async function selectCreature(nativa, moving = false) {
   if (!nativa) return;
@@ -50,7 +52,7 @@ async function selectCreature(nativa, moving = false) {
     button.setAttribute("aria-pressed", String(button.dataset.creatureChoice === selectedId));
   });
   let src = defaultPortrait(nativa), owned = false;
-  if (nativa.photoId) {
+  if (nativa.photoId || nativa.photoStoragePath) {
     try { const blob = await obterRetratoNativa(nativa); if (blob) { src = URL.createObjectURL(blob); owned = true; } } catch { /* use the default portrait */ }
   }
   if (version !== imageVersion) { if (owned) URL.revokeObjectURL(src); return; }
@@ -66,6 +68,8 @@ async function selectCreature(nativa, moving = false) {
 
 function renderSelector() {
   const container = document.getElementById("companion-selector");
+  const version = ++selectorVersion;
+  const previousUrls=[...selectorUrls];selectorUrls.clear();
   const index = Math.max(0, collection.findIndex(n => n.id === selectedId));
   const start = Math.floor(index / 5) * 5;
   container.replaceChildren(...collection.slice(start, start + 5).map((n, i) => {
@@ -76,10 +80,19 @@ function renderSelector() {
     const src = defaultPortrait(n);
     if (src) { const image = document.createElement("img"); image.src = src; image.alt = ""; button.append(image); }
     else { const initial = document.createElement("b"); initial.textContent = n.name?.slice(0, 1) || "N"; button.append(initial); }
+    if(n.photoId||n.photoStoragePath){
+      void obterRetratoNativa(n).then(blob=>{
+        if(!blob||version!==selectorVersion||!button.isConnected)return;
+        const url=URL.createObjectURL(blob);selectorUrls.add(url);
+        const image=document.createElement("img");image.src=url;image.alt="";
+        const previous=button.querySelector("img,b");if(previous)previous.replaceWith(image);else button.prepend(image);
+      }).catch(()=>{/* Keep the default portrait or initial when the remote photo is unavailable. */});
+    }
     const name = document.createElement("span"); name.textContent = n.name; button.append(name);
     button.addEventListener("click", () => { void selectCreature(n, true); });
     return button;
   }));
+  previousUrls.forEach(url=>URL.revokeObjectURL(url));
 }
 function releasePortraits() { for (const url of urls) URL.revokeObjectURL(url); urls.clear(); }
 
@@ -96,9 +109,9 @@ async function renderCompanions() {
       const card = document.createElement("article"); card.className = "companion-card";
       const imageBox = document.createElement("div"); imageBox.className = "companion-image";
       let src = defaultPortrait(n);
-      if (n.photoId) {
-        const blob = await obterRetratoNativa(n);
-        if (blob) { src = URL.createObjectURL(blob); localUrls.push(src); }
+      if (n.photoId || n.photoStoragePath) {
+        try{const blob = await obterRetratoNativa(n);
+        if (blob) { src = URL.createObjectURL(blob); localUrls.push(src); }}catch{/* One unavailable portrait must not hide the whole home collection. */}
       }
       if (src) { const image = document.createElement("img"); image.src = src; image.alt = `Retrato de ${n.name}`; image.loading = "lazy"; imageBox.append(image); }
       else { imageBox.textContent = "Seu próximo retrato começa no ateliê"; }
@@ -193,7 +206,7 @@ export async function initializeDashboard(client, user, applicationRole = "playe
   }, { once: true });
   window.addEventListener("hashchange", () => { const hash = location.hash.slice(1); navigate(DESTINATIONS[hash] || hash); });
   document.addEventListener("nativa:updated", () => { void renderCompanions(); });
-  window.addEventListener("pagehide", () => { releasePortraits(); if (featuredUrl) URL.revokeObjectURL(featuredUrl); });
+  window.addEventListener("pagehide", () => { selectorVersion++;selectorUrls.forEach(url=>URL.revokeObjectURL(url));selectorUrls.clear();releasePortraits(); if (featuredUrl) URL.revokeObjectURL(featuredUrl); });
   document.querySelectorAll("[data-signout]").forEach(button => button.addEventListener("click", async () => {
     button.disabled = true;
     try {

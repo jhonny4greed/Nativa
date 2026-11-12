@@ -589,3 +589,31 @@ test("synchronization queue receives only photoId references, never Blob", async
   assert.match(source, /p_data:\s*clonarJson\(snapshot\)/);
   assert.match(tests, /photoId[\s\S]{0,250}Blob|Blob[\s\S]{0,250}photoId/i);
 });
+
+
+test("falha 500 da NVIDIA é identificada sem confundir com armazenamento",async()=>{
+ const server=createServer({nvidiaStatus:500});
+ const response=await server.request({action:"start",kind:"nativa",title:"Teste",prompt:"Mata"});const result=await response.json();
+ assert.equal(response.status,502);assert.equal(result.providerStatus,500);assert.equal(result.code,"image_provider_unavailable");assert.match(result.error,/NVIDIA.*indisponível/);assert.equal(server.calls.some(call=>call.init.method==="POST"&&call.url.includes('/storage/v1/object/nativa-image-task-results/')),false);
+});
+test("NVIDIA 202 é consultado até concluir sem criar outra geração",async()=>{
+ const id="11111111-1111-4111-8111-111111111111";
+ const server=createServer({fetchOverride:async({url})=>{
+  if(url.endsWith('/auth/v1/user'))return jsonResponse({id:USER_A});
+  if(url===NVIDIA_URL)return new Response(null,{status:202,headers:{'nvcf-reqid':id}});
+  if(url.endsWith('/v1/status/'+id))return jsonResponse({artifacts:[{base64_image:PNG_BASE64}]});
+  throw new Error('Unexpected URL');
+ }});
+ const token=await createTask(server);assert.ok(token);assert.equal(server.calls.filter(call=>call.url===NVIDIA_URL).length,1);assert.equal(server.calls.filter(call=>call.url.endsWith('/v1/status/'+id)).length,1);
+});
+test("modelo alternativo só é usado para falha 5xx e respeita os parâmetros do Schnell",async()=>{
+ const server=createServer({nvidiaStatus:500,fetchOverride:async({url})=>{
+  if(url.endsWith('/auth/v1/user'))return jsonResponse({id:USER_A});
+  if(url===NVIDIA_URL)return jsonResponse({error:'unavailable'},500);
+  return jsonResponse({artifacts:[{base64_image:PNG_BASE64}]});
+ }});
+ server.envValues.NVIDIA_IMAGE_FALLBACK_MODEL='black-forest-labs/flux.1-schnell';
+ const response=await server.request({action:'start',kind:'nativa',title:'Teste',prompt:'Mata'});const result=await response.json();assert.equal(response.status,200);assert.equal(result.fallbackUsed,true);assert.equal(result.model,'black-forest-labs/flux.1-schnell');
+ const call=server.calls.find(call=>call.url.endsWith('flux.1-schnell'));const payload=JSON.parse(call.init.body);assert.equal(payload.steps,4);assert.equal(payload.cfg_scale,0);
+ const rejected=createServer({nvidiaStatus:401});rejected.envValues.NVIDIA_IMAGE_FALLBACK_MODEL='black-forest-labs/flux.1-schnell';await rejected.request({action:'start',kind:'nativa',title:'Teste',prompt:'Mata'});assert.equal(rejected.calls.some(call=>call.url.endsWith('flux.1-schnell')),false);
+});
