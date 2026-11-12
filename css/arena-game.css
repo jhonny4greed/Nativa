@@ -252,12 +252,3 @@ html body.dashboard:has(#battle.active) main { max-width:1700px; padding:22px 26
   .battle-layout .battle-technique-card,.dashboard .battle-layout .battle-technique { min-height:64px; }
   .battle-layout .battle-technique { flex-direction:row!important; align-items:center!important; justify-content:space-between!important; }
 }
-/* Full-screen remains scrollable; nothing sticks over the fight controls. */
-#battle:fullscreen,#battle.arena-expanded { overflow-y:auto; }
-#battle:fullscreen .battlefield,#battle.arena-expanded .battlefield { grid-template-areas:"top" "stage" "action" "forfeit" "commands"; min-height:0; overflow:visible; }
-#battle:fullscreen .arena-action-trigger,#battle.arena-expanded .arena-action-trigger { position:relative; bottom:auto; }
-html.arena-playing-fullscreen body { overflow:auto; }
-@media(max-width:760px) {
-  #battle:fullscreen .arena-stage,#battle.arena-expanded .arena-stage { height:clamp(310px,46svh,440px); min-height:310px; }
-  #battle:fullscreen .battle-commands-grid,#battle.arena-expanded .battle-commands-grid { grid-template-columns:1fr; }
-}

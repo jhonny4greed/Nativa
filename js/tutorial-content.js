@@ -178,9 +178,9 @@ export const TUTORIALS = {
       "O D10 exibido na tela testa se o golpe acerta. Uma penalidade −2 faz o ataque falhar em 1 ou 2; acima disso, acerta. Esse dado não representa o valor do dano. Golpes sem teste não precisam dele."
     ),
     step(
-      ".battle-log",
+      ".battle-history",
       "Entenda o resultado",
-      "O histórico mostra dados, acertos, erros, dano e efeitos. Fraquezas e resistências modificam o dano; a recarga controla quando cada golpe volta a ficar disponível."
+      "Abra o histórico para consultar dados, acertos, erros, dano e efeitos. Fraquezas e resistências modificam o dano; a recarga controla quando cada golpe volta a ficar disponível."
     )
   ],
   "battle-online": [

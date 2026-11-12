@@ -503,10 +503,7 @@ $("#form").addEventListener("submit", async e => {
 });
 
 function mostrarTela(id){document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active",v.id===id));document.querySelectorAll("[data-view]").forEach(b=>b.classList.toggle("active",b.dataset.view===id));if(id==="list")void renderizarLista();if(id==="art-studio"||id==="gallery"){void carregarAlvosArte();void renderizarAcervoArte();}if(id==="battle")atualizarSelectsBatalha();if(id==="settings")void atualizarSeletorResetProgressao();document.dispatchEvent(new CustomEvent("nativa:view",{detail:{id}}));}
-const helpDialog=$("#site-help-dialog");
-$("#site-help-launch")?.addEventListener("click",()=>helpDialog?.showModal());
-$("#site-help-close")?.addEventListener("click",()=>helpDialog?.close());
-helpDialog?.addEventListener("click",event=>{if(event.target===helpDialog)helpDialog.close();});
+
 document.querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>mostrarTela(b.dataset.view)));
 document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>mostrarTela(b.dataset.go)));
 
@@ -1380,7 +1377,7 @@ function cartoesTecnicas(c,indice){
           <span class="technique-card-top"><span class="technique-card-name">${escapar(t.nome)}</span><span class="technique-cost">${t.mp??"—"} MP</span></span>
           <span class="technique-card-badges">
             <span class="technique-badge source-badge" data-source="${escapar(slugVisualTecnica(t.origem))}"><i aria-hidden="true">${iconeOrigemTecnica(t)}</i><span class="source-label">${escapar(origemNome)} · ${escapar(t.grupo||"geral")}</span></span>
-            ${afinidade&&t.origem!=="afinidade"?`<span class="technique-badge affinity-badge">Afinidade · ${escapar(afinidade)}</span>`:""}
+            ${afinidade&&afinidade!=="Neutro"&&t.origem!=="afinidade"?`<span class="technique-badge affinity-badge">Afinidade · ${escapar(afinidade)}</span>`:""}
             <span class="technique-badge category-badge" data-category="${escapar(categoria)}">${categoriaIcone} ${escapar(categoria)}</span>
           </span>
           <span class="technique-card-stats"><span>Dano <b>${t.dano??"—"}</b></span></span>
@@ -1419,7 +1416,7 @@ function renderizarHudCombatente(c,indice){
         <span class="combatant-player">${escapar(rotuloJogador)}</span>
       </div></div>
       <div class="combatant-vitals" aria-label="Condição de ${escapar(n.name)}">
-        <div class="vital-line"><div class="bar-label"><span>PV</span><b>${c.hp}/${c.maxHP}</b></div><div class="bar hp"><span style="width:${Math.max(0,c.hp/c.maxHP*100)}%"></span></div></div>
+        <div class="vital-line"><div class="bar-label"><span>HP</span><b>${c.hp}/${c.maxHP}</b></div><div class="bar hp"><span style="width:${Math.max(0,c.hp/c.maxHP*100)}%"></span></div></div>
         <div class="vital-line"><div class="bar-label"><span>MP</span><b>${c.mp}/${c.maxMP}</b></div><div class="bar mp"><span style="width:${Math.max(0,c.mp/c.maxMP*100)}%"></span></div></div>
         <span class="condition-state">${c.hp<=0?"Fora de combate":"Sem condições"}</span>
       </div>
@@ -1481,6 +1478,12 @@ function renderizarPainelAcao(c,indice){
         </span>
       </div>
 
+      <section class="battle-moves" aria-label="Golpes de ${escapar(c.nativa.name)}">
+        <header class="battle-moves-heading"><span class="moves-emblem" aria-hidden="true">✦</span><span><strong>Golpes</strong><small>${tecnicasCombatente(c).filter(t=>podeUsarTecnicaEmCombate(t)).length} disponíveis · escolha sua ação</small></span><span class="moves-count">${tecnicasCombatente(c).length}</span></header>
+        <div class="battle-technique-grid">
+          ${cartoesTecnicas(c,indice)}
+        </div>
+      </section>
       <div class="special-actions">
         <button
           type="button"
@@ -1509,12 +1512,7 @@ function renderizarPainelAcao(c,indice){
         </button>
       </div>
 
-      <section class="battle-moves" aria-label="Golpes de ${escapar(c.nativa.name)}">
-        <header class="battle-moves-heading"><span class="moves-emblem" aria-hidden="true">✦</span><span><strong>Golpes</strong><small>${tecnicasCombatente(c).filter(t=>podeUsarTecnicaEmCombate(t)).length} disponíveis · escolha sua ação</small></span><span class="moves-count">${tecnicasCombatente(c).length}</span></header>
-        <div class="battle-technique-grid">
-          ${cartoesTecnicas(c,indice)}
-        </div>
-      </section>
+
     </section>
   `;
 }
@@ -1586,8 +1584,6 @@ function renderizarArena(){
         <div class="arena-fighter arena-fighter-two">${renderizarCombatente(f[1],1)}</div>
 
       </div>
-      <div class="arena-action-trigger">${botaoExecutar}</div>
-      ${botaoDesistir}
       <div class="battle-commands">
         <div class="battle-commands-grid">
           ${!batalha.encerrada&&((batalha.modo!=="online"&&batalha.modo!=="room")||(batalha.modo==="online"&&batalha.onlineSelfIndex===0)||(batalha.modo==="room"&&batalha.roomSelfIndex===0))?renderizarPainelAcao(f[0],0):""}
@@ -1596,8 +1592,12 @@ function renderizarArena(){
           ${!batalha.encerrada&&batalha.modo==="room"&&batalha.roomSelfIndex===1?renderizarPainelAcao(f[1],1):""}
         </div>
         ${resultado}
-        ${renderizarHistorico()}
       </div>
+      <div class="arena-action-trigger">${botaoExecutar}</div>
+      <footer class="battle-footer">
+        <details class="battle-history"><summary>Histórico da batalha</summary>${renderizarHistorico()}</details>
+        ${botaoDesistir}
+      </footer>
     </section>
   `;
 

@@ -55,7 +55,7 @@ test("arena organiza HUDs compactos, combatentes no campo e comandos antes do hi
   assert.match(app, /arena-hud-row[\s\S]*?renderizarHudCombatente\(f\[0\],0\)[\s\S]*?renderizarHudCombatente\(f\[1\],1\)/);
   assert.match(app, /arena-stage[\s\S]*?renderizarCombatente\(f\[0\],0\)[\s\S]*?renderizarCombatente\(f\[1\],1\)/);
   assert.match(app, /battle-commands-grid[\s\S]*?renderizarPainelAcao\(f\[0\],0\)[\s\S]*?renderizarPainelAcao\(f\[1\],1\)/);
-  assert.match(app, /arena-stage[\s\S]*?<div class="arena-action-trigger">\$\{botaoExecutar\}<\/div>[\s\S]*?\$\{botaoDesistir\}[\s\S]*?<div class="battle-commands">[\s\S]*?renderizarHistorico\(\)/);
+  assert.match(app, /arena-stage[\s\S]*?<div class="battle-commands">[\s\S]*?<div class="arena-action-trigger">\$\{botaoExecutar\}<\/div>[\s\S]*?renderizarHistorico\(\)[\s\S]*?\$\{botaoDesistir\}/);
   assert.match(css, /grid-template-areas:"top" "hud" "stage" "action" "forfeit" "commands"/);
   assert.match(css, /body:has\(#battle\.active\) main \{ max-width:none;/);
   assert.match(css, /\.arena-stage \{[\s\S]*?height:clamp\(190px,29vh,330px\)/);
