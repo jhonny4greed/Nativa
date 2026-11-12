@@ -309,8 +309,14 @@ function normalizarGolpesIniciais(nativa, lista=nativa.golpesIniciais||nativa.te
 }
 async function salvarDados(nativaAlterada = null){
   if(nativaAlterada?.photoId&&!nativaAlterada.photoStoragePath){
-    try{const blob=await obterFoto(nativaAlterada.photoId);if(blob)nativaAlterada.photoStoragePath=await enviarRetratoNativa(nativaAlterada,blob,nativaAlterada.photoId);}
-    catch(error){const status=$("#bestiary-status");if(status)status.textContent=`Retrato salvo no dispositivo, mas não foi enviado à conta: ${error.message}`;}
+    try{
+      const blob=await obterFoto(nativaAlterada.photoId);
+      if(!blob)throw new Error("Arquivo do retrato não encontrado.");
+      nativaAlterada.photoStoragePath=await enviarRetratoNativa(nativaAlterada,blob,nativaAlterada.photoId);
+    }catch(error){
+      const status=$("#bestiary-status");if(status)status.textContent=`Não foi possível enviar o retrato ao servidor: ${error.message}`;
+      return {persisted:false,error};
+    }
   }
   const colecao = JSON.parse(JSON.stringify(nativas));
   const snapshot = nativaAlterada ? JSON.parse(JSON.stringify(nativaAlterada)) : null;
@@ -448,6 +454,7 @@ $("#form").addEventListener("submit", async e => {
     $("#msg").textContent = `Use entre 37 e 42 XPA na criação. Até 5 podem ficar guardados para melhorar atributos depois; você usou ${xpUsado()}.`;
     return;
   }
+  if(tecnicasSelecionadas.size!==4){$("#msg").textContent="Escolha quatro golpes: um de linhagem, um de bioma, um de afinidade e um de arquétipo.";return;}
   const submit = form.querySelector('button[type="submit"]');
   submit.disabled = true;
   const f = new FormData(form);
@@ -472,7 +479,7 @@ $("#form").addEventListener("submit", async e => {
     submit.disabled = false;
     return;
   }
-  if($("#generate-art-on-create")?.checked){try{const art=await estudioImagens.gerar({kind:"nativa",title:n.name,prompt:`Full-body creature concept for a Brazilian fantasy RPG. Species inspiration: ${n.species}. Biological group: ${n.groupBio}. Lineage: ${n.lineageName||n.lineage}. Habitat: ${n.bioma}. Elemental affinity: ${n.affinity}. Combat archetype: ${n.archetype}. ${n.inspiracao||n.inspiration||n.descricao||""}`.slice(0,1400)});const savedArt=await galeriaImagens.salvar(art);const before=JSON.parse(JSON.stringify(n));n.photoId=savedArt.photoId;await salvarEdicaoNativa(n,before);}catch(error){console.warn("A ficha foi criada, mas a ilustração automática falhou.",error);}}
+  if($("#generate-art-on-create")?.checked){try{const art=await estudioImagens.gerar({kind:"nativa",title:n.name,prompt:`Full-body creature concept for a Brazilian fantasy RPG. Species inspiration: ${n.species}. Biological group: ${n.groupBio}. Lineage: ${n.lineageName||n.lineage}. Habitat: ${n.bioma}. Elemental affinity: ${n.affinity}. Combat archetype: ${n.archetype}. ${n.inspiracao||n.inspiration||n.descricao||""}`.slice(0,1400)});const savedArt=await galeriaImagens.salvar(art);const applied=await aplicarArteComoRetrato({artId:savedArt.id,target:n,persist:(nativa,previous)=>salvarEdicaoNativa(nativa,previous)});if(!applied.persisted)throw new Error("A arte foi salva no acervo, mas o retrato não foi vinculado.");}catch(error){console.warn("A ficha foi criada, mas a ilustração automática falhou.",error);}}
   let origemPreparada = true;
   try {
     await repositorioLocal.registrarOrigemNativa(n.id, "player");
@@ -608,16 +615,17 @@ async function renderizarAcervoArte(){
   urlsAcervoArte=[];
   try{
     const items=await galeriaImagens.listar();
-    if(!items.length){gallery.innerHTML='<p class="muted">Nenhuma imagem salva nesta conta ainda.</p>';return;}
+    const warnings=galeriaImagens.obterAvisos().map(message=>`<p role="status">${escapar(message)}</p>`).join("");
+    if(!items.length){gallery.innerHTML=warnings+'<p class="muted">Nenhuma imagem salva nesta conta ainda.</p>';return;}
     const labels={nativa:"Nativa",biome:"Bioma",technique:"Técnica/golpe",other:"Outra ideia"};
     const cards=await Promise.all(items.map(async item=>{
-      const blob=await repositorioLocal.obterFoto(item.photoId);
+      const blob=await galeriaImagens.obterArquivo(item);
       if(!blob)return "";
       const url=URL.createObjectURL(blob);urlsAcervoArte.push(url);
       return `<article class="art-item"><img src="${url}" alt="Arte: ${escapar(item.title)}"><div class="art-item-body"><span class="tag">${escapar(labels[item.kind]||"Arte")}</span><h4>${escapar(item.title)}</h4><p>Salva ${escapar(new Date(item.createdAt).toLocaleString())}</p><details><summary>Descrição</summary><p>${escapar(item.prompt)}</p></details>${item.kind==="nativa"?`<button type="button" class="small secondary" data-art-apply="${escapar(item.id)}">Aplicar como retrato</button>`:""}</div></article>`;
     }));
-    gallery.innerHTML=cards.filter(Boolean).join("")||'<p class="muted">Os arquivos registrados não estão disponíveis no IndexedDB deste navegador.</p>';
-  }catch(error){gallery.innerHTML=`<p role="status">Não foi possível abrir o acervo local: ${escapar(error.message)}</p>`;}
+    gallery.innerHTML=warnings+(cards.filter(Boolean).join("")||'<p class="muted">Não foi possível carregar os arquivos do servidor. Tente novamente.</p>');
+  }catch(error){gallery.innerHTML=`<p role="status">Não foi possível abrir o acervo da conta: ${escapar(error.message)}</p>`;}
 }
 
 $("#art-generation-form")?.addEventListener("submit",async event=>{
@@ -644,7 +652,7 @@ $("#art-generation-form")?.addEventListener("submit",async event=>{
     $("#art-preview-image").src=urlPreviaArte;
     $("#art-preview").hidden=false;
     $("#art-save").disabled=false;
-    status.textContent="Imagem pronta. Salve no acervo local para mantê-la neste navegador.";
+    status.textContent="Imagem pronta. Salve no acervo para mantê-la na sua conta.";
   }catch(error){status.textContent=`Não foi possível gerar a imagem: ${error.message}`;}
   finally{button.disabled=false;}
 });
@@ -654,7 +662,7 @@ $("#art-save")?.addEventListener("click",async event=>{
   if(!arteGeradaPendente)return;
   button.disabled=true;
   try{
-    let statusText="Imagem salva somente no acervo local deste navegador e desta conta.";
+    let statusText="Imagem salva no acervo da sua conta no servidor e desta conta.";
     const entry=await galeriaImagens.salvar(arteGeradaPendente);
     const targetId=$("#art-studio-target")?.value;
     const target=nativas.find(n=>n?.id===targetId);
@@ -682,7 +690,7 @@ $("#art-gallery")?.addEventListener("click",async event=>{
   try{
     const result=await aplicarArteComoRetrato({artId,target,persist:(nativa,previous)=>salvarEdicaoNativa(nativa,previous)});
     if(!result.persisted)return;
-    $("#art-status").textContent=`Retrato aplicado localmente a ${target.name}. O arquivo original permanece no acervo.`;
+    $("#art-status").textContent=`Retrato salvo no servidor e aplicado a ${target.name}. O arquivo original permanece no acervo.`;
     await renderizarLista();
   }catch(error){
     $("#art-status").textContent=`Não foi possível aplicar a imagem: ${error.message}`;
@@ -743,7 +751,7 @@ function personalizarCardsBestiario(abAsAtivas){
       const valor=Number(n.attrs?.[key])||1,custo=valor+1,insuficiente=resumo.xpaDisponivel<custo;
       return `<article class="profile-attribute" data-attribute="${key}"><div class="attribute-rune" aria-hidden="true">${key}</div><div class="attribute-value"><strong>${valor}</strong><span>${label}</span></div><button type="button" class="attribute-up" data-profile-attribute="${key}" data-index="${indice}" aria-label="Aumentar ${label} de ${valorSeguro(n.name)} para ${valor+1} por ${custo} XPA" ${card.classList.contains("card-readonly")||insuficiente?"disabled":""}>＋</button><small class="attribute-cost">PRÓXIMO · ${custo} XPA</small></article>`;
     }).join("");
-    attributes.innerHTML=`<div class="attributes-console"><div><span class="eyebrow">EVOLUÇÃO · NÍVEL ${resumo.nivel}</span><strong>Potencial disponível</strong></div><b>${resumo.xpaDisponivel} <small>XPA</small></b></div><div class="profile-attribute-grid">${cardsAtributos}</div><div class="derived-vitals"><div><span>PV MÁXIMO</span><strong>${(Number(n.attrs?.HP)||1)*5}</strong></div><div><span>PM MÁXIMO</span><strong>${(Number(n.attrs?.MP)||1)*2}</strong></div></div>`;
+    attributes.innerHTML=`<div class="attributes-console"><div><span class="eyebrow">EVOLUÇÃO · NÍVEL ${resumo.nivel}</span><strong>Potencial disponível</strong></div><b>${resumo.xpaDisponivel} <small>XPA</small></b></div><div class="profile-attribute-grid">${cardsAtributos}</div><div class="derived-vitals"><div><span>PV MÁXIMO</span><strong>${(Number(n.attrs?.HP)||1)*5}</strong></div><div><span>MP MÁXIMO</span><strong>${(Number(n.attrs?.MP)||1)*2}</strong></div></div>`;
     if(oldStats){oldStats.replaceWith(overview);overview.after(attributes);}
     card.querySelector(".progress-panel > .technique-group")?.remove();
 
@@ -897,7 +905,7 @@ let nativaInventarioEssencias=null;
 async function atualizarSeletorResetProgressao(){const select=$("#progress-reset-native");if(!select)return;const options=[];for(const n of nativas){const origin=await repositorioLocal.obterOrigemNativa(n.id).catch(()=>null);if(origin?.origin==="preset"||idsPresetCatalogo.has(n.id))continue;const permission=await repositorioLocal.podeEditarNativa(n.id).catch(()=>({allowed:false}));if(permission.allowed)options.push(new Option(`${n.name} · Nv. ${n.nivel||1}`,n.id));}select.replaceChildren(new Option("Selecione uma ficha editável",""),...options);$("#progress-reset-confirm").disabled=true;}
 $("#progress-reset-native")?.addEventListener("change",event=>{$("#progress-reset-confirm").disabled=!event.target.value;$("#progress-reset-status").textContent="";});
 $("#progress-reset-confirm")?.addEventListener("click",async()=>{const n=nativas.find(item=>item.id===$("#progress-reset-native").value);if(!n||!await podeEditarFicha(n))return;if(!confirm(`Resetar a progressão de ${n.name}? Nível, XP, XPA, Essências e melhorias registradas serão reiniciados somente nesta ficha.`))return;const previous=JSON.parse(JSON.stringify(n));try{n.nivel=1;n.xp=0;n.xpTotal=0;n.xpa=0;n.estagio=1;n.progressResetVersion=1;n.atributosIniciais||=structuredClone(n.attrs);n.attrs=structuredClone(n.atributosIniciais);if(!Array.isArray(n.golpesIniciais))n.golpesIniciais=normalizarGolpesIniciais(n,n.techniques);n.techniques=[...n.golpesIniciais].slice(0,4);n.essencias=[];n.afinidadesEssencia=[];n.essenciasDisponiveis=[];n.historicoProgressao=[];const result=await salvarEdicaoNativa(n,previous);$("#progress-reset-status").textContent=result.persisted?`${n.name} voltou ao nível 1. Seus companheiros nas mesas não foram alterados.`:"Não foi possível salvar o reset.";if(result.persisted){await atualizarSeletorResetProgressao();$("#progress-reset-native").value=n.id;}}catch(error){restaurarFicha(n,previous);$("#progress-reset-status").textContent=`Falha: ${error.message}`;}});
-async function iniciarAbsorcaoEssencia(n){if(!await podeEditarFicha(n))return;nativaInventarioEssencias=n;const dialog=$("#essence-inventory-dialog"),list=$("#essence-inventory-list");if(!dialog||!list)return;const pendentes=(n.essenciasDisponiveis||[]).filter(essence=>essence?.origem==="combate");if(!pendentes.length){list.innerHTML='<p class="muted">Nenhuma esfera ainda. Vitórias têm 5% de chance de conceder uma Essência.</p>';dialog.showModal();return;}const tipo=(n.essencias||[]).includes("primeira")?"segunda":"primeira";for(const essence of pendentes)essence.id||=crypto.randomUUID();list.innerHTML=await Promise.all(pendentes.map(async(essence)=>{let photoUrl=defaultPortrait({id:essence.oponenteId});if(essence.oponentePhotoId){try{const blob=await obterRetratoNativa({photoId:essence.oponentePhotoId,photoStoragePath:essence.oponentePhotoPath});if(blob)photoUrl=URL.createObjectURL(blob);}catch{}}const affinity=String(essence.oponenteAfinidade||"terra").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();const check=verificarEssencia(n,tipo);const sourceMoves=(essence.oponenteTecnicas||[]).map(id=>obterTecnicaPorId(id,{incluirArquivo:false})).filter(t=>t&&podeAprenderTecnica(t));const required=tipo==="primeira"?["linhagem","afinidade"]:["afinidade"];const complete=required.every(origin=>sourceMoves.some(move=>move.origem===origin));const disabled=!check.permitido||!complete;const detail=!check.permitido?check.motivo:!complete?"A ficha de origem não contém os golpes exigidos para esta Essência.":tipo==="primeira"?"Concede os golpes de linhagem e afinidade desta Nativa.":`Concede afinidade ${essence.oponenteAfinidade||"da origem"} e um golpe dela.`;return `<article class="essence-orb-card" data-affinity="${escapar(affinity)}"><div class="essence-orb"><span class="orb-glow"></span>${photoUrl?`<img src="${escapar(photoUrl)}" alt="${escapar(essence.oponenteNome||"Nativa de origem")}">`:`<span class="orb-creature-fallback">✦</span>`}</div><div class="essence-orb-info"><span class="eyebrow">ESSÊNCIA · ${tipo==="primeira"?"I":"II"}</span><h3>${escapar(essence.oponenteNome||"Nativa selvagem")}</h3><p>${escapar(essence.oponenteLinhagem||"Linhagem desconhecida")} · ${escapar(essence.oponenteAfinidade||"Afinidade desconhecida")}</p><small>${escapar(detail)}</small><button type="button" data-absorb-essence="${escapar(essence.id)}" ${disabled?"disabled":""}>${disabled?"Indisponível":"Absorver"}</button></div></article>`;})).then(cards=>cards.join(""));dialog.showModal();}
+async function iniciarAbsorcaoEssencia(n){if(!await podeEditarFicha(n))return;nativaInventarioEssencias=n;const dialog=$("#essence-inventory-dialog"),list=$("#essence-inventory-list");if(!dialog||!list)return;const pendentes=(n.essenciasDisponiveis||[]).filter(essence=>essence?.origem==="combate");if(!pendentes.length){list.innerHTML='<p class="muted">Nenhuma esfera ainda. Vitórias têm 5% de chance de conceder uma Essência.</p>';dialog.showModal();return;}const tipo=(n.essencias||[]).includes("primeira")?"segunda":"primeira";for(const essence of pendentes)essence.id||=crypto.randomUUID();list.innerHTML=await Promise.all(pendentes.map(async(essence)=>{let photoUrl=defaultPortrait({id:essence.oponenteId});if(essence.oponentePhotoId){try{const blob=await obterRetratoNativa({photoId:essence.oponentePhotoId,photoStoragePath:essence.oponentePhotoPath});if(blob)photoUrl=URL.createObjectURL(blob);}catch{}}const affinity=String(essence.oponenteAfinidade||"terra").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();const check=verificarEssencia(n,tipo);const sourceMoves=(essence.oponenteTecnicas||[]).map(id=>obterTecnicaPorId(id,{incluirArquivo:false})).filter(t=>t&&podeAprenderTecnica(t));const required=tipo==="primeira"?["linhagem","afinidade"]:["afinidade"];const complete=required.every(origin=>sourceMoves.some(move=>move.origem===origin));const learned=tipo==="primeira"?[sourceMoves.find(move=>move.origem==="linhagem"),sourceMoves.find(move=>move.origem==="afinidade")]:[sourceMoves.find(move=>move.origem==="afinidade"&&move.grupo===essence.oponenteAfinidade)];const duplicate=learned.some(move=>move&&(n.techniques||[]).includes(move.id));const sameAffinity=tipo==="segunda"&&[n.affinity,...(n.afinidadesEssencia||[])].includes(essence.oponenteAfinidade);const disabled=!check.permitido||!complete||duplicate||sameAffinity||learned.some(move=>!move);const detail=!check.permitido?check.motivo:sameAffinity?"Esta Nativa já possui a afinidade da origem.":duplicate?"Um dos golpes desta Essência já está na ficha.":!complete?"A ficha de origem não contém os golpes exigidos para esta Essência.":tipo==="primeira"?"Concede os golpes de linhagem e afinidade desta Nativa.":`Concede afinidade ${essence.oponenteAfinidade||"da origem"} e um golpe dela.`;return `<article class="essence-orb-card" data-affinity="${escapar(affinity)}"><div class="essence-orb"><span class="orb-glow"></span>${photoUrl?`<img src="${escapar(photoUrl)}" alt="${escapar(essence.oponenteNome||"Nativa de origem")}">`:`<span class="orb-creature-fallback">✦</span>`}</div><div class="essence-orb-info"><span class="eyebrow">ESSÊNCIA · ${tipo==="primeira"?"I":"II"}</span><h3>${escapar(essence.oponenteNome||"Nativa selvagem")}</h3><p>${escapar(essence.oponenteLinhagem||"Linhagem desconhecida")} · ${escapar(essence.oponenteAfinidade||"Afinidade desconhecida")}</p><div class="essence-effects"><strong>${tipo==="primeira"?"Aprende dois golpes · defesas preservadas":`Nova afinidade: ${escapar(essence.oponenteAfinidade||"não informada")} · combina fraquezas e resistências`}</strong><ul>${learned.map(move=>`<li>${move?`<b>${escapar(move.nome)}</b> · ${escapar(move.origem)}<br><small>MP ${move.mp??"—"} · Dano ${move.dano??"—"} · Recarga ${move.recarga??"—"}</small><p>${escapar(move.efeito||"")}</p>`:"Golpe exigido não disponível na origem."}</li>`).join("")}</ul></div><small class="essence-lock">${escapar(detail)}</small><button type="button" data-absorb-essence="${escapar(essence.id)}" ${disabled?"disabled":""}>${disabled?"Indisponível":"Absorver"}</button></div></article>`;})).then(cards=>cards.join(""));dialog.showModal();}
 $("#essence-inventory-close")?.addEventListener("click",()=>$("#essence-inventory-dialog")?.close());
 $("#essence-inventory-list")?.addEventListener("click",async event=>{const button=event.target.closest("[data-absorb-essence]");const n=nativaInventarioEssencias;if(!button||!n)return;const essence=(n.essenciasDisponiveis||[]).find((item,index)=>(item.id||String(index))===button.dataset.absorbEssence);if(!essence)return;const tipo=(n.essencias||[]).includes("primeira")?"segunda":"primeira";const anterior=JSON.parse(JSON.stringify(n));try{const sourceMoves=(essence.oponenteTecnicas||[]).map(id=>obterTecnicaPorId(id,{incluirArquivo:false})).filter(t=>t&&podeAprenderTecnica(t));let moves;if(tipo==="primeira"){moves=[sourceMoves.find(t=>t.origem==="linhagem"),sourceMoves.find(t=>t.origem==="afinidade")];}else{const affinity=essence.oponenteAfinidade;if(!affinity||affinity===n.affinity||(n.afinidadesEssencia||[]).includes(affinity))throw new Error("A afinidade da Nativa de origem já está presente nesta ficha.");moves=[sourceMoves.find(t=>t.origem==="afinidade"&&t.grupo===affinity)];}if(moves.some(t=>!t))throw new Error("A Nativa de origem não possui um golpe válido de cada grupo exigido.");if(moves.some(t=>(n.techniques||[]).includes(t.id)))throw new Error("Um dos golpes desta Essência já está na ficha.");const affinity=tipo==="segunda"?essence.oponenteAfinidade:null;absorverEssencia(n,tipo,affinity,essence.id||null);n.techniques=[...new Set([...(n.techniques||[]),...moves.map(t=>t.id)])];const history=n.historicoProgressao?.at(-1);if(history?.tipo==="essencia")history.golpesAdquiridos=moves.map(t=>t.id);const saved=await salvarEdicaoNativa(n,anterior);if(saved.persisted){$("#essence-inventory-dialog")?.close();alert(`${ESSENCIAS[tipo].nome} absorvida: ${moves.map(t=>t.nome).join(" · ")}.`);}}catch(error){restaurarFicha(n,anterior);alert(error.message);}});
 
@@ -964,7 +972,7 @@ async function iniciarBatalha(){
   // Recupera as imagens armazenadas no bestiário.
   try{
     for(const c of combatentes){
-      const foto=await obterFoto(c.nativa.photoId);
+      const foto=await obterRetratoNativa(c.nativa);
       substituirFotoCombatente(c,foto);
       if(!foto)c.fotoUrl=arenaPortrait(c.nativa)||defaultPortrait(c.nativa);
       c.arenaCutout=!foto&&Boolean(arenaPortrait(c.nativa));
@@ -1267,29 +1275,58 @@ async function desistirDaLuta(){
   }
 }
 
-async function animarDadoPrecisao(current,roll,hit){
-  if(!current||batalha!==current)return;
-  current.precisionRoll={roll:Number(roll)||1,hit};
-  renderizarArena();
-  const face=$("[data-d10-face]"),overlay=$("[data-precision-roll]");
-  if(!face||!overlay)return;
-  const motion=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const duration=motion?180:820,started=performance.now();
-  overlay.classList.add("rolling");
-  await new Promise(resolve=>{
-    const tick=now=>{
-      if(batalha!==current){resolve();return;}
-      const elapsed=now-started;
-      face.textContent=elapsed>=duration?String(current.precisionRoll?.roll||roll):String(1+Math.floor(Math.random()*10));
-      if(elapsed<duration)requestAnimationFrame(tick);else resolve();
-    };
-    requestAnimationFrame(tick);
+const efeitosApresentados=new Set();
+let filaDados=Promise.resolve();
+function identidadeEfeitos(current){
+  if(!current)return null;
+  return current.onlineMatchId||current.roomEncounterId||(current.fxId||=crypto.randomUUID());
+}
+function camadaEfeitos(){
+  let layer=$("#arena-effects");
+  if(!layer){layer=document.createElement("div");layer.id="arena-effects";layer.className="arena-effects";$("#battle").append(layer);}
+  return layer;
+}
+function apresentarDanosUmaVez(){
+  if(!batalha||batalha.damageTurn!==batalha.turno)return;
+  batalha.fighters.forEach((fighter,index)=>{
+    if(!fighter.damageThisTurn)return;
+    const key=`${identidadeEfeitos(batalha)}:${batalha.damageTurn}:${index}`;
+    if(efeitosApresentados.has(key))return;
+    efeitosApresentados.add(key);
+    if(efeitosApresentados.size>1000)efeitosApresentados.delete(efeitosApresentados.values().next().value);
+    const anchor=$(`#battle-arena .${index===0?"contestant-left":"contestant-right"}`);
+    if(!anchor)return;
+    const rect=anchor.getBoundingClientRect(),float=document.createElement("span");
+    float.className="damage-float";float.textContent=`−${fighter.damageThisTurn} HP`;
+    float.style.left=`${rect.left+rect.width/2}px`;float.style.top=`${rect.top+rect.height*.2}px`;
+    camadaEfeitos().append(float);setTimeout(()=>float.remove(),3000);
   });
-  if(batalha!==current)return;
-  overlay.classList.remove("rolling");overlay.classList.add(hit?"roll-hit":"roll-miss");
-  const label=overlay.querySelector("[data-d10-result]");if(label)label.textContent=hit?"ACERTO":"ERROU";
-  await new Promise(resolve=>setTimeout(resolve,motion?250:620));
-  if(batalha===current){current.precisionRoll=null;renderizarArena();}
+}
+async function animarDadoPrecisao(current,roll,hit){
+  const identity=identidadeEfeitos(current);
+  const play=async()=>{
+    if(identidadeEfeitos(batalha)!==identity)return;
+    const overlay=document.createElement("div");overlay.className="precision-die-overlay";overlay.setAttribute("role","status");overlay.setAttribute("aria-live","polite");
+    overlay.innerHTML='<div class="d10-shell"><span data-d10-face></span></div><small>DADO DE PRECISÃO · D10</small><strong data-d10-result>ROLANDO…</strong>';
+    const rect=$("#battle-arena .arena-scene")?.getBoundingClientRect()||$("#battle-arena").getBoundingClientRect();
+    overlay.style.top=`${Math.max(120,Math.min(innerHeight-140,rect.top+Math.min(rect.height,innerHeight)/2))}px`;
+    camadaEfeitos().append(overlay);
+    const face=overlay.querySelector('[data-d10-face]');
+    const reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const duration=reduced?0:1000,started=performance.now();
+    if(!reduced)overlay.classList.add("rolling");
+    await new Promise(resolve=>{
+      const tick=now=>{
+        if(identidadeEfeitos(batalha)!==identity){resolve();return;}
+        face.textContent=now-started>=duration?String(roll):String(1+Math.floor(Math.random()*10));
+        if(now-started<duration)requestAnimationFrame(tick);else resolve();
+      };requestAnimationFrame(tick);
+    });
+    overlay.classList.remove("rolling");overlay.classList.add(hit?"roll-hit":"roll-miss");
+    overlay.querySelector('[data-d10-result]').textContent=hit?"ACERTO":"ERROU";
+    await new Promise(resolve=>setTimeout(resolve,1800));overlay.remove();
+  };
+  filaDados=filaDados.then(play,play);await filaDados;
 }
 
 function slugVisualTecnica(value){
@@ -1339,8 +1376,8 @@ function cartoesTecnicas(c,indice){
     const detalhesAbertos=batalha.tecnicaDetalhesAberta===t.id;
     return `
       <article class="battle-technique-card ${selecionada?"selected":""} ${bloqueada?"unavailable":""} ${detalhesAbertos?"details-open":""}" data-source="${escapar(slugVisualTecnica(t.origem))}" data-group="${escapar(slugVisualTecnica(t.grupo))}" data-family="${escapar(t.origem==="linhagem"?slugVisualTecnica(t.grupo):"")}" data-biome="${escapar(t.origem==="bioma"?slugVisualTecnica(t.grupo):"")}" data-element="${escapar(t.origem==="afinidade"?slugVisualTecnica(t.grupo):"")}" data-category="${escapar(slugVisualTecnica(categoria))}">
-        <button type="button" class="battle-technique" data-battle-technique="${escapar(t.id)}" data-fighter="${indice}" aria-expanded="${detalhesAbertos}" ${bloqueada?'aria-disabled="true"':""} aria-label="${escapar(`${t.nome}. ${afinidade?`Afinidade ${afinidade}. `:""}${categoria}. Custo ${t.mp??"não definido"} PM. Dano ${t.dano??"não definido"}. Efeito: ${t.efeito||"sem efeito descrito"}`)}">
-          <span class="technique-card-top"><span class="technique-card-name">${escapar(t.nome)}</span><span class="technique-cost">${t.mp??"—"} PM</span></span>
+        <button type="button" class="battle-technique" data-battle-technique="${escapar(t.id)}" data-fighter="${indice}" aria-expanded="${detalhesAbertos}" ${bloqueada?'aria-disabled="true"':""} aria-label="${escapar(`${t.nome}. ${afinidade?`Afinidade ${afinidade}. `:""}${categoria}. Custo ${t.mp??"não definido"} MP. Dano ${t.dano??"não definido"}. Efeito: ${t.efeito||"sem efeito descrito"}`)}">
+          <span class="technique-card-top"><span class="technique-card-name">${escapar(t.nome)}</span><span class="technique-cost">${t.mp??"—"} MP</span></span>
           <span class="technique-card-badges">
             <span class="technique-badge source-badge" data-source="${escapar(slugVisualTecnica(t.origem))}"><i aria-hidden="true">${iconeOrigemTecnica(t)}</i><span class="source-label">${escapar(origemNome)} · ${escapar(t.grupo||"geral")}</span></span>
             ${afinidade&&t.origem!=="afinidade"?`<span class="technique-badge affinity-badge">Afinidade · ${escapar(afinidade)}</span>`:""}
@@ -1359,8 +1396,7 @@ function renderizarCombatente(c,indice){
   const foto=c.fotoUrl
     ?`<img class="combatant-photo" src="${c.fotoUrl}" alt="${escapar(n.name)}">`
     :`<div class="combatant-photo-placeholder" role="img" aria-label="${escapar(n.name)}, sem imagem cadastrada"><span></span></div>`;
-  const dano=batalha.damageTurn===batalha.turno&&c.damageThisTurn>0
-    ?`<span class="damage-float" aria-label="${c.damageThisTurn} de dano neste turno">−${c.damageThisTurn}<small>PV</small></span>`:"";
+  const dano="";
 
   return `
     <div class="arena-creature ${c.arenaCutout?"has-cutout":""} ${indice===0?"contestant-left":"contestant-right"} ${c.animacao?`anim-${c.animacao}`:""}" role="group" aria-label="${escapar(n.name)}">
@@ -1384,7 +1420,7 @@ function renderizarHudCombatente(c,indice){
       </div></div>
       <div class="combatant-vitals" aria-label="Condição de ${escapar(n.name)}">
         <div class="vital-line"><div class="bar-label"><span>PV</span><b>${c.hp}/${c.maxHP}</b></div><div class="bar hp"><span style="width:${Math.max(0,c.hp/c.maxHP*100)}%"></span></div></div>
-        <div class="vital-line"><div class="bar-label"><span>PM</span><b>${c.mp}/${c.maxMP}</b></div><div class="bar mp"><span style="width:${Math.max(0,c.mp/c.maxMP*100)}%"></span></div></div>
+        <div class="vital-line"><div class="bar-label"><span>MP</span><b>${c.mp}/${c.maxMP}</b></div><div class="bar mp"><span style="width:${Math.max(0,c.mp/c.maxMP*100)}%"></span></div></div>
         <span class="condition-state">${c.hp<=0?"Fora de combate":"Sem condições"}</span>
       </div>
     </article>
@@ -1548,7 +1584,7 @@ function renderizarArena(){
         <div class="arena-fighter arena-fighter-one">${renderizarCombatente(f[0],0)}</div>
         <div class="arena-stage-mark" aria-hidden="true"><span></span><b>VS</b><span></span></div>
         <div class="arena-fighter arena-fighter-two">${renderizarCombatente(f[1],1)}</div>
-        ${batalha.precisionRoll?`<div class="precision-die-overlay" data-precision-roll role="status" aria-live="polite"><div class="d10-shell"><span data-d10-face>${batalha.precisionRoll.roll}</span></div><small>DADO DE PRECISÃO · D10</small><strong data-d10-result>${batalha.precisionRoll.hit?"ACERTO":"ERROU"}</strong></div>`:""}
+
       </div>
       <div class="arena-action-trigger">${botaoExecutar}</div>
       ${botaoDesistir}
@@ -1565,6 +1601,8 @@ function renderizarArena(){
     </section>
   `;
 
+  apresentarDanosUmaVez();
+  batalha.fighters.forEach(fighter=>{fighter.animacao=null;});
   $("#execute-turn")?.addEventListener("click",()=>{
     if(batalha?.modo==="room"){void executarTurnoSala();return;}
     if(batalha?.modo!=="online"){void executarTurno();return;}
@@ -1626,6 +1664,11 @@ async function inicializarAplicacao(){
     nativas = await carregarNativas();
     nativasCarregadas = true;
     await origensPresetsProntas;
+    for(const n of nativas.filter(item=>item.photoId&&!item.photoStoragePath)){
+      if(!(await repositorioLocal.podeEditarNativa(n.id)).allowed)continue;
+      const result=await salvarDados(n);
+      if(!result.persisted)$("#bestiary-status").textContent="Há retratos antigos aguardando envio ao servidor. Reconecte e recarregue para tentar novamente; seus arquivos locais foram preservados.";
+    }
     await renderizarLista();
     atualizarSelectsBatalha();
   } catch (error) {
@@ -1665,7 +1708,7 @@ onlineArena=initializeOnlineArena({
       damageThisTurn:previous?Math.max(0,(previous.fighters[index]?.hp||0)-fighter.hp):0
     }));
     const history=match.state.history||[];
-    const newEvents=history.slice(previous?.log.length||0);
+    const newEvents=previous?history.slice(previous.log.length):[];
     if(previous&&previous.log?.at(-1)!==history.at(-1))aplicarAnimacoesDoHistorico(fighters,history);
     batalha={modo:"online",onlineMatchId:match.id,onlineSelfIndex:match.selfIndex,onlineSubmitted:match.ownConfirmed,
       onlineWinnerIndex:match.winnerIndex,onlineCancelled:match.status==="cancelled",onlineForfeit:match.reason==="forfeit",fighters,turno:match.turn,damageTurn:newEvents.length?match.turn:null,
@@ -1695,7 +1738,7 @@ function atualizarArenaDaSala(detail){
     return {...fighter,nativa,fotoUrl:portrait,arenaCutout:Boolean(arenaPortrait(nativa)),damageThisTurn:same?Math.max(0,(same.fighters[index]?.hp||0)-fighter.hp):0};
   });
   const history=encounter.state.history||[];
-  const newEvents=history.slice(same?.log.length||0);
+  const newEvents=same?history.slice(same.log.length):[];
   if(same&&same.log?.at(-1)!==history.at(-1))aplicarAnimacoesDoHistorico(fighters,history);
   const winnerIndex=encounter.winner_id?participants.findIndex(p=>p.player_id===encounter.winner_id):-1;
   const sameTurn=same?.turno===encounter.turn;

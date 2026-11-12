@@ -52,6 +52,8 @@ if (user) {
     void inicializarPainelAdmin();
   }
   document.dispatchEvent(new CustomEvent("nativa:ready"));
+  const { initializeTutorials } = await import("./tutorial.js");
+  void initializeTutorials(client,user).catch(error=>console.warn("Guia indisponível:",error));
   document.documentElement.dataset.authenticated = "true";
   window.addEventListener("pageshow", event => {
     if (event.persisted) location.reload();

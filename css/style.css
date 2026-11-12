@@ -1821,3 +1821,9 @@ html.arena-playing-fullscreen body { overflow:hidden; }
   .profile-tabs button.active { text-shadow:0 1px 2px #000; }
   #battle:fullscreen #arena-fullscreen,#battle.arena-expanded #arena-fullscreen { transition:none; }
 }
+
+/* Effects live outside the arena markup: panel updates never restart them. */
+.arena-effects{position:fixed;inset:0;pointer-events:none;z-index:1000}
+.arena-effects .damage-float{position:fixed;animation-duration:2.8s}
+.arena-effects .precision-die-overlay{position:fixed;left:50%}
+@keyframes damage-rise{0%{opacity:0;transform:translate(-50%,10px) scale(.85)}12%,72%{opacity:1;transform:translate(-50%,-12px) scale(1)}100%{opacity:0;transform:translate(-50%,-40px) scale(.98)}}

@@ -20,7 +20,7 @@ export async function enviarRetratoNativa(nativa, blob, photoId = nativa?.photoI
 }
 
 export async function obterRetratoNativa(nativa) {
-  if (!nativa?.photoId) return null;
+  if (!nativa?.photoId && !nativa?.photoStoragePath) return null;
   const local = await repositorioLocal.obterFoto(nativa.photoId);
   if (local) return local;
   if (!nativa.photoStoragePath) return null;

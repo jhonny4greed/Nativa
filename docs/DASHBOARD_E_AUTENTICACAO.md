@@ -38,8 +38,12 @@ As referências de hubs de jogos orientam o painel de seleção: criatura em des
 
 ## Arena em perspectiva
 
-O cenário usa a imagem do bioma selecionado, com a Nativa do jogador em primeiro plano e a adversária em um plano mais distante. Retratos personalizados prevalecem sobre os retratos padrão. Os HUDs acompanham os cantos inferior esquerdo e superior direito, com PV/PM reais.
+O cenário usa a imagem do bioma selecionado, com a Nativa do jogador em primeiro plano e a adversária em um plano mais distante. Retratos personalizados prevalecem sobre os retratos padrão. Os HUDs acompanham os cantos inferior esquerdo e superior direito, com HP/MP reais.
 
 Cada painel de ações tem uma seção nativa `details` chamada Golpes, inicialmente fechada. Somente sua expansão revela os cartões; a preferência de cada jogador é preservada durante os rerenders da batalha e reiniciada em uma nova partida. Defender e recuperar MP continuam como ações diretas. O golpe selecionado aparece pelo nome no painel.
 
 A revisão visual foi conferida com sessão real no Auth local, combate com dano/MP/recarga e tela de 390 px. A alteração é de interface e não modifica fórmulas de combate nem o banco de dados.
+
+
+## Tutorial e imagens (novembro de 2026)
+O histórico dos guias é versionado e separado por conta; contas antigas não precisam de reset. A repetição fica no Guia de jogo. Imagens e retratos são enviados ao armazenamento privado do servidor; IndexedDB é usado para cache e migração de arquivos legados.

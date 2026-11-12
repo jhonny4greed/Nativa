@@ -4,7 +4,7 @@ import { concederXpCampanha, definirNivelCampanha, concederEssenciaCampanha, con
 import { TECNICAS } from "../js/techniques.js";
 import { CATALOGO_TRACOS, obterTracosPadraoLinhagem } from "../js/traits.js";
 
-const base = () => ({ id: "local-campaign-1", name: "Teste", level: 1, nivel: 1, xp: 0, xpTotal: 0, xpa: 1, estagio: 1, lineage: "Felinos", lineageName: "Felinos", archetype: "Predador", affinity: "Água", essencias: [], afinidadesEssencia: [], essenciasDisponiveis: [{ id: "drop-1" }], techniques: [], tracos: [], attrs: { ATQ: 2 }, unknownField: { kept: true } });
+const base = () => ({ id: "local-campaign-1", name: "Teste", level: 1, nivel: 1, xp: 0, xpTotal: 0, xpa: 1, estagio: 1, lineage: "Felinos", lineageName: "Felinos", archetype: "Predador", affinity: "Água", essencias: [], afinidadesEssencia: [], essenciasDisponiveis: [{ id: "drop-1", origem:"combate" }], techniques: [], tracos: [], attrs: { ATQ: 2 }, unknownField: { kept: true } });
 
 test("XP usa a progressão oficial, distingue XP de XPA e preserva campos desconhecidos", () => {
   const source = base();
@@ -33,11 +33,11 @@ test("essência exige drop, pré-requisitos, afinidade nova e técnicas oficiais
   const lineageTech = TECNICAS.find(item => item.origem === "linhagem" && item.grupo === "Felinos");
   const result = concederEssenciaCampanha(source, "primeira", "Fogo", [affinityTech.id, lineageTech.id]);
   assert.deepEqual(result.data.essencias, ["primeira"]);
-  assert.deepEqual(result.data.afinidadesEssencia, ["Fogo"]);
+  assert.deepEqual(result.data.afinidadesEssencia, [], "A primeira Essência não muda afinidades nem defesas");
   assert.deepEqual(result.data.techniques, [affinityTech.id, lineageTech.id]);
   assert.deepEqual(result.data.essenciasDisponiveis, []);
   assert.throws(() => concederEssenciaCampanha(source, "primeira", "Água", [affinityTech.id, lineageTech.id]), /afinidade|correspondem/i);
-  assert.throws(() => concederEssenciaCampanha({ ...source, essenciasDisponiveis: [] }, "primeira", "Fogo", [affinityTech.id, lineageTech.id]), /Essências guardadas/);
+  assert.throws(() => concederEssenciaCampanha({ ...source, essenciasDisponiveis: [] }, "primeira", "Fogo", [affinityTech.id, lineageTech.id]), /obtidas em vitórias/);
 });
 
 test("traços vêm do catálogo, não duplicam e protege os derivados da linhagem", () => {

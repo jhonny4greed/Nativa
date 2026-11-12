@@ -20,7 +20,7 @@ export function validateRoomChoice(state,index,choice) {
   const fighter=state.fighters[index];
   const technique=obterTecnicasCombatente(fighter).find(t=>t.id===choice.tecnicaId);
   if(!technique||!podeUsarTecnicaEmCombate(technique))throw new Error("Este golpe não está liberado para combate.");
-  if((fighter.cooldowns[technique.id]||0)>0||fighter.mp<technique.mp)throw new Error("Golpe indisponível: confira PM e recarga.");
+  if((fighter.cooldowns[technique.id]||0)>0||fighter.mp<technique.mp)throw new Error("Golpe indisponível: confira MP e recarga.");
   return {tipo:"attack",tecnicaId:technique.id};
 }
 function describe(e){if(e.type==="initiative")return `Iniciativa: ${e.order.map(i=>e.names[i]).join(" → ")}.`;if(e.type==="hit"||e.type==="v21-hit")return `${e.attacker} usa ${e.technique} (D10: ${e.roll??"—"}, acerto): ${e.target} recebe ${e.damage} de dano.`;if(e.type==="support")return `${e.attacker} usa ${e.technique}: suporte.`;if(e.type==="miss")return `${e.attacker} erra ${e.technique} (D10: ${e.roll??"—"}, falha).`;if(e.type==="defeat")return `${e.defeated} foi derrotada. Vitória de ${e.winner}.`;return e.message||null;}

@@ -128,12 +128,12 @@
           <div class="grid">
             <label>Nome da Nativa<input name="name" placeholder="Ex.: Aruã" required maxlength="40"></label>
             <label>Jogador<input name="player" placeholder="Nome do jogador"></label>
-            <label>Grupo biológico<select name="groupBio" id="groupBio" required><option value="">Selecione um grupo</option></select><small id="groupBio-description" class="description">Escolha a grande categoria biológica.</small></label>
-            <label>Linhagem<select name="lineage" id="lineage" required disabled><option value="">Escolha primeiro o grupo biológico</option></select><small id="lineage-description" class="description">A linhagem reúne características e especialidades compartilhadas.</small></label>
+            <label>Grupo biológico<select name="groupBio" id="groupBio" required><option value="">Selecione um grupo</option></select><small id="groupBio-description" class="description">Escolha a grande categoria animal, como mamíferos ou aves. Ela libera as linhagens correspondentes.</small></label>
+            <label>Linhagem<select name="lineage" id="lineage" required disabled><option value="">Escolha primeiro o grupo biológico</option></select><small id="lineage-description" class="description">A linhagem reúne características biológicas e disponibiliza sua própria lista de golpes.</small></label>
             <label>Espécie ou inspiração<input name="species" id="species" placeholder="Ex.: Onça-pintada"><small class="description">Informe a espécie real ou a principal inspiração animal.</small></label>
-            <label>Bioma<select name="bioma" id="bioma" required><option value="">Selecione um bioma</option></select><small id="bioma-description" class="description">O ambiente em que sua Nativa está mais adaptada.</small></label>
-            <label>Afinidade<select name="affinity" id="affinity" required><option value="">Selecione uma afinidade</option></select><small id="affinity-description" class="description">Sua afinidade elemental inicial.</small></label>
-            <label>Arquétipo<select name="archetype" id="archetype" required><option value="">Selecione um arquétipo</option></select><small id="archetype-description" class="description">Seu estilo predominante de combate.</small></label>
+            <label>Bioma<select name="bioma" id="bioma" required><option value="">Selecione um bioma</option></select><small id="bioma-description" class="description">O ambiente de origem da sua Nativa, com sua própria lista de golpes.</small></label>
+            <label>Afinidade<select name="affinity" id="affinity" required><option value="">Selecione uma afinidade</option></select><small id="affinity-description" class="description">O elemento inicial da sua Nativa: dá acesso a golpes e participa das fraquezas e resistências.</small></label>
+            <label>Arquétipo<select name="archetype" id="archetype" required><option value="">Selecione um arquétipo</option></select><small id="archetype-description" class="description">Seu estilo predominante de combate, com sua própria lista de golpes.</small></label>
           </div>
           <div id="lineage-profile" class="lineage-profile empty"><span class="eyebrow">GUIA BIOLÓGICO</span><p>Selecione uma linhagem para consultar exemplos, biologia e especialidades.</p></div>
         </section>
@@ -142,7 +142,7 @@
           <div id="attrs" class="attrs"></div><div id="budget" class="budget-line">42 XPA restantes</div>
         </section>
 
-        <section id="technique-picker" class="form-panel"><div class="panel-heading"><span class="step-number">03</span><div><h3>Golpes iniciais</h3><p>Escolha até quatro: no máximo um de linhagem, bioma, afinidade e arquétipo.</p></div></div>
+        <section id="technique-picker" class="form-panel"><div class="panel-heading"><span class="step-number">03</span><div><h3>Golpes iniciais</h3><p>Escolha quatro: no máximo um de linhagem, bioma, afinidade e arquétipo.</p></div></div>
           <div id="technique-groups"></div><div class="selected-area"><div class="section-heading compact"><h3>Minha ficha de golpes</h3><span id="technique-count">0 de 4 golpes · um por grupo</span></div><div id="selected-techniques"></div></div>
         </section>
         <section class="form-panel"><div class="panel-heading"><span class="step-number">04</span><div><h3>Vocalização e sons</h3><p>Busque gravações naturais e efeitos que combinem com a criatura. O catálogo fornece efeitos de áudio, não síntese de voz.</p></div></div><div class="grid"><label>Descreva o som<input id="native-sound-query" maxlength="240" placeholder="Ex.: vocalização rouca de lobo ao entardecer"></label><button id="native-sound-search" class="secondary" type="button">Recomendar efeitos</button><label>Efeito escolhido<select id="native-sound-choice"><option value="">Sem efeito</option></select></label><audio id="native-sound-preview" controls preload="none" hidden></audio></div><div id="native-sound-status" role="status"></div></section>
@@ -156,7 +156,7 @@
       <p id="bestiary-status" role="status" aria-live="polite"></p>
       <section id="sync-panel" class="form-panel sync-panel" aria-labelledby="sync-heading">
         <div class="section-heading compact"><div><h3 id="sync-heading">Sincronização da conta</h3><p id="sync-session-state" class="sync-state" role="status">Verificando sessão…</p></div><button id="sync-run" type="button" disabled>Sincronizar agora</button></div>
-        <p class="sync-explanation">Somente fichas preparadas para esta conta entram na fila. O envio começa apenas quando você aciona este botão. Fotos permanecem neste dispositivo.</p>
+        <p class="sync-explanation">Somente fichas preparadas para esta conta entram na fila. O envio começa apenas quando você aciona este botão. Imagens e retratos são enviados ao servidor separadamente.</p>
         <div class="sync-counts" aria-live="polite"><span>Pendentes: <strong id="sync-pending">—</strong></span><span>Concluídas: <strong id="sync-completed">—</strong></span><span>Falhas: <strong id="sync-failed">—</strong></span><span>Conflitos: <strong id="sync-conflicts-count">—</strong></span></div>
         <p id="sync-progress" class="sync-state" role="status" aria-live="polite"></p>
         <div id="sync-conflicts" class="sync-conflicts"></div>
@@ -167,7 +167,7 @@
     <section id="art-studio" class="view">
       <div class="section-heading"><div><span class="eyebrow">CRIAÇÃO VISUAL</span><h2>Ateliê de imagens</h2><p>Crie arte para Nativas, biomas, técnicas e novas ideias.</p></div></div>
       <div class="form-panel">
-        <p class="art-cost-note">Geração disponível para qualquer conta autenticada. Cada conta tem limite diário para proteger os créditos; as imagens e vínculos ficam neste dispositivo.</p>
+        <p class="art-cost-note">Geração disponível para qualquer conta autenticada. Cada conta tem limite diário para proteger os créditos; as imagens salvas e os retratos ficam no servidor da sua conta.</p>
         <label>Vincular a uma Nativa após salvar (opcional)<select id="art-studio-target"><option value="">Salvar apenas no acervo</option></select></label>
         <form id="art-generation-form" class="art-form">
           <label>Categoria<select id="art-kind" required><option value="nativa">Nativa</option><option value="biome">Bioma</option><option value="technique">Técnica ou golpe</option><option value="other">Outra ideia futura</option></select></label>
@@ -175,13 +175,13 @@
           <label>Descrição visual<textarea id="art-prompt" maxlength="1400" rows="5" required placeholder="Descreva forma, ambiente, cores, movimento e estilo visual."></textarea></label>
           <div class="form-actions"><button id="art-generate" type="submit">Gerar imagem</button><p id="art-status" role="status" aria-live="polite">Entre em sua conta para começar.</p></div>
         </form>
-        <div id="art-preview" class="art-preview" hidden><img id="art-preview-image" alt="Prévia da imagem gerada"><div class="form-actions"><button id="art-save" type="button">Salvar no acervo local</button></div></div>
+        <div id="art-preview" class="art-preview" hidden><img id="art-preview-image" alt="Prévia da imagem gerada"><div class="form-actions"><button id="art-save" type="button">Salvar no acervo</button></div></div>
       </div>
       <p><button class="secondary" data-go="gallery">Abrir acervo e vincular um retrato →</button></p>
     </section>
     <section id="gallery" class="view"><div class="section-heading"><div><span class="eyebrow">SUA COLEÇÃO VISUAL</span><h2>Acervo e retratos</h2><p>Escolha uma arte do acervo e vincule à Nativa que ela representa.</p></div><button data-go="art-studio">Criar nova imagem</button></div>
       <div class="form-panel">
-        <div class="section-heading compact"><div><h3>Acervo deste navegador</h3><p>Separado por conta e armazenado localmente, junto às fotos do projeto.</p></div><label>Aplicar como retrato de uma Nativa<select id="art-target-nativa"><option value="">Escolha uma ficha editável</option></select></label></div>
+        <div class="section-heading compact"><div><h3>Acervo da sua conta</h3><p>Imagens guardadas no servidor, acessíveis em outros dispositivos com a mesma conta.</p></div><label>Aplicar como retrato de uma Nativa<select id="art-target-nativa"><option value="">Escolha uma ficha editável</option></select></label></div>
         <div id="art-gallery" class="art-gallery"><p class="muted">Entre em uma conta para consultar o acervo.</p></div>
       </div>
     </section>
@@ -208,11 +208,11 @@
         <article class="rule-card"><h3>Criação e progressão</h3><ul><li>Distribua de 37 a 42 dos 42 XPA de criação; até 5 pontos não gastos ficam na ficha para melhorar atributos depois.</li><li>Todos os sete atributos começam em 1. O custo para subir de N para N+1 é N+1 XPA.</li><li>Ao criar, a Nativa recebe 1 XPA de vínculo além dos pontos guardados.</li><li>Para subir de nível, precisa de XP igual ao nível de destino; ao subir, recebe XPA igual ao novo nível. A taxa padrão de Essência é 5% por vitória.</li><li>Estágios: 1–9, estágio 1; 10–16, estágio 2; 17+, estágio 3.</li></ul></article>
         <article class="rule-card"><h3>Combate</h3><ul><li>Iniciativa: 1D10 + AGI, rolada novamente a cada turno.</li><li>Precisão negativa representa penalidade: -1 erra no 1; -2 erra de 1 a 2; e assim por diante.</li><li>Dano físico: ATQ + dano da técnica − DEF.</li><li>Dano especial: POT + dano da técnica − RES.</li><li>Golpes ofensivos acertados causam pelo menos 1 de dano antes do modificador de afinidade.</li><li>Fraqueza: +2 dano. Resistência: −2 dano. O resultado final não fica abaixo de zero.</li><li>HP máximo = HP × 5. MP máximo = MP × 2.</li><li>MP é gasto ao usar técnicas; a recarga é controlada por turnos.</li></ul></article>
         <article class="rule-card"><h3>Essências</h3><ul><li>Vitórias concedem uma Essência com 5% de chance; só Essências obtidas em combate podem ser absorvidas.</li><li>Primeira Essência: a partir do nível 5; concede os golpes de linhagem e afinidade da Nativa de origem, sem alterar as defesas.</li><li>Segunda Essência: a partir do nível 12 e estágio 2; concede uma afinidade nova e um golpe dela. As duas afinidades combinam fraquezas e resistências.</li><li>Terceira Essência: reservada para o estágio 3, ainda indisponível.</li></ul></article>
-        <article class="rule-card"><h3>Limites deste protótipo</h3><ul><li>A arena oferece combates contra CPU e duelos PvP online.</li><li>Efeitos escritos nos golpes são exibidos no registro; nem todos são automatizados nesta versão.</li><li>Fotos são guardadas no IndexedDB do navegador, separadas dos dados das fichas.</li><li>As fichas locais precisam ser sincronizadas para uso nos recursos online.</li></ul></article>
+        <article class="rule-card"><h3>Limites deste protótipo</h3><ul><li>A arena oferece combates contra CPU e duelos PvP online.</li><li>Efeitos escritos nos golpes são exibidos no registro; nem todos são automatizados nesta versão.</li><li>Imagens e retratos são enviados ao armazenamento privado do servidor da conta.</li><li>As fichas locais precisam ser sincronizadas para uso nos recursos online.</li></ul></article>
       </div>
     </section>
 
-    <section id="account" class="view refuge-account"><div class="section-heading"><div><span class="eyebrow">SEU PERFIL</span><h2>Minha conta</h2><p>Seu ponto de encontro com o mundo NATIVA.</p></div></div><div class="account-card"><h3 data-player-name>Explorador</h3><p data-player-email></p><p class="muted">Suas fotos e artes ficam neste dispositivo. Prepare suas fichas no bestiário para sincronizar com a conta.</p><button data-go="list">Abrir bestiário</button><button class="secondary" data-signout>Sair da conta</button><p style="margin-top:20px"><a href="./tests/sync-diagnostic.html">Diagnóstico de sincronização</a></p></div></section>
+    <section id="account" class="view refuge-account"><div class="section-heading"><div><span class="eyebrow">SEU PERFIL</span><h2>Minha conta</h2><p>Seu ponto de encontro com o mundo NATIVA.</p></div></div><div class="account-card"><h3 data-player-name>Explorador</h3><p data-player-email></p><p class="muted">Suas fotos, artes e retratos são guardados no servidor da sua conta. Prepare suas fichas no bestiário para sincronizar com a conta.</p><button data-go="list">Abrir bestiário</button><button class="secondary" data-signout>Sair da conta</button><p style="margin-top:20px"><a href="./tests/sync-diagnostic.html">Diagnóstico de sincronização</a></p></div></section>
     <section id="settings" class="view"><div class="section-heading"><div><span class="eyebrow">AJUSTES DA JORNADA</span><h2>Configurações</h2><p>Gerencie o progresso individual das suas Nativas.</p></div></div>
       <section class="form-panel"><div class="panel-heading"><span class="step-number" data-icon="refresh"></span><div><h3>Reiniciar progressão</h3><p>Volta nível e XP a 1/0, zera o XPA, remove Essências e restaura atributos e golpes iniciais registrados. O reset vale apenas para a ficha escolhida.</p></div></div><label>Escolha uma Nativa<select id="progress-reset-native"><option value="">Selecione uma ficha editável</option></select></label><div class="form-actions"><button id="progress-reset-confirm" type="button" class="danger" disabled>Resetar progresso desta Nativa</button><p id="progress-reset-status" role="status" aria-live="polite"></p></div></section>
       <section class="form-panel essence-admin-settings" data-admin-only hidden><div class="panel-heading"><span class="step-number">ADM</span><div><h3>Teste de drop de Essências</h3><p>Taxa de produção padrão: 5%. Este ajuste temporário está disponível apenas à conta administradora e vale para batalhas locais de teste.</p></div></div><label>Chance de drop de teste <span id="essence-drop-rate-value">5%</span><input id="essence-drop-rate" type="range" min="0" max="100" step="1" value="5"></label><button id="essence-drop-reset" type="button" class="small secondary">Restaurar 5%</button></section>
@@ -249,10 +249,10 @@
     <div class="site-help-head"><div><span class="eyebrow">GUIA DO JOGADOR</span><h2 id="site-help-title">Ajuda do NATIVA</h2><p>Atalhos e explicações para as principais áreas.</p></div><button id="site-help-close" class="secondary" type="button" aria-label="Fechar ajuda">Fechar</button></div>
     <div class="site-help-content">
       <section><h3>Criação de Nativas</h3><p>Preencha identidade, linhagem, bioma, afinidade e arquétipo. Distribua entre 37 e 42 XPA nos atributos: os pontos restantes, até 5, ficam disponíveis na ficha para melhorias futuras. Todos começam no valor 1.</p></section>
-      <section><h3>Golpes iniciais</h3><p>Você pode escolher até quatro golpes, no máximo um de cada origem: linhagem, bioma, afinidade e arquétipo. Golpes em revisão aparecem identificados e não podem ser usados em combate.</p></section>
+      <section><h3>Golpes iniciais</h3><p>Escolha quatro golpes, no máximo um de cada origem: linhagem, bioma, afinidade e arquétipo. Golpes em revisão aparecem identificados e não podem ser usados em combate.</p></section>
       <section><h3>Bestiário e progressão</h3><p>Abra a ficha de uma Nativa para consultar traços, golpes, imagens e atributos. XPA melhora atributos; XP recebido em combates pode elevar o nível.</p></section>
-      <section><h3>Arena</h3><p>Escolha um combate contra CPU ou PvP online. Na arena, selecione uma ação por turno; golpes sem PM suficiente ou em recarga ficam indisponíveis. Consulte o histórico para ver resultados e efeitos.</p></section>
-          <section><h3>Ateliê, acervo e mesas</h3><p>Gere artes no Ateliê e vincule retratos no acervo. Os retratos escolhidos ficam na sua conta. Nas mesas compartilhadas, a ficha da campanha guarda progressão separada do seu bestiário.</p></section>
+      <section><h3>Arena</h3><p>Escolha um combate contra CPU ou PvP online. Na arena, selecione uma ação por turno; golpes sem MP suficiente ou em recarga ficam indisponíveis. Consulte o histórico para ver resultados e efeitos.</p></section>
+          <section><h3>Ateliê, acervo e mesas</h3><p>Gere artes no Ateliê e vincule retratos no acervo. Imagens e retratos são guardados no servidor da sua conta. Nas mesas compartilhadas, a ficha da campanha guarda progressão separada do seu bestiário.</p></section>
       <p class="site-help-note">Use o botão <b>?</b> no canto da tela para reabrir este guia a qualquer momento.</p>
     </div>
   </dialog>

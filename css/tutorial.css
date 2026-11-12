@@ -1,0 +1,181 @@
+.nativa-tour[hidden] {
+  display: none !important;
+}
+.nativa-tour {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  font-family: inherit;
+  pointer-events: none;
+}
+.tour-spotlight {
+  position: fixed;
+  pointer-events: none;
+  border: 2px solid #b9df85;
+  border-radius: 16px;
+  box-shadow:
+    0 0 0 9999px #061b16b8,
+    0 0 24px #b9df8540;
+  transition:
+    left 0.18s,
+    top 0.18s,
+    width 0.18s,
+    height 0.18s;
+}
+.tour-popup {
+  pointer-events: auto;
+  position: fixed;
+  box-sizing: border-box;
+  width: min(410px, calc(100vw - 24px));
+  padding: 25px;
+  border: 1px solid #b9df8566;
+  border-radius: 22px;
+  background: linear-gradient(145deg, #163e32, #0c241e);
+  color: #f5f6e9;
+  box-shadow: 0 20px 70px #0008;
+  overflow: auto;
+  overscroll-behavior: contain;
+  outline: none;
+}
+.tour-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.tour-kicker {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  font-weight: 800;
+  color: #c4e99b;
+}
+.tour-count {
+  font-size: 12px;
+  color: #d7e2ce;
+}
+.tour-popup h2 {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 25px;
+  line-height: 1.2;
+  margin: 15px 0 12px;
+  color: #fff8df;
+}
+.tour-popup p {
+  font-size: 14px;
+  line-height: 1.65;
+  color: #e0e9de;
+  margin: 0;
+}
+.tour-popup .tour-hint {
+  font-size: 11px;
+  color: #b8cbb7;
+  margin-top: 13px;
+}
+.tour-progress {
+  height: 3px;
+  background: #ffffff20;
+  border-radius: 3px;
+  margin: 18px 0;
+}
+.tour-progress span {
+  display: block;
+  height: 100%;
+  background: #c6e69d;
+  border-radius: 3px;
+  transition: width 0.2s;
+}
+.tour-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.tour-controls button {
+  min-height: 44px;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font: 600 13px inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.tour-controls .tour-skip {
+  margin-right: auto;
+  background: transparent;
+  color: #d0ddc8;
+  border: 0;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.tour-controls .tour-back {
+  background: #ffffff0c;
+  color: #eff4e5;
+  border: 1px solid #ffffff30;
+}
+.tour-controls .tour-next {
+  background: #c7e6a0;
+  border: 1px solid #c7e6a0;
+  color: #142e22;
+}
+.tour-controls button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.tour-controls button:focus-visible {
+  outline: 3px solid #fff5cf;
+  outline-offset: 3px;
+}
+.tutorial-library select {
+  max-width: 100%;
+  margin: 14px 12px 14px 0;
+}
+.tutorial-context-message {
+  padding: 16px;
+  border: 1px solid #b9df85;
+  border-radius: 12px;
+  background: #183b2e;
+  color: #f5f6e9;
+}
+.essence-effects {
+  margin: 12px 0;
+  padding: 12px;
+  border-radius: 12px;
+  background: #ffffff09;
+}
+.essence-effects ul {
+  padding-left: 20px;
+  margin: 8px 0;
+}
+.essence-lock {
+  display: block;
+  color: var(--text-muted, #b9cbb8);
+  margin: 8px 0;
+}
+@media (max-width: 640px) {
+  .tour-popup {
+    padding: 18px;
+    border-radius: 18px;
+    padding-bottom: max(18px, env(safe-area-inset-bottom));
+  }
+  .tour-popup h2 {
+    font-size: 22px;
+  }
+  .tour-popup p {
+    font-size: 13px;
+    line-height: 1.55;
+  }
+  .tour-controls button {
+    padding: 10px 12px;
+  }
+  .tour-spotlight {
+    transition: none;
+  }
+  html:has(.nativa-tour:not([hidden])) {
+    scroll-padding-bottom: 330px;
+    scroll-padding-top: 20px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tour-spotlight,
+  .tour-progress span {
+    transition: none;
+  }
+}

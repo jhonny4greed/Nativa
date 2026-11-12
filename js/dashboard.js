@@ -97,7 +97,7 @@ async function renderCompanions() {
       const imageBox = document.createElement("div"); imageBox.className = "companion-image";
       let src = defaultPortrait(n);
       if (n.photoId) {
-        const blob = await repositorioLocal.obterFoto(n.photoId);
+        const blob = await obterRetratoNativa(n);
         if (blob) { src = URL.createObjectURL(blob); localUrls.push(src); }
       }
       if (src) { const image = document.createElement("img"); image.src = src; image.alt = `Retrato de ${n.name}`; image.loading = "lazy"; imageBox.append(image); }

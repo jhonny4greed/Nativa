@@ -26,23 +26,23 @@ Outros comandos: `npm test` (testes), `npm run lint`, `npm run build` (gera `dis
 ## Dados e compatibilidade
 
 - Mantém a chave `localStorage` `nativa.prototype.v1` para preservar fichas existentes.
-- Fotos são armazenadas no IndexedDB do navegador, separadas dos dados textuais.
-- As fichas podem ser preparadas e sincronizadas explicitamente com a conta. Fotos e artes permanecem locais.
+- Fotos e retratos são enviados ao bucket privado `nativa-portraits`; o acervo é guardado em `nativa-artworks`, com metadados em `player_artworks`. O navegador pode manter cache para desempenho.
+- As fichas são preparadas e sincronizadas explicitamente com a conta. Imagens são enviadas ao servidor ao salvar. No primeiro acesso após a atualização, fotos antigas editáveis são enviadas; ao abrir o acervo, artes antigas da conta são migradas. A migração exige acessar o navegador que contém os arquivos antigos e preserva os originais em caso de falha.
 
 ## O que está implementado
 
 - Criação com grupo biológico → linhagem → espécie.
 - Perfil biológico com exemplos, descrição e especialidades por linhagem.
-- Seleção de até seis técnicas iniciais, usando o catálogo recebido.
+- Seleção de quatro golpes iniciais: um de linhagem, um de bioma, um de afinidade e um de arquétipo. A primeira Essência acrescenta dois golpes; a segunda, mais um (4 → 6 → 7).
 - Bestiário com foto, atributos, técnicas e progressão.
 - XP, níveis, XPA, melhoria de atributos e absorção das duas primeiras essências.
 - Arena local 1 contra 1 com iniciativa, precisão, MP, dano, HP, recarga e registro de combate.
 
 ## Limitações conhecidas
 
-- A arena é uma simulação local para duas fichas no mesmo navegador; ainda não é multiplayer online.
+- Há arena contra CPU, duelos PvP online por turnos e mesas multiplayer com progressão independente. Duelos amistosos online preservam fichas originais e não concedem recompensas automáticas.
 - Efeitos textuais de suporte/condição são registrados no histórico, mas não são todos aplicados automaticamente.
-- A batalha atual não restaura MP nem HP automaticamente entre partidas; inicie uma nova simulação para testar fichas novamente.
+- Cada nova batalha cria combatentes próprios; acompanhe HP, MP e recargas no painel de combate.
 - A terceira essência permanece desativada, conforme as regras atuais.
 
 ## Nova experiência de jogo
@@ -50,3 +50,22 @@ Outros comandos: `npm test` (testes), `npm run lint`, `npm run build` (gera `dis
 Veja [Dashboard e autenticação](docs/DASHBOARD_E_AUTENTICACAO.md) para rotas, configuração do Supabase e role administrativa. A [pesquisa de bibliotecas](docs/BIBLIOTECAS_ANIMACAO.md) registra as alternativas avaliadas.
 
 Os cinco retratos originais estão em `assets/generated/nativa-*.png`; a aplicação usa versões WebP leves, reproduzíveis com `npm run assets:optimize`. Os prompts estão em `docs/nativa-portrait-prompts.json`.
+
+## Tutoriais guiados
+
+- Introdução geral e guias no primeiro acesso a cada área; sem tutorial no login, cadastro ou Administração.
+- Destaques em elementos reais, pop-ups responsivos, navegação por teclado e botões Pular, Voltar e Avançar/Concluir.
+- Guias específicos para primeira rodada, PvP, Essências, salvamento de arte e papéis da campanha.
+- Repetição disponível no **Guia de jogo**, sem reiniciar fichas ou contas.
+- O histórico fica em `player_tutorials`, por usuário, tutorial e versão (`TUTORIAL_VERSION` em `js/tutorial-content.js`). Contas antigas sem histórico recebem o tutorial normalmente. Incrementar a versão reapresenta os guias após uma mudança relevante.
+- Se o servidor estiver indisponível, o navegador mantém um histórico e uma fila de reenvio separados por conta. A reconexão e o próximo login tentam sincronizar novamente.
+
+## Atualização do banco e armazenamento
+
+Aplique as migrations antes de publicar o frontend (`supabase db push` no projeto correto). A migration `20261112000000_guided_tours_and_gallery.sql` cria o histórico dos tutoriais, o acervo persistente e políticas RLS por proprietário. Os buckets são privados: imagens não são expostas publicamente. Retratos continuam usando as permissões de campanha já definidas em `20261111000000_native_progress_and_portraits.sql`.
+
+Imagens recém-geradas aparecem como prévia até clicar em **Salvar no acervo**. O sucesso só é informado depois de enviar arquivo e metadados. Trocar de navegador não transfere fichas ainda pendentes de sincronização; use **Sincronizar agora** no Bestiário.
+
+## Efeitos da arena
+
+Dano e dado usam uma camada independente dos painéis. Atualizar a interface não reinicia a animação de dano. O D10 rola por 1 segundo e mantém o resultado por 1,8 segundo; números de dano permanecem por cerca de 2,8 segundos. Movimentos reduzidos são respeitados. O dado indica precisão, não dano.

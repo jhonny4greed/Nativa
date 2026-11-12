@@ -64,7 +64,7 @@ function anexarAtributos(container, data) {
   const attrs = data?.attrs && typeof data.attrs === "object" ? data.attrs : {};
   const definitions = [
     ["ATQ", "Ataque"], ["POT", "Potência"], ["DEF", "Defesa"],
-    ["RES", "Resistência"], ["AGI", "Agilidade"], ["HP", "PV · atributo"], ["MP", "PM · atributo"]
+    ["RES", "Resistência"], ["AGI", "Agilidade"], ["HP", "PV · atributo"], ["MP", "MP · atributo"]
   ];
   const values = definitions.filter(([key]) => valorNumerico(attrs[key]))
     .map(([key, label]) => [label, Number(attrs[key])]);
@@ -80,7 +80,7 @@ function anexarAtributos(container, data) {
 
   const vitals = [
     { label: "PV", current: ["pvAtual", "currentPV", "hpAtual", "currentHP"], maximum: ["pvMax", "pvMaximo", "maxPV", "hpMax", "maxHP"] },
-    { label: "PM", current: ["pmAtual", "currentPM", "mpAtual", "currentMP"], maximum: ["pmMax", "pmMaximo", "maxPM", "mpMax", "maxMP"] }
+    { label: "MP", current: ["pmAtual", "currentPM", "mpAtual", "currentMP"], maximum: ["pmMax", "pmMaximo", "maxPM", "mpMax", "maxMP"] }
   ];
   for (const vital of vitals) {
     const currentKey = vital.current.find(key => valorNumerico(data?.[key]));
@@ -91,7 +91,7 @@ function anexarAtributos(container, data) {
     const row = elemento("div", undefined, "room-companion-vital");
     const label = elemento("div", undefined, "room-companion-vital-label");
     label.append(elemento("span", vital.label), elemento("strong", `${current} / ${maximum}`));
-    const bar = elemento("div", undefined, vital.label === "PM" ? "room-companion-bar is-mana" : "room-companion-bar");
+    const bar = elemento("div", undefined, vital.label === "MP" ? "room-companion-bar is-mana" : "room-companion-bar");
     const fill = elemento("span");
     fill.style.width = `${maximum > 0 ? Math.max(0, Math.min(100, current / maximum * 100)) : 0}%`;
     bar.append(fill);

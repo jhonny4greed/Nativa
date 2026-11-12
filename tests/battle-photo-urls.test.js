@@ -58,7 +58,7 @@ test("substituição publica a nova foto antes de revogar a antiga; sem Blob pod
 });
 
 test("integração da arena carrega photoId, renderiza a imagem e limpa no fim e na troca de batalha", () => {
-  assert.match(app, /const foto=await obterFoto\(c\.nativa\.photoId\);\s*substituirFotoCombatente\(c,foto\)/);
+  assert.match(app, /const foto=await obterRetratoNativa\(c\.nativa\);\s*substituirFotoCombatente\(c,foto\)/);
   assert.match(app, /c\.fotoUrl\s*\?`<img class="combatant-photo" src="\$\{c\.fotoUrl\}"/);
   assert.ok(app.includes('class="combatant-photo-placeholder" role="img"'));
   assert.match(app, /liberarFotosBatalha\(\);\s*\n\s*const combatentes=/);
