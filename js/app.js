@@ -20,6 +20,7 @@ import { obterClienteSupabase } from "./auth.js";
 import { inicializarSalas } from "./rooms.js";
 import { servicoSincronizacao } from "./sync-service.js";
 import { estudioImagens, carregarPuter, conectarPuter, erroPuter } from "./art-studio.js";
+import { referenciasVisuaisNativa } from "./art-prompts.js";
 import { aplicarArteComoRetrato, galeriaImagens } from "./art-gallery.js";
 import { criarRegistroUrlsFotosArena } from "./battle-photo-urls.js";
 import { enviarRetratoNativa, obterRetratoNativa, removerRetratoNativa } from "./native-portraits.js";
@@ -484,7 +485,7 @@ $("#form").addEventListener("submit", async e => {
     return;
   }
   let creationArtError=null;
-  if($("#generate-art-on-create")?.checked){try{const art=await estudioImagens.gerar({kind:"nativa",title:n.name,prompt:`Full-body creature concept for a Brazilian fantasy RPG. Species inspiration: ${n.species}. Biological group: ${n.groupBio}. Lineage: ${n.lineageName||n.lineage}. Habitat: ${n.bioma}. Elemental affinity: ${n.affinity}. Combat archetype: ${n.archetype}. ${n.inspiracao||n.inspiration||n.descricao||""}`.slice(0,1400)});const savedArt=await galeriaImagens.salvar(art);const applied=await aplicarArteComoRetrato({artId:savedArt.id,target:n,persist:(nativa,previous)=>salvarEdicaoNativa(nativa,previous)});if(!applied.persisted)throw new Error("A arte foi salva no acervo, mas o retrato não foi vinculado.");}catch(error){creationArtError=error.message;}}
+  if($("#generate-art-on-create")?.checked){try{const art=await estudioImagens.gerar({kind:"nativa",title:n.name,prompt:referenciasVisuaisNativa(n)});const savedArt=await galeriaImagens.salvar(art);const applied=await aplicarArteComoRetrato({artId:savedArt.id,target:n,persist:(nativa,previous)=>salvarEdicaoNativa(nativa,previous)});if(!applied.persisted)throw new Error("A arte foi salva no acervo, mas o retrato não foi vinculado.");}catch(error){creationArtError=error.message;}}
   let origemPreparada = true;
   try {
     await repositorioLocal.registrarOrigemNativa(n.id, "player");
@@ -609,7 +610,7 @@ async function carregarAlvosArte(){
   }
   for(const selector of ["#art-target-nativa","#art-studio-target"]){const select=$(selector);if(!select)continue;const selected=select.value;const empty=selector==="#art-studio-target"?"Salvar apenas no acervo":"Escolha uma ficha editável";select.innerHTML=`<option value="">${empty}</option>`+available.map(n=>`<option value="${escapar(n.id)}">${escapar(n.name||n.id)}</option>`).join("");if(available.some(n=>n.id===selected))select.value=selected;}
 }
-$("#art-studio-target")?.addEventListener("change",()=>{const n=nativas.find(item=>item?.id===$("#art-studio-target").value);if(!n)return;$("#art-kind").value="nativa";$("#art-title").value=n.name||"Nativa";const inspirations=[n.descricao,n.description,n.inspiracao,n.inspiration,n.visualDescription].filter(value=>typeof value==="string"&&value.trim());$("#art-prompt").value=["Espécie: "+(n.species||"")+". Linhagem: "+(n.lineageName||n.lineage||"")+". Habitat: "+(n.bioma||"")+". Afinidade: "+(n.affinity||"")+". Arquétipo: "+(n.archetype||"")+".",...inspirations].join(" ").slice(0,1400);});
+$("#art-studio-target")?.addEventListener("change",()=>{const n=nativas.find(item=>item?.id===$("#art-studio-target").value);if(!n)return;$("#art-kind").value="nativa";$("#art-title").value=n.name||"Nativa";$("#art-prompt").value=referenciasVisuaisNativa(n);});
 
 async function renderizarAcervoArte(){
   const gallery=$("#art-gallery");

@@ -1,4 +1,5 @@
 import { obterClienteSupabase } from "./auth.js";
+import { montarPromptImagem } from "./art-prompts.js";
 
 const CATEGORIAS = new Set(["nativa", "biome", "technique", "other"]);
 const LIMITE_IMAGEM = 15_000_000;
@@ -108,16 +109,10 @@ export function criarEstudioImagens({
       };
       await validarConta();
       onProgress({ phase: "generating" });
-      const subject = {
-        nativa: "Nativa creature",
-        biome: "Brazilian biome",
-        technique: "battle technique",
-        other: "creative concept"
-      }[kind];
       let image;
       try {
         image = await sdk.ai.txt2img(
-          `Create a detailed illustration for NATIVA, a Brazilian biodiversity fantasy RPG. Category: ${subject}. Theme: ${cleanTitle}. ${cleanPrompt}`
+          montarPromptImagem({ kind, title: cleanTitle, prompt: cleanPrompt })
         );
       } catch (error) {
         throw new Error(erroPuter(error), { cause: error });

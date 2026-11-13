@@ -21,6 +21,14 @@ Nenhuma imagem é gerada ao abrir uma página ou carregar o SDK. A geração oco
 
 Não há reenvio automático de pedidos que possam consumir saldo. Cliques paralelos são bloqueados. Falhas de autenticação, saldo, moderação e download recebem mensagens próprias.
 
+## Direção visual
+
+O prompt compartilhado em `js/art-prompts.js` trata nome, espécie, grupo biológico, linhagem, habitat, afinidade, arquétipo e descrições pessoais como referências internas de aparência. Espécie e linhagem orientam anatomia e traços; afinidade orienta cores e poderes; arquétipo orienta postura e expressão. O nome e os dados não devem ser escritos na imagem.
+
+Para Nativas, pedimos uma única criatura de corpo inteiro, centralizada, com silhueta legível, pintura de fantasia com texturas realistas e habitat discreto ao fundo, seguindo a composição das artes iniciais. O prompt exclui textos, marcas, painéis, fichas, estatísticas e múltiplas vistas. A criação de Nativas e o preenchimento do Ateliê usam a mesma montagem de referências. Biomas e golpes mantêm suas composições próprias, também sem textos ou painéis.
+
+Essas instruções orientam o modelo; os testes automatizados verificam o pedido enviado ao Puter, sem gerar imagens nem consumir saldo.
+
 ## Prévia, acervo e retratos
 
 O `HTMLImageElement` retornado pelo SDK é convertido para um Blob PNG, JPEG ou WebP válido, limitado a 15 MB. Essa conversão foi validada com a imagem real. A conta NATIVA é verificada novamente antes e depois da geração e do download para impedir associação à conta errada.

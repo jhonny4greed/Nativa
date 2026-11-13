@@ -343,6 +343,10 @@ test("Puter gera uma única imagem real e converte para o Blob usado no acervo",
   assert.equal(calls, 1);
   assert.equal(args.length, 1, "produção não usa testMode");
   assert.match(args[0], /Guardião.*Escamas verdes/);
+  assert.match(args[0], /exactly one individual.*one single full-body view/s);
+  assert.match(args[0], /internal visual reference data only/);
+  assert.match(args[0], /No text, letters.*logos.*character sheet/s);
+  assert.doesNotMatch(args[0], /for NATIVA/);
   assert.equal(result.blob.type, "image/png");
   assert.equal(result.blob.size, PNG_BYTES.length);
   assert.equal(result.provider, "puter");

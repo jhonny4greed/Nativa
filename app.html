@@ -174,7 +174,8 @@
         <form id="art-generation-form" class="art-form">
           <label>Categoria<select id="art-kind" required><option value="nativa">Nativa</option><option value="biome">Bioma</option><option value="technique">Técnica ou golpe</option><option value="other">Outra ideia futura</option></select></label>
           <label>Nome do tema<input id="art-title" maxlength="80" required placeholder="Ex.: Guardião das veredas"></label>
-          <label>Descrição visual<textarea id="art-prompt" maxlength="1400" rows="5" required placeholder="Descreva forma, ambiente, cores, movimento e estilo visual."></textarea></label>
+          <label>Descrição visual<textarea id="art-prompt" maxlength="1400" rows="5" required aria-describedby="art-visual-help" placeholder="Descreva aparência, cores, postura e poderes da criatura."></textarea></label>
+          <p id="art-visual-help" class="muted">Os dados personalizam a aparência da arte. Para Nativas, pedimos uma única criatura de corpo inteiro, sem textos, fichas ou logotipos.</p>
           <div class="form-actions"><button id="art-generate" type="submit">Gerar imagem</button><p id="art-status" role="status" aria-live="polite">Preencha o tema e a descrição. A geração usa sua conta Puter conectada.</p></div>
         </form>
         <div id="art-preview" class="art-preview" hidden><img id="art-preview-image" alt="Prévia da imagem gerada"><div class="form-actions"><button id="art-save" type="button">Salvar no acervo</button></div></div>
