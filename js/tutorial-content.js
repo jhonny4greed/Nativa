@@ -185,14 +185,14 @@ export const TUTORIALS = {
   ],
   "battle-online": [
     step(
-      "#online-arena-nativa",
+      "#online-arena-nativa + .visual-picker",
       "Leve uma ficha sincronizada",
       "Escolha uma Nativa da sua conta. Se a lista estiver vazia, vá ao Bestiário, prepare a ficha quando necessário e clique em Sincronizar agora."
     ),
     step(
-      "#online-connect",
-      "Encontre outros jogadores",
-      "Fique disponível online para consultar jogadores e receber desafios."
+      "#online-quick-match",
+      "Entre na fila quando quiser jogar",
+      "O lobby conecta automaticamente. Escolha sua Nativa e clique em Entrar na fila PvP para buscar um oponente. Ao encontrar uma partida, a arena abre em uma tela de jogo."
     ),
     step(
       ".online-lobby-grid",
@@ -336,6 +336,7 @@ export const TUTORIALS = {
     )
   ],
   settings: [
+    step(".music-settings", "Escolha sua trilha sonora", "Ative ou desative a música de fundo. Use a trilha padrão de cada área ou, quando houver faixas de arena, escolha uma música ou o modo aleatório. Sua escolha fica salva na conta."),
     step(
       ".arena-preferences",
       "Seu ritmo de combate",

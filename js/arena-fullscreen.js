@@ -19,6 +19,8 @@ export function initializeArenaFullscreen() {
     } catch { arena.classList.toggle("arena-expanded"); }
     sync();
   });
+  document.addEventListener("nativa:combat-start",()=>{arena.classList.add("arena-expanded");arena.scrollTop=0;sync();document.querySelector('#battle-arena')?.focus({preventScroll:true});});
+  document.addEventListener("nativa:combat-close",()=>{arena.classList.remove("arena-expanded");if(document.fullscreenElement===arena)void document.exitFullscreen().catch(()=>{});sync();});
   document.addEventListener("fullscreenchange",sync);
   document.addEventListener("keydown",event=>{if(event.key==="Escape"){arena.classList.remove("arena-expanded");sync();}});
   window.addEventListener("orientationchange",sync);

@@ -1,3 +1,4 @@
+import { initializeMusic } from "./music.js";
 import "@fontsource-variable/inter";
 import "@fontsource-variable/fraunces";
 import "../css/tokens.css";
@@ -198,3 +199,5 @@ async function boot() {
 }
 
 boot();
+
+void initializeMusic();

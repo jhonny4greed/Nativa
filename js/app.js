@@ -1,3 +1,4 @@
+import { updateVisualPicker } from "./visual-picker.js";
 import { getArenaPreferences, animationDuration } from "./arena-preferences.js";
 import { createCombatPresenter, combatActions, historyActions } from "./arena-sequence.js";
 import { defaultPortrait } from "./creature-art.js";
@@ -923,6 +924,8 @@ function atualizarSelectsBatalha(){
     if(atual==="random"||nativas.some(n=>n.id===atual))el.value=atual;
   });
   atualizarRotulosModoBatalha();
+  updateVisualPicker($("#fighter-a"),nativas);updateVisualPicker($("#fighter-b"),nativas);
+  updateVisualPicker($("#battle-time"),[],"time");updateVisualPicker($("#battle-biome"),[],"biome");
 }
 
 function substituirFotoCombatente(combatente, blob){
@@ -935,6 +938,7 @@ function substituirFotoCombatente(combatente, blob){
 }
 
 function liberarFotosBatalha({manterBatalha=false}={}){
+  if(!manterBatalha)document.dispatchEvent(new CustomEvent("nativa:combat-close"));
   urlsFotosArena.liberarTodasDepoisDe(()=>{
     batalha?.fighters.forEach(combatente=>{combatente.fotoUrl=null;});
     if(!manterBatalha)batalha=null;
@@ -1004,6 +1008,7 @@ async function iniciarBatalha(){
   };
 
   prepararTurno(true);
+  document.dispatchEvent(new CustomEvent("nativa:combat-start"));
 }
 
 function prepararTurno(inicial=false){
@@ -1486,8 +1491,8 @@ function renderizarArena(){
         </div>
       </div>
 
-      <button id="new-battle" class="secondary" type="button" ${["online","room"].includes(batalha.modo)?"hidden":""}>
-        Novo combate
+      <button id="new-battle" class="secondary" type="button" ${batalha.modo==="room"?"hidden":""}>
+        ${batalha.modo==="online"?"Voltar ao lobby PvP":"Novo combate"}
       </button>
     `
     :"";
@@ -1543,6 +1548,7 @@ function renderizarArena(){
   });
 
   $("#new-battle")?.addEventListener("click",()=>{
+    if(batalha?.modo==="online"){void onlineArena.returnToLobby();return;}
     liberarFotosBatalha();
   });
   $("#forfeit-battle")?.addEventListener("click",()=>{void desistirDaLuta();});

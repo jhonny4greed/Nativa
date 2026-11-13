@@ -1,10 +1,11 @@
+import { updateVisualPicker } from "./visual-picker.js";
 import { obterClienteSupabase } from "./auth.js";
 import { BIOMAS } from "./data.js";
 
 export function initializeOnlineArena({onMatch,onLocal}) {
   const $=s=>document.querySelector(s);
   let client=null,userId=null,connected=false,match=null,busy=false,timer=null,lastHeartbeat=0,version=-1;
-  let stopped=false;
+  let stopped=false,connecting=null,laneVersion=0;
   const panel=$("#online-arena-lobby"),status=$("#online-arena-status"),nativas=$("#online-arena-nativa");
   const storedKey=()=>`nativa.online.match.${userId}`;
   const tell=text=>{status.textContent=text;};
@@ -28,23 +29,27 @@ export function initializeOnlineArena({onMatch,onLocal}) {
     nativas.replaceChildren(new Option("Escolha sua Nativa sincronizada",""));
     for(const n of data||[])nativas.add(new Option(`${n.data.name} · nível ${n.data.nivel||1}`,n.id));
     if([...nativas.options].some(o=>o.value===old))nativas.value=old;
+    updateVisualPicker(nativas,(data||[]).map(n=>({...n.data,id:n.id})));
     if(!data?.length)tell("Você ainda não tem uma ficha sincronizada. No bestiário, prepare sua Nativa e use Sincronizar agora.");
   }
   function paintMatch(value) {
     if(!value)return;
     if(match?.id===value.id&&value.revision<version)return;
     const changed=value.revision!==version||match?.id!==value.id||match?.ownConfirmed!==value.ownConfirmed||match?.status!==value.status;
+    const entering=value.status==='active'&&Boolean(value.state)&&(match?.id!==value.id||match?.status!=='active'||!match?.state);
     match=value;remember(value.id);
     const waiting=value.status==="waiting";
     $("#online-match-controls").hidden=false;
     $("#online-match-title").textContent=waiting?"Aguardando adversário":value.status==="active"?`Duelo · turno ${value.turn}`:value.status==="completed"?"Duelo encerrado":"Duelo cancelado";
     const code=$("#online-private-code");code.value=value.code||"";code.closest("label").hidden=!value.code||!waiting;
-    const cancel=$("#online-match-cancel");cancel.textContent=waiting?"Cancelar convite/busca":value.status==="active"?"Desistir do duelo":"Voltar ao lobby";
+    const cancel=$("#online-match-cancel");cancel.textContent=waiting?(value.mode==="quick"?"Sair da fila PvP":"Cancelar convite"):value.status==="active"?"Desistir do duelo":"Voltar ao lobby";
     $("#online-match-message").textContent=waiting?(value.mode==="quick"?"Buscando um jogador disponível…":value.mode==="challenge"?"Convite enviado. O jogador precisa aceitar.":"Envie o código ou copie o link para convidar um amigo.")
       :value.status==="active"?(value.ownConfirmed?"Ação confirmada. Aguardando o resultado do turno…":value.opponentConfirmed?"O adversário já confirmou. Escolha sua ação.":"Escolha uma ação e confirme para resolver o turno.")
       :value.reason==="timeout"?"O duelo foi encerrado por inatividade.":value.reason==="forfeit"?"Duelo encerrado por desistência.":"As fichas originais foram preservadas.";
     $("#online-copy-invite").hidden=!waiting||!value.code;
-    if(value.state&&changed) {version=value.revision;$("#battle-arena").hidden=false;onMatch(value);}
+    const queue=$("#online-quick-match");queue.disabled=['waiting','active'].includes(value.status);queue.textContent=waiting&&value.mode==='quick'?'Na fila PvP…':'Entrar na fila PvP';
+    nativas.disabled=['waiting','active'].includes(value.status);$("#online-arena-biome").disabled=nativas.disabled;
+    if(value.state&&changed) {if(entering)document.querySelector('[data-view="battle"]')?.click();version=value.revision;$("#battle-arena").hidden=false;onMatch(value);if(entering){document.dispatchEvent(new CustomEvent("nativa:combat-start"));}}
   }
   function playerRow(player) {
     const row=document.createElement("article");row.className="online-player";
@@ -69,23 +74,29 @@ export function initializeOnlineArena({onMatch,onLocal}) {
     try {
       if(Date.now()-lastHeartbeat>20000){await invoke("heartbeat");lastHeartbeat=Date.now();}
       const data=await invoke("lobby");
+      if(!connected||stopped)return;
       const players=$("#online-arena-players"),incoming=$("#online-arena-incoming");
-      players.replaceChildren(...data.players.map(playerRow));
-      if(!data.players.length){const p=document.createElement("p");p.className="muted";p.textContent="Nenhum outro jogador disponível agora. Convide um amigo para uma sala privada.";players.append(p);}
-      incoming.replaceChildren(...data.incoming.map(incomingRow));
+      players.replaceChildren(...(data.players||[]).map(playerRow));
+      if(!data.players?.length){const p=document.createElement("p");p.className="muted";p.textContent="Nenhum outro jogador disponível agora. Convide um amigo para uma sala privada.";players.append(p);}
+      incoming.replaceChildren(...(data.incoming||[]).map(incomingRow));
       if(!match&&data.current)paintMatch(data.current);
       if(match&&["waiting","active"].includes(match.status))paintMatch(await invoke("snapshot",{matchId:match.id}));
-      tell("Conectado · duelos amistosos por turnos, sem recompensas automáticas. Atualização automática ativa.");
+      if(match?.status==='waiting')tell(match.mode==='quick'?'Você está na fila PvP. A arena abrirá automaticamente quando encontrar um oponente.':'Aguardando resposta ao convite.');
+      else if(!match||!['active'].includes(match.status))tell('Escolha sua Nativa e entre na fila PvP quando estiver pronto. Abrir esta página não inicia uma busca.');
     } catch(error){report(error);}
   }
   function schedule(){clearTimeout(timer);if(!connected||stopped)return;timer=setTimeout(async()=>{await poll();schedule();},3000);}
   async function connect() {
+    if(connecting)return connecting;
     if(connected)return;
-    await getClient();connected=true;stopped=false;
-    $("#online-connect").textContent="Disponível online";$("#online-connect").disabled=true;
-    if(!match){let id;try{id=sessionStorage.getItem(storedKey());}catch{/* no stored match */}if(id){try{paintMatch(await invoke("snapshot",{matchId:id}));}catch{remember(null);}}}
-    await poll();schedule();
+    connecting=(async()=>{
+      await getClient();connected=true;stopped=false;
+      if(!match){let id;try{id=sessionStorage.getItem(storedKey());}catch{}if(id){try{paintMatch(await invoke('snapshot',{matchId:id}));}catch{remember(null);}}}
+      await poll();schedule();
+    })();
+    try{await connecting;}finally{connecting=null;}
   }
+
   async function operation(action,payload) {
     if(busy)return;busy=true;
     try{await connect();tell("Preparando duelo…");paintMatch(await invoke(action,payload));await poll();}
@@ -93,15 +104,16 @@ export function initializeOnlineArena({onMatch,onLocal}) {
   }
   async function setLane(online) {
     if(!online&&match?.status==="active"){tell("Finalize o duelo online antes de trocar de modo.");return;}
+    const lane=++laneVersion;
     panel.hidden=!online;$(".battle-setup").hidden=online;
     $("#battle-arena").hidden=online&&!match?.state;
     document.querySelectorAll("[data-arena-lane]").forEach(b=>b.setAttribute("aria-pressed",String((b.dataset.arenaLane==="online")===online)));
-    if(online){try{await refreshNativas();if(!connected)tell("Conecte-se para encontrar jogadores ou criar um convite privado.");}catch(error){report(error);}}
-    else {if(connected){try{await invoke("offline");}catch{/* expires automatically */}connected=false;clearTimeout(timer);$("#online-connect").disabled=false;$("#online-connect").textContent="Ficar disponível online";}match=null;version=-1;remember(null);onLocal();}
+    if(online){try{await refreshNativas();if(lane!==laneVersion)return;await connect();}catch(error){report(error);}}
+    else {if(connected){try{await invoke("offline");}catch{/* expires automatically */}connected=false;clearTimeout(timer);}match=null;version=-1;remember(null);nativas.disabled=false;$("#online-arena-biome").disabled=false;$("#online-quick-match").disabled=false;$("#online-quick-match").textContent="Entrar na fila PvP";onLocal();}
   }
   document.querySelectorAll("[data-arena-lane]").forEach(button=>button.addEventListener("click",()=>{void setLane(button.dataset.arenaLane==="online");}));
   for(const biome of BIOMAS)$("#online-arena-biome").add(new Option(biome.nome,biome.nome));
-  $("#online-connect").addEventListener("click",()=>{void connect().catch(report);});
+  updateVisualPicker($("#online-arena-biome"),[],"biome");
   $("#online-refresh-nativas").addEventListener("click",()=>{void refreshNativas().catch(report);});
   $("#online-create-private").addEventListener("click",()=>{try{void operation("private",ownPayload()).catch(report);}catch(error){report(error);}});
   $("#online-quick-match").addEventListener("click",()=>{try{void operation("quick",ownPayload()).catch(report);}catch(error){report(error);}});
@@ -112,6 +124,10 @@ export function initializeOnlineArena({onMatch,onLocal}) {
   window.addEventListener("pagehide",()=>{stopped=true;clearTimeout(timer);});
   const invite=new URL(location.href).searchParams.get("duelo");if(invite){$("#online-invite-code").value=invite;void setLane(true);}
   return {
+    async returnToLobby(){
+      if(match?.status==='active')return;
+      match=null;version=-1;remember(null);nativas.disabled=false;$("#online-arena-biome").disabled=false;$("#online-quick-match").disabled=false;$("#online-quick-match").textContent="Entrar na fila PvP";$("#online-match-controls").hidden=true;onLocal();await setLane(true);
+    },
     async submit(choice,turn){if(!match||match.status!=="active")throw new Error("Duelo não está ativo");const result=await invoke("submit",{matchId:match.id,turn,choice});version=-1;paintMatch(result);await poll();},
     async forfeit(){if(!match||match.status!=="active")throw new Error("Duelo não está ativo");const result=await invoke("forfeit",{matchId:match.id});version=-1;paintMatch(result);await poll();},
     isActive:()=>match?.status==="active",

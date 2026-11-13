@@ -50,6 +50,8 @@ if (user) {
   await initializeDashboard(client, user, role);
   const { initializeArenaPreferences } = await import("./arena-preferences.js");
   await initializeArenaPreferences(client,user);
+  const { initializeMusic } = await import("./music.js");
+  await initializeMusic(client,user);
   await import("./app.js");
   if (role === "admin") {
     const { inicializarPainelAdmin } = await import("./admin.js");

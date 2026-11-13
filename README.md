@@ -71,3 +71,13 @@ Imagens recém-geradas aparecem como prévia até clicar em **Salvar no acervo**
 Cada ação tem uma apresentação sequencial: destaque da Nativa, nome do golpe, D10 de precisão quando aplicável e resultado (dano, erro ou efeito de suporte). A próxima Nativa só começa após esse fluxo. O padrão é cerca de 5 segundos por ação; as Configurações oferecem velocidade muito rápida (3 s), rápida (4 s), normal (5 s), devagar (6 s) e muito devagar (8 s), além de desativar os efeitos e a espera. Preferências são salvas por conta em `player_preferences`, com cache e reenvio local. O resolvedor e o servidor continuam sendo a fonte dos resultados; as animações apenas os apresentam. HP e MP visuais acompanham a sequência, sem alterar as fichas.
 
 A confirmação de ação fica sobreposta ao cenário, entre as Nativas, acima dos golpes, sem faixa de fundo. A migration `20261112010000_arena_preferences.sql` cria as preferências com RLS por conta.
+
+## Lobby PvP, seletores e trilha sonora
+
+O lobby conecta automaticamente ao abrir PvP. Isso atualiza presença e convites, mas não entra na fila: a busca só começa com **Entrar na fila PvP**, e **Sair da fila PvP** cancela a espera. Uma partida encontrada ou aceita abre o modo de jogo em uma superfície própria, assim como iniciar um combate contra CPU. É possível sair da visualização expandida; ela não reabre a cada rodada. Ao terminar o duelo, **Voltar ao lobby PvP** libera uma nova busca.
+
+Os seletores de Nativas (CPU e online), biomas e horários têm miniaturas, suporte a teclado e layout para celular. Os campos originais continuam fornecendo os valores ao jogo. Retratos personalizados são obtidos do armazenamento da conta.
+
+A faixa enviada **NATIVA — Desperte sua Essência** fica em `assets/audio/nativa-desperte-sua-essencia.mp3` e toca na página inicial e no Refúgio. A reprodução usa volume moderado e respeita o bloqueio de autoplay do navegador: o controle **Ouvir música** permite iniciar com um gesto. O usuário pode silenciar pelo controle ou nas Configurações. Sem faixas de arena, as batalhas permanecem silenciosas.
+
+`ARENA_TRACKS` em `js/music.js` recebe as próximas músicas de batalha. As Configurações já oferecem **Trilha padrão de cada área**, **Aleatório entre as músicas da arena** e **Escolher uma música da arena**. Os modos e a preferência global são salvos em `player_preferences`; aplique `20261113000000_music_preferences.sql` antes do frontend. A seleção individual fica indisponível enquanto não há faixas de arena. A música do Refúgio não é reutilizada automaticamente nas batalhas.

@@ -1,0 +1,133 @@
+.visual-picker {
+  position: relative;
+  min-width: 0;
+  width: 100%;
+}
+.dashboard .visual-picker .picker-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 66px;
+  padding: 7px;
+  text-align: left;
+  background: linear-gradient(125deg, #254d3b, #132f25);
+  border: 1px solid #91b58066;
+  color: #f1eacb;
+  border-radius: 12px;
+}
+.picker-trigger > span:not(.picker-arrow) {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  line-height: 1.35;
+  white-space: normal;
+}
+.picker-arrow {
+  padding: 6px;
+}
+.visual-picker img {
+  width: 66px;
+  height: 50px;
+  flex: none;
+  object-fit: cover;
+  border-radius: 7px;
+  background: #13261c;
+}
+.picker-options {
+  position: fixed;
+  z-index: 2000;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 7px;
+  background: #102a20;
+  border: 1px solid #a4c088;
+  border-radius: 13px;
+  box-shadow: 0 15px 45px #0009;
+}
+.picker-options[hidden] {
+  display: none !important;
+}
+.dashboard .picker-option {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  min-height: 64px;
+  padding: 6px;
+  background: transparent !important;
+  color: #f0edd7 !important;
+  text-align: left;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  font-size: 12px;
+}
+.picker-option[aria-selected="true"] {
+  border-color: #e1d091 !important;
+  background: #35513d !important;
+}
+.picker-option:hover,
+.picker-option:focus-visible {
+  outline: 2px solid #b9db92;
+  outline-offset: -2px;
+  background: #294f39 !important;
+}
+.picker-placeholder {
+  display: grid;
+  place-items: center;
+  width: 66px;
+  height: 50px;
+  flex: none;
+  border-radius: 7px;
+  background: linear-gradient(135deg, #496d49, #203e34);
+  font-size: 24px;
+  color: #e3d7a5;
+}
+.music-toggle {
+  position: fixed;
+  right: 14px;
+  bottom: 14px;
+  z-index: 70;
+  min-height: 40px;
+  padding: 8px 12px;
+  border-radius: 99px;
+  border: 1px solid #c5d89a55;
+  background: #10291fe8 !important;
+  color: #e9e4c7 !important;
+  font-size: 11px;
+  box-shadow: 0 4px 16px #0005;
+}
+.music-settings label {
+  display: grid;
+  gap: 6px;
+  max-width: 460px;
+  margin: 14px 0;
+}
+.music-settings .checkbox-row {
+  display: flex;
+}
+.music-settings p {
+  font-size: 12px;
+}
+.music-settings input[type="range"] {
+  width: 100%;
+}
+body.arena-fullscreen-open .music-toggle {
+  display: none;
+}
+@media (max-width: 760px) {
+  .dashboard .music-toggle {
+    bottom: 82px;
+  }
+  .visual-picker img,
+  .picker-placeholder {
+    width: 58px;
+    height: 48px;
+  }
+  .picker-trigger > span:not(.picker-arrow) {
+    font-size: 11px;
+  }
+  .picker-options {
+    max-width: calc(100vw - 24px);
+  }
+}
