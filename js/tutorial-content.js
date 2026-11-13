@@ -80,7 +80,7 @@ export const TUTORIALS = {
     step(
       "#native-sound-query",
       "Uma voz para seu companheiro",
-      "Este passo é opcional. Descreva uma vocalização, peça recomendações e ouça os efeitos antes de escolher. São gravações e efeitos sonoros."
+      "Este passo é opcional. Busque uma vocalização ou envie um áudio e ouça o trecho. Ao salvar a Nativa, guardamos no servidor um grito de entrada de 1,8 segundo e uma vocalização de golpe de 1,5 segundo. Sem personalização, a arena usa sons básicos. Depois, altere pela aba Sons da ficha."
     ),
     step(
       "#generate-art-on-create",

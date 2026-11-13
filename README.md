@@ -78,7 +78,15 @@ O lobby conecta automaticamente ao abrir PvP. Isso atualiza presença e convites
 
 Os seletores de Nativas (CPU e online), biomas e horários têm miniaturas, suporte a teclado e layout para celular. Os campos originais continuam fornecendo os valores ao jogo. Retratos personalizados são obtidos do armazenamento da conta.
 
-A faixa enviada **NATIVA — Desperte sua Essência** fica em `assets/audio/nativa-desperte-sua-essencia.mp3` e toca na página inicial e no Refúgio. A reprodução usa volume moderado e respeita o bloqueio de autoplay do navegador: o controle **Ouvir música** permite iniciar com um gesto. O usuário pode silenciar pelo controle ou nas Configurações. Sem faixas de arena, as batalhas permanecem silenciosas.
+A faixa enviada **NATIVA — Desperte sua Essência** fica em `assets/audio/nativa-desperte-sua-essencia.mp3` e toca na página inicial e no Refúgio. A reprodução usa volume moderado e respeita o bloqueio de autoplay do navegador: o controle **Ouvir música** permite iniciar com um gesto. O usuário pode silenciar pelo controle ou nas Configurações. A arena já possui gritos de entrada e sons de golpes; a trilha musical de batalha depende das faixas cadastradas.
+
+### Vocalizações e efeitos curtos
+
+Na criação ou em **Bestiário → Sons → Configurar sons**, escolha uma gravação Epidemic Sound ou envie seu áudio (até 6 MB e 2 minutos). A prévia é cortada para 1,8 s. Ao confirmar, a integração usa o endpoint oficial de download, converte e salva dois WAVs no bucket privado `nativa-sounds`: grito de entrada de 1,8 s e vocalização de golpe de 1,5 s, com volume ajustado e fades. A ficha guarda os caminhos permanentes, sem links temporários do catálogo. Efeitos antigos que tinham apenas um ID podem ser concluídos nessa mesma aba.
+
+CPU, PvP e campanha reproduzem as duas entradas em sequência e a vocalização da Nativa que está usando o golpe. Nenhum trecho ultrapassa 2 s e o som é interrompido ao sair da arena, ocultar a página ou silenciar os efeitos. Sem áudio personalizado, o site fornece efeitos básicos originais por grupo biológico e afinidade em `assets/audio/sfx/`, reproduzíveis com `node scripts/generate-sounds.mjs`. Esses efeitos não usam o catálogo. **Configurações → Efeitos da arena → Reproduzir gritos e sons dos golpes** controla apenas esses sons, independentemente da música e das animações.
+
+A função `epidemic-sound` exige uma sessão válida e a chave `EPIDEMIC_SOUND_API_KEY` no servidor; distingue falhas de credencial, quota e conexão. Downloads só ocorrem ao confirmar uma personalização; prévias não são salvas como arquivos definitivos. A migration `20261113010000_native_sounds.sql` cria o armazenamento e a preferência por conta. Leitura dos sons segue autoria, compartilhamento de ficha, participação na sala ou no duelo; uploads e exclusões pertencem ao dono.
 
 `ARENA_TRACKS` em `js/music.js` recebe as próximas músicas de batalha. As Configurações já oferecem **Trilha padrão de cada área**, **Aleatório entre as músicas da arena** e **Escolher uma música da arena**. Os modos e a preferência global são salvos em `player_preferences`; aplique `20261113000000_music_preferences.sql` antes do frontend. A seleção individual fica indisponível enquanto não há faixas de arena. A música do Refúgio não é reutilizada automaticamente nas batalhas.
 

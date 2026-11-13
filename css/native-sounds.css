@@ -1,0 +1,70 @@
+.sound-picker-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+}
+.sound-picker-grid label,
+.sound-picker-grid input,
+.sound-picker-grid select,
+.sound-picker-grid audio {
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+}
+.sound-picker-wide {
+  grid-column: 1/-1;
+}
+.sound-picker-grid p {
+  margin: 0;
+}
+.sound-picker-grid audio {
+  height: 42px;
+}
+.native-sounds-dialog {
+  width: min(620px, calc(100vw - 24px));
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--panel);
+  color: var(--text);
+  padding: 22px;
+}
+.native-sounds-dialog::backdrop {
+  background: #07140dd9;
+  backdrop-filter: blur(5px);
+}
+.native-sounds-dialog h3 {
+  margin-top: 0;
+}
+.native-sounds-dialog .form-actions {
+  margin-top: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.native-sound-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+#cards [data-profile-tab="sounds"].active {
+  color: #fff3d3;
+  text-shadow: 0 1px 2px #0008;
+}
+@media (max-width: 540px) {
+  .sound-picker-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .sound-picker-wide {
+    grid-column: auto;
+  }
+  .native-sounds-dialog {
+    padding: 16px;
+  }
+  .native-sounds-dialog .form-actions button {
+    flex: 1 1 140px;
+  }
+}

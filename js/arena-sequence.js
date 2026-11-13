@@ -60,6 +60,9 @@ export function createCombatPresenter({
   duration,
   render,
   techniques,
+  onAction = () => {},
+  onFastActions = () => {},
+  onCancel = () => {},
   wait = ms => new Promise(resolve => setTimeout(resolve, ms))
 }) {
   let queue = Promise.resolve(),
@@ -85,6 +88,7 @@ export function createCombatPresenter({
     document.querySelector(".arena-stage")?.classList.remove("cinematic-stage");
   }
   function cancel() {
+    onCancel();
     controller?.abort();
     cleanup();
   }
@@ -149,6 +153,7 @@ export function createCombatPresenter({
       await pause(total * 0.2);
       if (signal.aborted || identity(getBattle()) !== id) return;
       panel.dataset.phase = "roll";
+      onAction(action, getBattle().fighters);
       if (action.roll !== null && action.roll !== undefined) {
         info.textContent = "";
         const dice = document.createElement("div");
@@ -233,9 +238,10 @@ export function createCombatPresenter({
   }
   function enqueue(actions, key, before) {
     const id = identity(getBattle());
-    if (!actions.length || seen.has(key) || !preferences().effects) return Promise.resolve();
+    if (!actions.length || seen.has(key)) return Promise.resolve();
     seen.add(key);
     if (seen.size > 600) seen.delete(seen.values().next().value);
+    if (!preferences().effects) { onFastActions(actions, getBattle().fighters); return Promise.resolve(); }
     if (!session || session.id !== id) {
       cancel();
       session = { id, vitals: (before || getBattle().fighters).map(f => ({ hp: f.hp, mp: f.mp })) };

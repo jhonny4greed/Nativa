@@ -1,6 +1,9 @@
 import { updateVisualPicker } from "./visual-picker.js";
 import { getArenaPreferences, animationDuration } from "./arena-preferences.js";
 import { createCombatPresenter, combatActions, historyActions } from "./arena-sequence.js";
+import { createArenaSounds } from "./arena-sounds.js";
+import { createSoundPicker } from "./sound-editor.js";
+import { nativeSounds } from "./native-sounds.js";
 import { defaultPortrait } from "./creature-art.js";
 import { requireAuthenticatedUser } from "./session-gate.js";
 import { authHref, safeDestination, isAdmin } from "./access.js";
@@ -38,7 +41,16 @@ let atributos = Object.fromEntries(DEFINICOES_ATRIBUTOS.map(([key])=>[key,1]));
 let tecnicasSelecionadas = new Set();
 let batalha = null;
 let onlineArena = null;
-const apresentador=createCombatPresenter({getBattle:()=>batalha,identity:identidadeEfeitos,preferences:getArenaPreferences,duration:animationDuration,render:renderizarArena,techniques:tecnicasCombatente});
+const arenaAudio=createArenaSounds({preferences:getArenaPreferences});
+const apresentador=createCombatPresenter({getBattle:()=>batalha,identity:identidadeEfeitos,preferences:getArenaPreferences,duration:animationDuration,render:renderizarArena,techniques:tecnicasCombatente,onAction:(action,fighters)=>{void arenaAudio.actions([action],fighters);},onFastActions:(actions,fighters)=>{if($("#battle.active")&&!document.hidden)void arenaAudio.actions(actions,fighters);},onCancel:()=>arenaAudio.stop()});
+document.addEventListener("pointerdown",()=>arenaAudio.unlock());
+document.addEventListener("keydown",()=>arenaAudio.unlock());
+document.addEventListener("nativa:combat-start",()=>{if(batalha&&!batalha.encerrada)void arenaAudio.start(batalha.fighters);});
+document.addEventListener("nativa:combat-close",()=>arenaAudio.stop());
+document.addEventListener("nativa:view",event=>{if(event.detail.id!=="battle")arenaAudio.stop();});
+document.addEventListener("nativa:arena-preferences",()=>{if(!getArenaPreferences().sounds)arenaAudio.stop();});
+document.addEventListener("visibilitychange",()=>{if(document.hidden)arenaAudio.stop();});
+window.addEventListener("pagehide",()=>arenaAudio.stop());
 const urlsFotosArena = criarRegistroUrlsFotosArena({
   criarUrl: blob => URL.createObjectURL(blob),
   revogarUrl: url => URL.revokeObjectURL(url)
@@ -418,8 +430,6 @@ function configurarFormularios(){
   $("#lineage").addEventListener("change",()=>{renderizarPerfilLinhagem();renderizarSeletorTecnicas();});
   ["#bioma","#affinity","#archetype"].forEach(s=>$(s).addEventListener("change",renderizarSeletorTecnicas));
 }
-$("#native-sound-search")?.addEventListener("click",async()=>{const status=$("#native-sound-status"),term=$("#native-sound-query").value.trim();if(term.length<3){status.textContent="Descreva a vocalização, timbre ou ambiente.";return;}status.textContent="Buscando efeitos recomendados…";try{const client=await obterClienteSupabase();const {data,error}=await client.functions.invoke("epidemic-sound",{body:{action:"search",term}});if(error)throw error;const items=data.soundEffects||data.results||data.items||[];const select=$("#native-sound-choice");select.replaceChildren(new Option("Sem efeito",""));for(const item of items){const id=item.id||item.soundEffectId;if(id)select.add(new Option(`${item.title||"Efeito sonoro"} · ${Math.round(item.length||0)}s`,id));}status.textContent=items.length?`${items.length} sugestões. Os títulos mantêm a descrição completa do catálogo.`:"Nenhum efeito encontrado.";}catch(error){status.textContent="Busca indisponível: "+(error.message||"verifique a configuração do servidor");}});
-$("#native-sound-choice")?.addEventListener("change",async event=>{const player=$("#native-sound-preview"),id=event.target.value;if(!id){player.hidden=true;player.removeAttribute("src");return;}try{const client=await obterClienteSupabase();const {data,error}=await client.functions.invoke("epidemic-sound",{body:{action:"preview",id}});if(error)throw error;player.src=data.url;player.hidden=false;$("#native-sound-status").textContent="Prévia temporária — o link expira e não será armazenado.";}catch(error){$("#native-sound-status").textContent="Não foi possível carregar a prévia: "+error.message;}});
 function renderizarPerfilLinhagem(){
   const item=LINHAGENS.find(x=>x.nome===$("#lineage").value);const box=$("#lineage-profile");
   if(!item){box.className="lineage-profile empty";box.innerHTML='<span class="eyebrow">GUIA BIOLÓGICO</span><p>Selecione uma linhagem para consultar exemplos, biologia e especialidades.</p>';return;}
@@ -444,6 +454,43 @@ $("#technique-groups").addEventListener("click",e=>{const id=e.target.dataset.ad
 $("#selected-techniques").addEventListener("click",e=>{const id=e.target.dataset.removeTechnique;if(!id)return;tecnicasSelecionadas.delete(id);renderizarSeletorTecnicas();});
 
 const { guardarFoto, obterFoto, removerFoto } = repositorioLocal;
+
+const creationSoundPicker=createSoundPicker($("#native-sound-editor"));
+let soundEditingTarget=null;
+const soundDialog=document.createElement("dialog");
+soundDialog.className="native-sounds-dialog";
+soundDialog.innerHTML='<h3>Vocalização da Nativa</h3><div data-edit-sound-picker></div><div class="form-actions"><button type="button" data-save-native-sounds>Salvar sons no servidor</button><button type="button" class="secondary" data-close-native-sounds>Cancelar</button></div>';
+document.body.append(soundDialog);
+const editSoundPicker=createSoundPicker(soundDialog.querySelector("[data-edit-sound-picker]"),"edit-native-sound");
+let savingSound=false;
+soundDialog.querySelector("[data-close-native-sounds]").addEventListener("click",()=>soundDialog.close());
+soundDialog.addEventListener("cancel",event=>{if(savingSound)event.preventDefault();});
+soundDialog.addEventListener("close",()=>{editSoundPicker.stop();soundEditingTarget=null;});
+soundDialog.querySelector("[data-save-native-sounds]").addEventListener("click",async()=>{
+  const target=soundEditingTarget;if(!target||savingSound||!await podeEditarFicha(target))return;
+  const previous=structuredClone(target),selection=editSoundPicker.getSelection();let effect;
+  savingSound=true;soundDialog.querySelectorAll("button,input,select").forEach(el=>el.disabled=true);editSoundPicker.status("Salvando os trechos no servidor…");
+  try{
+    effect=selection?await nativeSounds.save(target,selection):null;
+    if(effect)target.soundEffect=effect;else delete target.soundEffect;
+    const result=await salvarEdicaoNativa(target,previous);
+    if(!result.persisted)throw new Error("Não foi possível salvar a ficha. Os sons anteriores foram preservados.");
+    soundDialog.close();await renderizarLista();$("#bestiary-status").textContent=effect?"Grito e vocalização de golpe salvos no servidor.":"A Nativa usará os sons básicos da arena.";
+  }catch(error){restaurarFicha(target,previous);if(effect&&!selection?.existing)await nativeSounds.remove(effect).catch(()=>{});editSoundPicker.status(error.message);}
+  finally{savingSound=false;soundDialog.querySelectorAll("button,input,select").forEach(el=>el.disabled=false);}
+});
+function personalizarSonsNativas(){
+  document.querySelectorAll("#cards [data-card-index]").forEach(card=>{
+    const n=nativaNoIndice(card.dataset.cardIndex);if(!n)return;
+    const tab=document.createElement("button");tab.type="button";tab.dataset.profileTab="sounds";tab.textContent="Sons";card.querySelector(".profile-tabs").append(tab);
+    const pane=document.createElement("section");pane.dataset.profilePane="sounds";pane.hidden=true;
+    const text=document.createElement("p");text.textContent=n.soundEffect?.cryPath?"Vocalização salva no servidor · entrada 1,8 s · golpes 1,5 s.":n.soundEffect?.id?"O efeito antigo precisa ser salvo como áudio. Use Configurar sons para concluir.":"Sons básicos por grupo biológico e afinidade · entrada 1,8 s · golpes 1,5 s.";
+    const actions=document.createElement("div");actions.className="native-sound-actions";
+    for(const [label,kind] of [["Ouvir grito","cry"],["Ouvir golpe","attack"]]){const button=document.createElement("button");button.type="button";button.className="small secondary";button.dataset.playSound=kind;button.textContent=label;actions.append(button);}
+    const edit=document.createElement("button");edit.type="button";edit.className="small secondary";edit.dataset.editSounds="true";edit.textContent="Configurar sons";edit.disabled=card.classList.contains("card-readonly");actions.append(edit);
+    pane.append(text,actions);card.querySelector(".card-body").append(pane);
+  });
+}
 
 $("#form").addEventListener("submit", async e => {
   e.preventDefault();
@@ -475,12 +522,13 @@ $("#form").addEventListener("submit", async e => {
   n.progressResetVersion=1;
   n.atributosIniciais = structuredClone(atributos);
   n.golpesIniciais = [...tecnicasSelecionadas];
-  const soundId=$("#native-sound-choice")?.value;const soundTitle=$("#native-sound-choice")?.selectedOptions[0]?.textContent;
-  if(soundId)n.soundEffect={provider:"epidemic-sound",id:soundId,title:soundTitle||"Efeito selecionado"};
+  try{const selection=creationSoundPicker.getSelection();if(selection)n.soundEffect=await nativeSounds.save(n,selection);}
+  catch(error){$("#msg").textContent=`Não foi possível salvar os sons: ${error.message}`;submit.disabled=false;return;}
   nativas.push(n);
   const persisted = await salvarDados();
   if (!persisted.persisted) {
     nativas = nativas.filter(item => item !== n);
+    if(n.soundEffect)await nativeSounds.remove(n.soundEffect).catch(()=>{});
     submit.disabled = false;
     return;
   }
@@ -493,6 +541,7 @@ $("#form").addEventListener("submit", async e => {
     origemPreparada = false;
   }
   form.reset();
+  creationSoundPicker.reset();
   atributos = Object.fromEntries(DEFINICOES_ATRIBUTOS.map(([k]) => [k, 1]));
   tecnicasSelecionadas.clear();
   $("#lineage").disabled = true;
@@ -831,7 +880,7 @@ async function renderizarLista(){
     <div class="progress-panel"><h4>Progressão</h4><div class="progress-grid"><div><strong>${resumo.xpAtual}/${resumo.xpNecessario}</strong><span>${resumo.nivel>=17?"Nível máximo temporário · 17":"XP para próximo nível"} · ${resumo.xpAcumulado} acumulado</span></div><div><strong>${resumo.xpaDisponivel}</strong><span>XPA disponível</span></div><div><strong>${(n.essencias||[]).length}/3</strong><span>Essências absorvidas</span></div><div><strong>${(n.essenciasDisponiveis||[]).length}</strong><span>Essências guardadas</span></div></div>${essenciasGuardadas.length?`<p class="pending-essences">Guardadas de: ${essenciasGuardadas.map(escapar).join(" · ")}</p>`:""}<div class="progress-controls"><button type="button" class="small secondary" data-essence-index="${index}" ${disabled}>Essência</button></div><details class="technique-group"><summary>Atributos · gastar XPA</summary><div class="stat-chips">${DEFINICOES_ATRIBUTOS.map(([key,label])=>`<span>${key} ${label}: ${n.attrs[key]||1} <button type="button" data-profile-attribute="${key}" data-index="${index}" ${disabled||resumo.xpaDisponivel<((n.attrs[key]||1)+1)?"disabled":""}>＋</button></span>`).join("")}</div></details></div>
     <div class="card-actions">${associationAction}<label class="small secondary ${somenteLeitura?"disabled-label":""}" style="display:inline-flex;align-items:center;gap:7px;padding:8px 10px;border-radius:8px;cursor:pointer">${n.photoId?"Trocar foto":"Adicionar foto"}<input type="file" accept="image/*" data-photo-index="${index}" ${disabled} hidden></label>${n.photoId?`<button type="button" class="small secondary" data-remove-photo-index="${index}" ${disabled}>Remover foto</button>`:""}<button type="button" class="small danger" data-delete-index="${index}" data-delete-retry="${estado?.associationState==="deleted"?"true":"false"}" ${deleteDisabled}>Excluir</button></div></div></article>`;
   }));
-  if (versao === versaoRenderLista){$("#cards").innerHTML=html.join("");personalizarCardsBestiario(abas);personalizarPainelBiologicoGlobal();}
+  if (versao === versaoRenderLista){$("#cards").innerHTML=html.join("");personalizarSonsNativas();personalizarCardsBestiario(abas);personalizarPainelBiologicoGlobal();}
 }
 function personalizarPainelBiologicoGlobal(){
   const admin=isAdmin(document.documentElement.dataset.applicationRole);
@@ -847,6 +896,8 @@ function nativaNoIndice(valor){const indice=Number(valor);return Number.isIntege
 $("#cards").addEventListener("click",async e=>{
   const aba=e.target.closest("[data-profile-tab]");
   if(aba){const card=aba.closest(".card");card.querySelectorAll("[data-profile-tab]").forEach(button=>button.classList.toggle("active",button===aba));card.querySelectorAll("[data-profile-pane]").forEach(pane=>pane.hidden=pane.dataset.profilePane!==aba.dataset.profileTab);return;}
+  const soundButton=e.target.closest("[data-edit-sounds],[data-play-sound]");
+  if(soundButton){const n=nativaNoIndice(soundButton.closest("[data-card-index]")?.dataset.cardIndex);if(!n)return;if(soundButton.dataset.playSound){await arenaAudio.preview(n,soundButton.dataset.playSound);return;}if(!await podeEditarFicha(n))return;soundEditingTarget=n;editSoundPicker.reset(n.soundEffect);soundDialog.querySelector("h3").textContent=`Sons de ${n.name}`;soundDialog.showModal();return;}
   const associateIndex=e.target.dataset.associateIndex;
   if(associateIndex!==undefined){
     const statusEl=$("#bestiary-status");
@@ -1700,6 +1751,7 @@ function atualizarArenaDaSala(detail){
     tecnicaDetalhesAberta:sameTurn?same?.tecnicaDetalhesAberta:null,
     encerrada:encounter.status!=="active",processando:false,aguardandoProximoTurno:false};
   renderizarArena();
+  if(!same&&!batalha.encerrada)document.dispatchEvent(new CustomEvent("nativa:combat-start"));
   void apresentador.enqueue(historyActions(newEvents,fighters,tecnicasCombatente),`room:${encounter.id}:${history.length}`,same?.fighters);
 }
 
