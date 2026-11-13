@@ -85,7 +85,7 @@ export const TUTORIALS = {
     step(
       "#generate-art-on-create",
       "Uma ilustração para sua Nativa",
-      "Se quiser, marque a geração de arte após salvar. A operação pode consumir créditos e está sujeita ao limite diário da conta."
+      "Se quiser, marque a geração de arte após salvar. A geração requer sua conta Puter conectada no Ateliê e pode consumir o saldo Puter."
     ),
     step(
       '#create button[type="submit"]',
@@ -207,6 +207,7 @@ export const TUTORIALS = {
     )
   ],
   "art-studio": [
+    step("#art-connect-puter", "Conecte sua conta Puter", "Entre no Puter por este botão antes de gerar. O uso de IA é associado à sua conta Puter. A imagem só entra no acervo NATIVA quando você a salva."),
     step(
       "#art-kind",
       "Dê forma às suas ideias",
@@ -220,7 +221,7 @@ export const TUTORIALS = {
     step(
       "#art-generate",
       "Geração com créditos",
-      "Gerar uma imagem pode consumir créditos e está sujeito ao limite diário. Aguarde o resultado antes de fazer outro pedido."
+      "Conecte sua conta Puter. Gerar uma imagem pode consumir o saldo dessa conta. Aguarde o resultado antes de fazer outro pedido."
     ),
     step(
       "#art-preview",

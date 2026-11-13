@@ -19,7 +19,7 @@ import { repositorioLocal } from "./repository.js";
 import { obterClienteSupabase } from "./auth.js";
 import { inicializarSalas } from "./rooms.js";
 import { servicoSincronizacao } from "./sync-service.js";
-import { estudioImagens } from "./art-studio.js";
+import { estudioImagens, carregarPuter, conectarPuter, erroPuter } from "./art-studio.js";
 import { aplicarArteComoRetrato, galeriaImagens } from "./art-gallery.js";
 import { criarRegistroUrlsFotosArena } from "./battle-photo-urls.js";
 import { enviarRetratoNativa, obterRetratoNativa, removerRetratoNativa } from "./native-portraits.js";
@@ -483,7 +483,8 @@ $("#form").addEventListener("submit", async e => {
     submit.disabled = false;
     return;
   }
-  if($("#generate-art-on-create")?.checked){try{const art=await estudioImagens.gerar({kind:"nativa",title:n.name,prompt:`Full-body creature concept for a Brazilian fantasy RPG. Species inspiration: ${n.species}. Biological group: ${n.groupBio}. Lineage: ${n.lineageName||n.lineage}. Habitat: ${n.bioma}. Elemental affinity: ${n.affinity}. Combat archetype: ${n.archetype}. ${n.inspiracao||n.inspiration||n.descricao||""}`.slice(0,1400)});const savedArt=await galeriaImagens.salvar(art);const applied=await aplicarArteComoRetrato({artId:savedArt.id,target:n,persist:(nativa,previous)=>salvarEdicaoNativa(nativa,previous)});if(!applied.persisted)throw new Error("A arte foi salva no acervo, mas o retrato não foi vinculado.");}catch(error){console.warn("A ficha foi criada, mas a ilustração automática falhou.",error);}}
+  let creationArtError=null;
+  if($("#generate-art-on-create")?.checked){try{const art=await estudioImagens.gerar({kind:"nativa",title:n.name,prompt:`Full-body creature concept for a Brazilian fantasy RPG. Species inspiration: ${n.species}. Biological group: ${n.groupBio}. Lineage: ${n.lineageName||n.lineage}. Habitat: ${n.bioma}. Elemental affinity: ${n.affinity}. Combat archetype: ${n.archetype}. ${n.inspiracao||n.inspiration||n.descricao||""}`.slice(0,1400)});const savedArt=await galeriaImagens.salvar(art);const applied=await aplicarArteComoRetrato({artId:savedArt.id,target:n,persist:(nativa,previous)=>salvarEdicaoNativa(nativa,previous)});if(!applied.persisted)throw new Error("A arte foi salva no acervo, mas o retrato não foi vinculado.");}catch(error){creationArtError=error.message;}}
   let origemPreparada = true;
   try {
     await repositorioLocal.registrarOrigemNativa(n.id, "player");
@@ -503,6 +504,7 @@ $("#form").addEventListener("submit", async e => {
     ? "Nativa salva no bestiário deste navegador."
     : "Nativa salva localmente. Não foi possível preparar seus metadados locais.";
   mostrarTela("list");
+  if(creationArtError)$("#bestiary-status").textContent=`Sua Nativa foi criada. A ilustração não foi gerada: ${creationArtError}`;
   submit.disabled = false;
 });
 
@@ -629,22 +631,34 @@ async function renderizarAcervoArte(){
   }catch(error){gallery.innerHTML=`<p role="status">Não foi possível abrir o acervo da conta: ${escapar(error.message)}</p>`;}
 }
 
+const puterConnect=$("#art-connect-puter");
+async function prepararConexaoPuter(){
+  if(!puterConnect)return;
+  try{const sdk=await carregarPuter();const connected=await sdk.auth.isSignedIn();puterConnect.disabled=false;puterConnect.textContent=connected?"Conta Puter conectada":"Conectar conta Puter";$("#puter-connection-status").textContent=connected?"Pronto para gerar imagens com sua conta Puter.":"Conecte uma conta Puter para liberar a geração.";}
+  catch(error){puterConnect.disabled=false;puterConnect.textContent="Tentar carregar Puter";$("#puter-connection-status").textContent=error.message;}
+}
+puterConnect?.addEventListener("click",()=>{
+  if(!globalThis.puter?.auth?.signIn){void prepararConexaoPuter();return;}
+  puterConnect.disabled=true;
+  try{Promise.resolve(conectarPuter()).then(()=>prepararConexaoPuter()).catch(error=>{$("#puter-connection-status").textContent=erroPuter(error);puterConnect.disabled=false;});}catch(error){$("#puter-connection-status").textContent=erroPuter(error);puterConnect.disabled=false;}
+});
+document.addEventListener("nativa:view",event=>{if(["art-studio","create"].includes(event.detail.id))void prepararConexaoPuter();});
+void prepararConexaoPuter();
+
 $("#art-generation-form")?.addEventListener("submit",async event=>{
   event.preventDefault();
   const status=$("#art-status");
   const button=$("#art-generate");
   if(arteGeradaPendente&&!confirm("Descartar a prévia atual que ainda não foi salva e iniciar outra geração?"))return;
   button.disabled=true;
-  status.textContent="Enviando pedido ao gerador autorizado… A operação pode consumir créditos.";
+  status.textContent="Gerando com o Puter… A operação pode consumir o saldo da sua conta Puter.";
   try{
     const result=await estudioImagens.gerar({
       kind:$("#art-kind").value,
       title:$("#art-title").value,
       prompt:$("#art-prompt").value,
       onProgress:progress=>{
-        status.textContent=progress.phase==="processing"
-          ?`Gerando imagem… verificação ${progress.attempt}/${progress.maxPolls}${progress.progress?` · ${progress.progress}%`:""}`
-          :"Criando tarefa de imagem…";
+        status.textContent=progress.phase==="downloading"?"Imagem pronta no Puter. Baixando para a prévia…":"Gerando com o Puter… Aguarde sem iniciar outra geração.";
       }
     });
     if(urlPreviaArte)URL.revokeObjectURL(urlPreviaArte);

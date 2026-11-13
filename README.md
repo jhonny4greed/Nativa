@@ -81,3 +81,7 @@ Os seletores de Nativas (CPU e online), biomas e horários têm miniaturas, supo
 A faixa enviada **NATIVA — Desperte sua Essência** fica em `assets/audio/nativa-desperte-sua-essencia.mp3` e toca na página inicial e no Refúgio. A reprodução usa volume moderado e respeita o bloqueio de autoplay do navegador: o controle **Ouvir música** permite iniciar com um gesto. O usuário pode silenciar pelo controle ou nas Configurações. Sem faixas de arena, as batalhas permanecem silenciosas.
 
 `ARENA_TRACKS` em `js/music.js` recebe as próximas músicas de batalha. As Configurações já oferecem **Trilha padrão de cada área**, **Aleatório entre as músicas da arena** e **Escolher uma música da arena**. Os modos e a preferência global são salvos em `player_preferences`; aplique `20261113000000_music_preferences.sql` antes do frontend. A seleção individual fica indisponível enquanto não há faixas de arena. A música do Refúgio não é reutilizada automaticamente nas batalhas.
+
+## Provedor de imagens: Puter
+
+A geração passou a usar o SDK `https://js.puter.com/v2/` e `puter.ai.txt2img(prompt)` após um teste real bem-sucedido. No Ateliê, use **Conectar conta Puter** antes de gerar. O saldo e os limites são da conta Puter; as imagens salvas permanecem no Supabase da conta NATIVA. A função NVIDIA foi preservada como legado e não é chamada pelo frontend. Veja `docs/GERACAO_IMAGENS.md` para o registro de validação e os detalhes do fluxo.

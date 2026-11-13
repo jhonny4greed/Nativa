@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="./css/style.css">
   <style>html:not([data-authenticated="true"]) body.dashboard{visibility:hidden!important}</style>
   <script src="/env.js"></script>
+  <script id="nativa-puter-sdk" src="https://js.puter.com/v2/" async></script>
   <script type="module" src="./js/main.js"></script>
 </head>
 <body class="dashboard">
@@ -146,7 +147,7 @@
           <div id="technique-groups"></div><div class="selected-area"><div class="section-heading compact"><h3>Minha ficha de golpes</h3><span id="technique-count">0 de 4 golpes · um por grupo</span></div><div id="selected-techniques"></div></div>
         </section>
         <section class="form-panel"><div class="panel-heading"><span class="step-number">04</span><div><h3>Vocalização e sons</h3><p>Busque gravações naturais e efeitos que combinem com a criatura. O catálogo fornece efeitos de áudio, não síntese de voz.</p></div></div><div class="grid"><label>Descreva o som<input id="native-sound-query" maxlength="240" placeholder="Ex.: vocalização rouca de lobo ao entardecer"></label><button id="native-sound-search" class="secondary" type="button">Recomendar efeitos</button><label>Efeito escolhido<select id="native-sound-choice"><option value="">Sem efeito</option></select></label><audio id="native-sound-preview" controls preload="none" hidden></audio></div><div id="native-sound-status" role="status"></div></section>
-        <label class="checkbox-row"><input id="generate-art-on-create" type="checkbox"> Gerar também uma ilustração desta Nativa após salvar (usa créditos de imagem)</label>
+        <label class="checkbox-row"><input id="generate-art-on-create" type="checkbox"> Gerar uma ilustração após salvar (requer conta Puter conectada e usa o saldo Puter)</label>
         <div class="form-actions"><button type="submit">Salvar Nativa no bestiário</button><p id="msg" role="status"></p></div>
       </form>
     </section>
@@ -167,13 +168,14 @@
     <section id="art-studio" class="view">
       <div class="section-heading"><div><span class="eyebrow">CRIAÇÃO VISUAL</span><h2>Ateliê de imagens</h2><p>Crie arte para Nativas, biomas, técnicas e novas ideias.</p></div></div>
       <div class="form-panel">
-        <p class="art-cost-note">Geração disponível para qualquer conta autenticada. Cada conta tem limite diário para proteger os créditos; as imagens salvas e os retratos ficam no servidor da sua conta.</p>
+        <p class="art-cost-note">As imagens são geradas pelo Puter. Conecte sua conta Puter: o consumo usa o saldo e os limites dessa conta. Ao salvar, a imagem fica no servidor da sua conta NATIVA.</p>
+        <div class="form-actions"><button id="art-connect-puter" type="button" class="secondary" disabled>Carregando Puter…</button><p id="puter-connection-status" role="status"></p></div>
         <label>Vincular a uma Nativa após salvar (opcional)<select id="art-studio-target"><option value="">Salvar apenas no acervo</option></select></label>
         <form id="art-generation-form" class="art-form">
           <label>Categoria<select id="art-kind" required><option value="nativa">Nativa</option><option value="biome">Bioma</option><option value="technique">Técnica ou golpe</option><option value="other">Outra ideia futura</option></select></label>
           <label>Nome do tema<input id="art-title" maxlength="80" required placeholder="Ex.: Guardião das veredas"></label>
           <label>Descrição visual<textarea id="art-prompt" maxlength="1400" rows="5" required placeholder="Descreva forma, ambiente, cores, movimento e estilo visual."></textarea></label>
-          <div class="form-actions"><button id="art-generate" type="submit">Gerar imagem</button><p id="art-status" role="status" aria-live="polite">Entre em sua conta para começar.</p></div>
+          <div class="form-actions"><button id="art-generate" type="submit">Gerar imagem</button><p id="art-status" role="status" aria-live="polite">Preencha o tema e a descrição. A geração usa sua conta Puter conectada.</p></div>
         </form>
         <div id="art-preview" class="art-preview" hidden><img id="art-preview-image" alt="Prévia da imagem gerada"><div class="form-actions"><button id="art-save" type="button">Salvar no acervo</button></div></div>
       </div>

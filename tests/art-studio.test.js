@@ -300,70 +300,144 @@ test("cliente não inicia geração sem clique explícito e limita tentativas", 
   assert.doesNotMatch(viewFn, /estudioImagens\.gerar|action:\s*["']start/);
   assert.match(source, /#art-generation-form[\s\S]{0,300}addEventListener\("submit"/);
   assert.match(source, /estudioImagens\.gerar\(/);
-  let invokes = 0;
+  let calls = 0;
   const studio = criarEstudioImagens({
-    clientProvider: mockClient({
-      invoke: async () => {
-        invokes++;
-        return { data: {}, error: null };
+    clientProvider: mockClient(),
+    sdkProvider: async () => ({
+      auth: { isSignedIn: () => true },
+      ai: {
+        txt2img: async () => {
+          calls++;
+          throw { code: "insufficient_funds" };
+        }
       }
-    }),
-    maxPolls: 2,
-    wait: async () => {}
+    })
   });
-  await assert.rejects(studio.gerar({ kind: "nativa", title: "x", prompt: "y" }), /task|tarefa/i);
-  assert.equal(invokes, 1);
+  await assert.rejects(studio.gerar({ kind: "nativa", title: "Teste", prompt: "Mata" }), /saldo/);
+  assert.equal(calls, 1);
 });
 
-test("fluxo completo do estúdio interpreta resposta octet-stream do supabase-js como Blob raster", async () => {
-  const actions = [];
-  const invoke = async (_name, options) => {
-    actions.push(options.body.action);
-    if (options.body.action === "start") return { data: { taskToken: "opaque-signed-token" }, error: null };
-    if (options.body.action === "status") return { data: { status: "succeeded" }, error: null };
-    assert.equal(options.responseType, undefined);
-    return {
-      data: new Blob([PNG_BYTES], { type: "application/octet-stream" }),
-      response: new Response(null, { headers: { "x-image-content-type": "image/png" } }),
-      error: null
-    };
-  };
-  const studio = criarEstudioImagens({ clientProvider: mockClient({ invoke }), wait: async () => {}, maxPolls: 1 });
+function puterStudio({
+  signedIn = true,
+  generate = async () => ({ src: "https://images.puter.test/test.png" }),
+  download = async () => new Response(PNG()),
+  clientProvider = mockClient()
+} = {}) {
+  return criarEstudioImagens({
+    clientProvider,
+    sdkProvider: async () => ({ auth: { isSignedIn: () => signedIn }, ai: { txt2img: generate } }),
+    fetchImpl: download
+  });
+}
+test("Puter gera uma única imagem real e converte para o Blob usado no acervo", async () => {
+  let calls = 0,
+    args;
+  const studio = puterStudio({
+    generate: async (...received) => {
+      calls++;
+      args = received;
+      return { src: "https://images.puter.test/test.png" };
+    }
+  });
   const result = await studio.gerar({ kind: "nativa", title: "Guardião", prompt: "Escamas verdes" });
-  assert.deepEqual(actions, ["start", "status", "download"]);
+  assert.equal(calls, 1);
+  assert.equal(args.length, 1, "produção não usa testMode");
+  assert.match(args[0], /Guardião.*Escamas verdes/);
   assert.equal(result.blob.type, "image/png");
-  assert.equal(result.blob.size, PNG_BYTES.byteLength);
+  assert.equal(result.blob.size, PNG_BYTES.length);
+  assert.equal(result.provider, "puter");
+  assert.equal(result.title, "Guardião");
 });
-
-test("estúdio rejeita resposta binária sem cabeçalho raster validado", async () => {
-  const invoke = async (_name, options) => {
-    if (options.body.action === "start") return { data: { taskToken: "opaque-signed-token" }, error: null };
-    if (options.body.action === "status") return { data: { status: "succeeded" }, error: null };
-    return {
-      data: new Blob([new Uint8Array([1])], { type: "application/octet-stream" }),
-      response: new Response(null),
-      error: null
-    };
-  };
-  const studio = criarEstudioImagens({ clientProvider: mockClient({ invoke }), wait: async () => {}, maxPolls: 1 });
-  await assert.rejects(studio.gerar({ kind: "nativa", title: "x", prompt: "y" }), /imagem inválido/i);
-});
-
-test("estúdio interrompe ao trocar de conta antes de baixar e não tenta de novo automaticamente", async () => {
-  let downloads = 0;
-  const invoke = async (_name, options) => {
-    if (options.body.action === "start") return { data: { taskToken: "opaque-signed-token" }, error: null };
-    if (options.body.action === "status") return { data: { status: "succeeded" }, error: null };
-    downloads++;
-    return { data: PNG(), error: null };
-  };
-  const studio = criarEstudioImagens({
-    clientProvider: mockClient({ invoke, sessionIds: [USER_A, USER_A, USER_B] }),
-    wait: async () => {},
-    maxPolls: 1
+test("Puter pede conexão explícita e não inicia geração sem autenticação", async () => {
+  let calls = 0;
+  const studio = puterStudio({
+    signedIn: false,
+    generate: async () => {
+      calls++;
+    }
   });
-  await assert.rejects(studio.gerar({ kind: "nativa", title: "x", prompt: "y" }), /conta mudou/i);
+  await assert.rejects(studio.gerar({ kind: "nativa", title: "x", prompt: "y" }), /Conecte sua conta Puter/);
+  assert.equal(calls, 0);
+  const anonymous = puterStudio({
+    clientProvider: mockClient({ userId: null }),
+    generate: async () => {
+      calls++;
+    }
+  });
+  await assert.rejects(anonymous.gerar({ kind: "nativa", title: "x", prompt: "y" }), /conta NATIVA/);
+  assert.equal(calls, 0);
+});
+test("troca de conta durante geração Puter impede download e associação cruzada", async () => {
+  let downloads = 0;
+  const studio = puterStudio({
+    clientProvider: mockClient({ sessionIds: [USER_A, USER_A, USER_B] }),
+    download: async () => {
+      downloads++;
+      return new Response(PNG());
+    }
+  });
+  await assert.rejects(studio.gerar({ kind: "nativa", title: "x", prompt: "y" }), /conta mudou/);
   assert.equal(downloads, 0);
+});
+test("troca de conta durante download impede entregar a imagem à outra conta", async () => {
+  const studio = puterStudio({ clientProvider: mockClient({ sessionIds: [USER_A, USER_A, USER_A, USER_B] }) });
+  await assert.rejects(studio.gerar({ kind: "nativa", title: "x", prompt: "y" }), /conta mudou/);
+});
+test("download inválido ou inacessível não dispara nova geração Puter", async () => {
+  let calls = 0;
+  for (const download of [
+    async () => {
+      throw new TypeError("CORS");
+    },
+    async () => new Response("<html>not an image</html>", { headers: { "content-type": "image/png" } }),
+    async () => new Response(PNG(), { headers: { "content-length": "15000001" } })
+  ]) {
+    const studio = puterStudio({
+      generate: async () => {
+        calls++;
+        return { src: "https://images.puter.test/test.png" };
+      },
+      download
+    });
+    await assert.rejects(studio.gerar({ kind: "nativa", title: "x", prompt: "y" }), /imagem|arquivo/);
+  }
+  assert.equal(calls, 3);
+});
+test("duplo clique não inicia gerações Puter em paralelo", async () => {
+  let release,
+    calls = 0;
+  const studio = puterStudio({
+    generate: async () => {
+      calls++;
+      await new Promise(resolve => {
+        release = resolve;
+      });
+      return { src: "https://images.puter.test/test.png" };
+    }
+  });
+  const first = studio.gerar({ kind: "nativa", title: "x", prompt: "y" });
+  await assert.rejects(studio.gerar({ kind: "nativa", title: "x", prompt: "y" }), /andamento/);
+  await new Promise(resolve => setTimeout(resolve, 0));
+  release();
+  await first;
+  assert.equal(calls, 1);
+});
+test("cancelamento do login e falta de saldo retornam orientação sem reenviar", async () => {
+  for (const [error, expected] of [
+    [{ error: "popup_blocked" }, /navegador bloqueou/],
+    [{ code: "auth_window_closed" }, /cancelada/],
+    [{ code: "insufficient_funds" }, /saldo/]
+  ]) {
+    let calls = 0;
+    const studio = puterStudio({
+      generate: async () => {
+        calls++;
+        throw error;
+      }
+    });
+    await assert.rejects(studio.gerar({ kind: "nativa", title: "x", prompt: "y" }), expected);
+    assert.equal(calls, 1);
+  }
 });
 
 function serverGallery() {
@@ -590,30 +664,70 @@ test("synchronization queue receives only photoId references, never Blob", async
   assert.match(tests, /photoId[\s\S]{0,250}Blob|Blob[\s\S]{0,250}photoId/i);
 });
 
+test("falha 500 da NVIDIA é identificada sem confundir com armazenamento", async () => {
+  const server = createServer({ nvidiaStatus: 500 });
+  const response = await server.request({ action: "start", kind: "nativa", title: "Teste", prompt: "Mata" });
+  const result = await response.json();
+  assert.equal(response.status, 502);
+  assert.equal(result.providerStatus, 500);
+  assert.equal(result.code, "image_provider_unavailable");
+  assert.match(result.error, /NVIDIA.*indisponível/);
+  assert.equal(
+    server.calls.some(
+      call => call.init.method === "POST" && call.url.includes("/storage/v1/object/nativa-image-task-results/")
+    ),
+    false
+  );
+});
+test("NVIDIA 202 é consultado até concluir sem criar outra geração", async () => {
+  const id = "11111111-1111-4111-8111-111111111111";
+  const server = createServer({
+    fetchOverride: async ({ url }) => {
+      if (url.endsWith("/auth/v1/user")) return jsonResponse({ id: USER_A });
+      if (url === NVIDIA_URL) return new Response(null, { status: 202, headers: { "nvcf-reqid": id } });
+      if (url.endsWith("/v1/status/" + id)) return jsonResponse({ artifacts: [{ base64_image: PNG_BASE64 }] });
+      throw new Error("Unexpected URL");
+    }
+  });
+  const token = await createTask(server);
+  assert.ok(token);
+  assert.equal(server.calls.filter(call => call.url === NVIDIA_URL).length, 1);
+  assert.equal(server.calls.filter(call => call.url.endsWith("/v1/status/" + id)).length, 1);
+});
+test("modelo alternativo só é usado para falha 5xx e respeita os parâmetros do Schnell", async () => {
+  const server = createServer({
+    nvidiaStatus: 500,
+    fetchOverride: async ({ url }) => {
+      if (url.endsWith("/auth/v1/user")) return jsonResponse({ id: USER_A });
+      if (url === NVIDIA_URL) return jsonResponse({ error: "unavailable" }, 500);
+      return jsonResponse({ artifacts: [{ base64_image: PNG_BASE64 }] });
+    }
+  });
+  server.envValues.NVIDIA_IMAGE_FALLBACK_MODEL = "black-forest-labs/flux.1-schnell";
+  const response = await server.request({ action: "start", kind: "nativa", title: "Teste", prompt: "Mata" });
+  const result = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(result.fallbackUsed, true);
+  assert.equal(result.model, "black-forest-labs/flux.1-schnell");
+  const call = server.calls.find(call => call.url.endsWith("flux.1-schnell"));
+  const payload = JSON.parse(call.init.body);
+  assert.equal(payload.steps, 4);
+  assert.equal(payload.cfg_scale, 0);
+  const rejected = createServer({ nvidiaStatus: 401 });
+  rejected.envValues.NVIDIA_IMAGE_FALLBACK_MODEL = "black-forest-labs/flux.1-schnell";
+  await rejected.request({ action: "start", kind: "nativa", title: "Teste", prompt: "Mata" });
+  assert.equal(
+    rejected.calls.some(call => call.url.endsWith("flux.1-schnell")),
+    false
+  );
+});
 
-test("falha 500 da NVIDIA é identificada sem confundir com armazenamento",async()=>{
- const server=createServer({nvidiaStatus:500});
- const response=await server.request({action:"start",kind:"nativa",title:"Teste",prompt:"Mata"});const result=await response.json();
- assert.equal(response.status,502);assert.equal(result.providerStatus,500);assert.equal(result.code,"image_provider_unavailable");assert.match(result.error,/NVIDIA.*indisponível/);assert.equal(server.calls.some(call=>call.init.method==="POST"&&call.url.includes('/storage/v1/object/nativa-image-task-results/')),false);
-});
-test("NVIDIA 202 é consultado até concluir sem criar outra geração",async()=>{
- const id="11111111-1111-4111-8111-111111111111";
- const server=createServer({fetchOverride:async({url})=>{
-  if(url.endsWith('/auth/v1/user'))return jsonResponse({id:USER_A});
-  if(url===NVIDIA_URL)return new Response(null,{status:202,headers:{'nvcf-reqid':id}});
-  if(url.endsWith('/v1/status/'+id))return jsonResponse({artifacts:[{base64_image:PNG_BASE64}]});
-  throw new Error('Unexpected URL');
- }});
- const token=await createTask(server);assert.ok(token);assert.equal(server.calls.filter(call=>call.url===NVIDIA_URL).length,1);assert.equal(server.calls.filter(call=>call.url.endsWith('/v1/status/'+id)).length,1);
-});
-test("modelo alternativo só é usado para falha 5xx e respeita os parâmetros do Schnell",async()=>{
- const server=createServer({nvidiaStatus:500,fetchOverride:async({url})=>{
-  if(url.endsWith('/auth/v1/user'))return jsonResponse({id:USER_A});
-  if(url===NVIDIA_URL)return jsonResponse({error:'unavailable'},500);
-  return jsonResponse({artifacts:[{base64_image:PNG_BASE64}]});
- }});
- server.envValues.NVIDIA_IMAGE_FALLBACK_MODEL='black-forest-labs/flux.1-schnell';
- const response=await server.request({action:'start',kind:'nativa',title:'Teste',prompt:'Mata'});const result=await response.json();assert.equal(response.status,200);assert.equal(result.fallbackUsed,true);assert.equal(result.model,'black-forest-labs/flux.1-schnell');
- const call=server.calls.find(call=>call.url.endsWith('flux.1-schnell'));const payload=JSON.parse(call.init.body);assert.equal(payload.steps,4);assert.equal(payload.cfg_scale,0);
- const rejected=createServer({nvidiaStatus:401});rejected.envValues.NVIDIA_IMAGE_FALLBACK_MODEL='black-forest-labs/flux.1-schnell';await rejected.request({action:'start',kind:'nativa',title:'Teste',prompt:'Mata'});assert.equal(rejected.calls.some(call=>call.url.endsWith('flux.1-schnell')),false);
+
+test("resultado Puter é salvo no servidor e recuperado em outra instância do acervo",async()=>{
+ const server=serverGallery();const studio=puterStudio({clientProvider:server.clientProvider});
+ const generated=await studio.gerar({kind:'nativa',title:'Guardião Puter',prompt:'Nativa de escamas verdes na floresta'});
+ const gallery=criarGaleriaImagens(server);const saved=await gallery.salvar(generated);
+ assert.equal(server.rows.size,1);assert.equal(server.files.get(saved.storagePath).type,'image/png');
+ const anotherDevice=criarGaleriaImagens({...server,storage:{getItem:()=>null,setItem(){}}});
+ const items=await anotherDevice.listar();assert.equal(items[0].title,'Guardião Puter');assert.equal((await anotherDevice.obterArquivo(items[0])).size,PNG_BYTES.length);
 });
